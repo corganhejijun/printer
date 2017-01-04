@@ -1,3 +1,9 @@
 x64
 Debug
 obj
+*.suo
+*.sdf
+Release
+ipch
+Thumbs.db
+*.opensdf
