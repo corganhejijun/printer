@@ -35,8 +35,22 @@
             this.panelDisplay = new System.Windows.Forms.Panel();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.buttonSpeed = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.textBoxAccelerate = new System.Windows.Forms.TextBox();
+            this.textBoxSpeed = new System.Windows.Forms.TextBox();
+            this.radioButtonY = new System.Windows.Forms.RadioButton();
+            this.radioButtonX = new System.Windows.Forms.RadioButton();
+            this.buttonX = new System.Windows.Forms.Button();
+            this.buttonY = new System.Windows.Forms.Button();
+            this.buttonOptic = new System.Windows.Forms.Button();
+            this.checkBoxReverse = new System.Windows.Forms.CheckBox();
+            this.buttonManufact = new System.Windows.Forms.Button();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonConnectPCI
@@ -84,7 +98,6 @@
             this.panelDisplay.Name = "panelDisplay";
             this.panelDisplay.Size = new System.Drawing.Size(456, 351);
             this.panelDisplay.TabIndex = 2;
-            this.panelDisplay.Paint += new System.Windows.Forms.PaintEventHandler(this.panelDisplay_Paint);
             this.panelDisplay.Resize += new System.EventHandler(this.panelDisplay_Resize);
             // 
             // statusStrip
@@ -103,11 +116,148 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(131, 17);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.buttonSpeed);
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.textBoxAccelerate);
+            this.groupBox1.Controls.Add(this.textBoxSpeed);
+            this.groupBox1.Controls.Add(this.radioButtonY);
+            this.groupBox1.Controls.Add(this.radioButtonX);
+            this.groupBox1.Location = new System.Drawing.Point(0, 57);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(75, 171);
+            this.groupBox1.TabIndex = 4;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "groupBox1";
+            // 
+            // buttonSpeed
+            // 
+            this.buttonSpeed.Location = new System.Drawing.Point(6, 142);
+            this.buttonSpeed.Name = "buttonSpeed";
+            this.buttonSpeed.Size = new System.Drawing.Size(63, 23);
+            this.buttonSpeed.TabIndex = 6;
+            this.buttonSpeed.Text = "应用";
+            this.buttonSpeed.UseVisualStyleBackColor = true;
+            this.buttonSpeed.Click += new System.EventHandler(this.buttonSpeed_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(4, 100);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(71, 12);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "加速(PPS/s)";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(4, 61);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(59, 12);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "速度(PPS)";
+            // 
+            // textBoxAccelerate
+            // 
+            this.textBoxAccelerate.Location = new System.Drawing.Point(0, 115);
+            this.textBoxAccelerate.Name = "textBoxAccelerate";
+            this.textBoxAccelerate.Size = new System.Drawing.Size(75, 21);
+            this.textBoxAccelerate.TabIndex = 3;
+            // 
+            // textBoxSpeed
+            // 
+            this.textBoxSpeed.Location = new System.Drawing.Point(0, 76);
+            this.textBoxSpeed.Name = "textBoxSpeed";
+            this.textBoxSpeed.Size = new System.Drawing.Size(75, 21);
+            this.textBoxSpeed.TabIndex = 2;
+            // 
+            // radioButtonY
+            // 
+            this.radioButtonY.AutoSize = true;
+            this.radioButtonY.Location = new System.Drawing.Point(6, 42);
+            this.radioButtonY.Name = "radioButtonY";
+            this.radioButtonY.Size = new System.Drawing.Size(29, 16);
+            this.radioButtonY.TabIndex = 1;
+            this.radioButtonY.TabStop = true;
+            this.radioButtonY.Text = "Y";
+            this.radioButtonY.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonX
+            // 
+            this.radioButtonX.AutoSize = true;
+            this.radioButtonX.Location = new System.Drawing.Point(6, 20);
+            this.radioButtonX.Name = "radioButtonX";
+            this.radioButtonX.Size = new System.Drawing.Size(29, 16);
+            this.radioButtonX.TabIndex = 0;
+            this.radioButtonX.TabStop = true;
+            this.radioButtonX.Text = "X";
+            this.radioButtonX.UseVisualStyleBackColor = true;
+            this.radioButtonX.CheckedChanged += new System.EventHandler(this.radioButtonX_CheckedChanged);
+            // 
+            // buttonX
+            // 
+            this.buttonX.Location = new System.Drawing.Point(0, 250);
+            this.buttonX.Name = "buttonX";
+            this.buttonX.Size = new System.Drawing.Size(75, 23);
+            this.buttonX.TabIndex = 5;
+            this.buttonX.Text = "X开始";
+            this.buttonX.UseVisualStyleBackColor = true;
+            this.buttonX.Click += new System.EventHandler(this.buttonX_Click);
+            // 
+            // buttonY
+            // 
+            this.buttonY.Location = new System.Drawing.Point(0, 279);
+            this.buttonY.Name = "buttonY";
+            this.buttonY.Size = new System.Drawing.Size(75, 23);
+            this.buttonY.TabIndex = 6;
+            this.buttonY.Text = "Y开始";
+            this.buttonY.UseVisualStyleBackColor = true;
+            this.buttonY.Click += new System.EventHandler(this.buttonY_Click);
+            // 
+            // buttonOptic
+            // 
+            this.buttonOptic.Location = new System.Drawing.Point(0, 308);
+            this.buttonOptic.Name = "buttonOptic";
+            this.buttonOptic.Size = new System.Drawing.Size(75, 23);
+            this.buttonOptic.TabIndex = 7;
+            this.buttonOptic.Text = "光闸开";
+            this.buttonOptic.UseVisualStyleBackColor = true;
+            this.buttonOptic.Click += new System.EventHandler(this.buttonOptic_Click);
+            // 
+            // checkBoxReverse
+            // 
+            this.checkBoxReverse.AutoSize = true;
+            this.checkBoxReverse.Location = new System.Drawing.Point(0, 228);
+            this.checkBoxReverse.Name = "checkBoxReverse";
+            this.checkBoxReverse.Size = new System.Drawing.Size(48, 16);
+            this.checkBoxReverse.TabIndex = 8;
+            this.checkBoxReverse.Text = "反向";
+            this.checkBoxReverse.UseVisualStyleBackColor = true;
+            // 
+            // buttonManufact
+            // 
+            this.buttonManufact.Location = new System.Drawing.Point(0, 337);
+            this.buttonManufact.Name = "buttonManufact";
+            this.buttonManufact.Size = new System.Drawing.Size(75, 23);
+            this.buttonManufact.TabIndex = 9;
+            this.buttonManufact.Text = "制造开始";
+            this.buttonManufact.UseVisualStyleBackColor = true;
+            this.buttonManufact.Click += new System.EventHandler(this.buttonManufact_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(537, 404);
+            this.Controls.Add(this.buttonManufact);
+            this.Controls.Add(this.checkBoxReverse);
+            this.Controls.Add(this.buttonOptic);
+            this.Controls.Add(this.buttonY);
+            this.Controls.Add(this.buttonX);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.panelDisplay);
             this.Controls.Add(this.buttonConnectPCI);
@@ -116,11 +266,12 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -135,6 +286,19 @@
         private System.Windows.Forms.Panel panelDisplay;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button buttonSpeed;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox textBoxAccelerate;
+        private System.Windows.Forms.TextBox textBoxSpeed;
+        private System.Windows.Forms.RadioButton radioButtonY;
+        private System.Windows.Forms.RadioButton radioButtonX;
+        private System.Windows.Forms.Button buttonX;
+        private System.Windows.Forms.Button buttonY;
+        private System.Windows.Forms.Button buttonOptic;
+        private System.Windows.Forms.CheckBox checkBoxReverse;
+        private System.Windows.Forms.Button buttonManufact;
     }
 }
 
