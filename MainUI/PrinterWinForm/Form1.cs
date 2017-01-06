@@ -10,20 +10,31 @@ using System.Windows.Forms;
 
 using ManagedExchange;
 using System.Runtime.InteropServices;
+using Driver;
 
 namespace PrinterWinForm
 {
     public partial class Form1 : Form
     {
         IntPtr param;
+        ART m_art;
         public Form1()
         {
             InitializeComponent();
             param = ClassDisplay.glInit(panelDisplay.Handle);
+            m_art = new ART();
         }
 
-        private void buttonOpenFile_Click(object sender, EventArgs e)
+        private void buttonConnectPCI_Click(object sender, EventArgs e)
         {
+            if (m_art.create())
+            {
+                MessageBox.Show("连接成功");
+            }
+            else
+            {
+                MessageBox.Show("连接失败");
+            }
         }
 
         private void panelDisplay_Paint(object sender, PaintEventArgs e)

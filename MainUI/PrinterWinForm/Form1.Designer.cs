@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.buttonOpenFile = new System.Windows.Forms.Button();
+            this.buttonConnectPCI = new System.Windows.Forms.Button();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.ToolStripMenuItemFile = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemOpenFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,15 +39,15 @@
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
-            // buttonOpenFile
+            // buttonConnectPCI
             // 
-            this.buttonOpenFile.Location = new System.Drawing.Point(0, 52);
-            this.buttonOpenFile.Name = "buttonOpenFile";
-            this.buttonOpenFile.Size = new System.Drawing.Size(75, 23);
-            this.buttonOpenFile.TabIndex = 0;
-            this.buttonOpenFile.Text = "打开...";
-            this.buttonOpenFile.UseVisualStyleBackColor = true;
-            this.buttonOpenFile.Click += new System.EventHandler(this.buttonOpenFile_Click);
+            this.buttonConnectPCI.Location = new System.Drawing.Point(0, 28);
+            this.buttonConnectPCI.Name = "buttonConnectPCI";
+            this.buttonConnectPCI.Size = new System.Drawing.Size(75, 23);
+            this.buttonConnectPCI.TabIndex = 0;
+            this.buttonConnectPCI.Text = "连接设备";
+            this.buttonConnectPCI.UseVisualStyleBackColor = true;
+            this.buttonConnectPCI.Click += new System.EventHandler(this.buttonConnectPCI_Click);
             // 
             // menuStrip
             // 
@@ -70,7 +70,7 @@
             // toolStripMenuItemOpenFile
             // 
             this.toolStripMenuItemOpenFile.Name = "toolStripMenuItemOpenFile";
-            this.toolStripMenuItemOpenFile.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItemOpenFile.Size = new System.Drawing.Size(127, 22);
             this.toolStripMenuItemOpenFile.Text = "打开(&O)...";
             this.toolStripMenuItemOpenFile.Click += new System.EventHandler(this.toolStripMenuItemOpenFile_Click);
             // 
@@ -110,7 +110,7 @@
             this.ClientSize = new System.Drawing.Size(537, 404);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.panelDisplay);
-            this.Controls.Add(this.buttonOpenFile);
+            this.Controls.Add(this.buttonConnectPCI);
             this.Controls.Add(this.menuStrip);
             this.MainMenuStrip = this.menuStrip;
             this.Name = "Form1";
@@ -128,7 +128,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button buttonOpenFile;
+        private System.Windows.Forms.Button buttonConnectPCI;
         private System.Windows.Forms.MenuStrip menuStrip;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItemFile;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemOpenFile;
