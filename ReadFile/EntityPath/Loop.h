@@ -33,7 +33,7 @@ public:
     void LoopGetExt(ELoop*ploop);
     ELoop* EGetLoop(EntFull* &pLoop, EntFull* &pRear);
     ELoop* BuildLoopBTree(vector<ELoop*> &ELoopArray);
-    void LoopArrangeDirection(ELoop*ploop, BOOL exterior);
+    void LoopArrangeDirection(ELoop*ploop, BOOL exterior = TRUE);
     int LoopRelationSimple(ELoop*pLoop1, ELoop*pLoop2);
     int LoopRelationSimple2(ELoop *pLoop1, ELoop * pLoop2);
     int PtInLoop(float x, float y, ELoop *pLoop);

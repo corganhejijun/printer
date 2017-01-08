@@ -285,8 +285,10 @@ void Loop::ReOrganizeEnts(EntFull*pEnt) {
 int Loop::LoopDirection(ELoop*ploop) {
     int botype = 0, by;
     float da;
-    if(ploop)
+    if (!ploop) {
+        ERROR_MSG("LoopDirection error\n");
         return 0;
+    }
     EntFull*p = ploop->loop->pre, *pEnt = NULL;
     EntFull*pEnd = ploop->loop->next;
     if (pEnd != p)
@@ -319,11 +321,10 @@ int Loop::LoopDirection(ELoop*ploop) {
         }
         p = p->next;
     } while (p != pEnd);
-    if (!pEnt) {
+    if (!botype) {
+        ERROR_MSG("LoopDirection error 2\n");
         return 0;
     }
-    if(botype)
-        return 0;
     if (botype == 0)
         return 0;
     if (pEnt->flag & ENT_ISFLIP)
@@ -351,6 +352,7 @@ int Loop::LoopDirection(ELoop*ploop) {
         else if (da<0)
             return -1;
     }
+    ERROR_MSG("LoopDirection error 3\n");
     return 0;
 }
 

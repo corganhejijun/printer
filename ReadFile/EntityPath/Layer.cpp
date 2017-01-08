@@ -14,7 +14,7 @@ void Layer::BuildLayer(ELayer*pLayer, float cncAngle, float z) {
     pLayer->z = z * m_fScalez;
     pLayer->pLoopOriginalBTree = BuildLayerLoopOriginal(pLayer);
     if (pLayer->pLoopOriginalBTree)
-        m_cLoop.LoopArrangeDirection(pLayer->pLoopOriginalBTree, FALSE);
+        m_cLoop.LoopArrangeDirection(pLayer->pLoopOriginalBTree);
     pLayer->pLoopOriginalTree = m_cLoop.LoopTreeCopyNoEnt(pLayer->pLoopOriginalBTree);
     m_cLoop.BuildLoopTreeFromBTree(pLayer->pLoopOriginalTree);
     ////////////////////////¼«ÏÞÍ¼ÐÎ
