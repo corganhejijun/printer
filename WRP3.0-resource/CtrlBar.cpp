@@ -67,12 +67,14 @@ LRESULT CCtrlBar::HandleInitDialog(WPARAM, LPARAM)
 	COccManager* pOccManager = afxOccManager;
 	if ((pOccManager != NULL) && (m_pOccDialogInfo != NULL))
 	{
+        /*
 		if (!pOccManager->CreateDlgControls(this, m_lpszTemplateName,
 			m_pOccDialogInfo))
 		{
 			TRACE0("Warning: CreateDlgControls failed during dialog bar init.\n");
 			return FALSE;
 		}
+        */
 	}
 
 	return TRUE;

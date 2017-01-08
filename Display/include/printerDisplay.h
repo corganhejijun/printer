@@ -8,5 +8,6 @@ _EXTERN_C_ int resize(void* hWnd, void* param);
 _EXTERN_C_ int glDispose(void* param);
 _EXTERN_C_ int displayDxf(void *param, char* fileName);
 _EXTERN_C_ int drawEntity(void* hWnd, void* param);
+_EXTERN_C_ int slowDrawEntity(void* hWnd, void* gl, int sleepMillisecond);
 
 #endif

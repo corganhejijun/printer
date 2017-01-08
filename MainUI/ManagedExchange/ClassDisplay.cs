@@ -26,5 +26,8 @@ namespace ManagedExchange
 
         [DllImport("printerDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
         public extern static int drawEntity(IntPtr hWnd, IntPtr param);
+
+        [DllImport("printerDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+        public extern static int slowDrawEntity(IntPtr hWnd, IntPtr param, int sleepMillisecond);
     }
 }

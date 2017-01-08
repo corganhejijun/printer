@@ -118,22 +118,58 @@ namespace PrinterWinForm
 
         private void buttonX_Click(object sender, EventArgs e)
         {
-
+            if (!m_art.DeviceAvailable)
+                return;
+            if (m_art.XIsRuning)
+            {
+                buttonX.Text = "X开始";
+                if (!m_art.stopX())
+                    MessageBox.Show("停止错误");
+            }
+            else
+            {
+                ART.Direction dir = ART.Direction.forward;
+                if (checkBoxReverse.Checked)
+                    dir = ART.Direction.backward;
+                if(!m_art.startX(m_speed.x, m_speed.accX, dir))
+                    MessageBox.Show("开始失败");
+                else
+                    buttonX.Text = "X停止";
+            }
         }
 
         private void buttonY_Click(object sender, EventArgs e)
         {
-
+            if (!m_art.DeviceAvailable)
+                return;
+            if (m_art.YIsRunning)
+            {
+                buttonY.Text = "Y开始";
+                if(!m_art.stopY())
+                    MessageBox.Show("停止错误");
+            }
+            else
+            {
+                ART.Direction dir = ART.Direction.forward;
+                if (checkBoxReverse.Checked)
+                    dir = ART.Direction.backward;
+                if (!m_art.startY(m_speed.y, m_speed.accY, dir))
+                    MessageBox.Show("开始失败");
+                else
+                    buttonY.Text = "Y停止";
+            }
         }
 
         private void buttonOptic_Click(object sender, EventArgs e)
         {
+            if (!m_art.DeviceAvailable)
+                return;
 
         }
 
         private void buttonManufact_Click(object sender, EventArgs e)
         {
-            ClassDisplay.drawEntity(panelDisplay.Handle, param);
+            ClassDisplay.slowDrawEntity(panelDisplay.Handle, param, 100);
         }
     }
 }

@@ -43,7 +43,7 @@ void* glInit(void* hWnd) {
     static PIXELFORMATDESCRIPTOR pfd =
     {
         sizeof(PIXELFORMATDESCRIPTOR),1,
-        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL,
         PFD_TYPE_RGBA,24,0, 0, 0, 0, 0, 0,0,0,0,0, 0, 0, 0,16,0,0,
         PFD_MAIN_PLANE,0,0, 0, 0
     };
@@ -191,12 +191,8 @@ BOOL glDrawEntOn3dView(void* param, void* hWnd, EntFull*pEnt, float z, float zh,
     GetClientRect((HWND)hWnd, &rect);
     if (rect.right>0) {
         if (ms) {
-            wglMakeCurrent(GetDC((HWND)hWnd), glParam->hrc);
-            glCordinationTransform(param);
-            glPreDraw3D(param);
             glParam->global.drawEntity->glDrawNcEntSolid(pEnt, glParam->fOffsetDist, z, zh, prems);
             glFlush();
-            glFinish();
         }
         return FALSE;
     }
@@ -208,6 +204,37 @@ int drawEntity(void* hWnd, void* gl) {
     GlParam* glParam = (GlParam*)gl;
     NcEnt*pEnt; 
     EntFull e; 
+    memset(&e, 0, sizeof(EntFull));
+    float z, zh, Px, Py;
+    if (glParam->global.eSpace == NULL)
+        return -1;
+    wglMakeCurrent(GetDC((HWND)hWnd), glParam->hrc);
+    displayClear(glParam);
+    glCordinationTransform(gl);
+    glPreDraw3D(gl);
+    for (int iz = 0; iz < glParam->global.eSpace->LayerNum - 1; iz++) {
+        BOOL prems = FALSE;
+        pEnt = glParam->global.eSpace->pLayer[iz].pNcEnt;
+        z = glParam->global.eSpace->pLayer[iz].z;
+        zh = glParam->global.eSpace->pLayer[iz + 1].z;
+        Px = Py = 0;
+        for (int i = 0; i < glParam->global.eSpace->pLayer[iz].iNcEntNum; i++) {
+            if (!glParam->global.layer->m_cLoop.m_entity.NcToEntFull(pEnt + i, Px, Py, e))
+                continue;
+            glDrawEntOn3dView(gl, hWnd, &e, z, zh, prems, pEnt[i].ms);
+            //glDrawEntOn2dView(pView2d, &e, pEnt[i].ms, pEnt[i].on_contour);
+            prems = pEnt[i].ms;
+        }
+    }
+    glFinish();
+    SwapBuffers(GetDC((HWND)hWnd));
+    return 0;
+}
+
+int slowDrawEntity(void* hWnd, void* gl, int sleepMillisecond) {
+    GlParam* glParam = (GlParam*)gl;
+    NcEnt*pEnt;
+    EntFull e;
     memset(&e, 0, sizeof(EntFull));
     float z, zh, Px, Py;
     if (glParam->global.eSpace == NULL)
@@ -226,7 +253,12 @@ int drawEntity(void* hWnd, void* gl) {
             glDrawEntOn3dView(gl, hWnd, &e, z, zh, prems, pEnt[i].ms);
             //glDrawEntOn2dView(pView2d, &e, pEnt[i].ms, pEnt[i].on_contour);
             prems = pEnt[i].ms;
-            SwapBuffers(GetDC((HWND)hWnd));
+            glFlush();
+            glFinish();
+            if (pEnt[i].ms) {
+                SwapBuffers(GetDC((HWND)hWnd));
+                Sleep(sleepMillisecond);
+            }
         }
     }
     return 0;

@@ -783,9 +783,9 @@ BOOL glDrawEntOn3dView(CGLView*pView,EntFull*pEnt,float z,float zh,BOOL prems,BO
 			pView->glCordinationTransform();
 			glPreDraw3D();
 			glDrawNcEntSolid(pEnt,AppParam.fOffsetDist,z,zh,prems);
-			glFlush();		
-			glFinish();		
-			wglMakeCurrent(NULL,NULL);
+			//glFlush();		
+			//glFinish();		
+			//wglMakeCurrent(NULL,NULL);
 			pView->m_mtglMutex.Unlock();
 		}
 		return FALSE;
@@ -1046,8 +1046,9 @@ void AppEmulateQuickThreadProc(WPARAM param){
 			pcbar->SetPos((long)Px,(long)Py);
 			bp1=glDrawEntOn3dView(pView3d,&e,z,zh,prems,pEnt[i].ms);
 			bp2=glDrawEntOn2dView(pView2d,&e,pEnt[i].ms,pEnt[i].on_contour);
-			AppEmulateTestRepaint(pView2d,pView3d,i+1,iz);
-			if((bp1&&bp2)||AppEmulateToExit())goto threadend;
+			//AppEmulateTestRepaint(pView2d,pView3d,i+1,iz);
+            Sleep(100);
+			//if((bp1&&bp2)||AppEmulateToExit())goto threadend;
 			prems=pEnt[i].ms;
 		}
 		ib=0;
@@ -1067,7 +1068,7 @@ threadend:
 	if(pView2d->m_rePaint==PAINT_ASSERT_PAINT)
 		SetEvent(pView2d->m_pProcessData->hPaintAssert);
 	if(pView3d->m_rePaint==PAINT_ASSERT_PAINT)
-		SetEvent(pView3d->m_pProcessData->hPaintAssert);
+		//SetEvent(pView3d->m_pProcessData->hPaintAssert);
 
 	EmulateSts.pMutex->Unlock();
 	pView3d->m_rePaintMutex.Unlock();
