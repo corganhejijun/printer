@@ -36,15 +36,15 @@ void Layer::BuildLayer(ELayer*pLayer, float cncAngle, float z) {
 }
 
 ELoop* Layer::BuildLayerLoopOriginal(ELayer*pLayer) {
-    int i, LoopNum = 0;
+    int LoopNum = 0;
     ELoop *pELoopTree = NULL; EntFull *pEf = NULL;
     //////计算该层的线条的起始
     ////////生成环/\/\/\/\\/\/\/\/\\/\/\/\\\/\/\/
     vector<EPolyLine*> PlArray, LoopArray;
     vector<ELoop*>ELoopArray;
     EPolyLine* pEpl;
-    int j, appendok = 0;
-    for (i = 0; i<pLayer->iEntNum; i++) {
+    int appendok = 0;
+    for (int i = 0; i<pLayer->iEntNum; i++) {
         ///////生成该层的环元素
         pEf = new EntFull;
         memset(pEf, 0, sizeof(EntFull));
@@ -58,7 +58,8 @@ ELoop* Layer::BuildLayerLoopOriginal(ELayer*pLayer) {
         {
             appendok = 0;
             do {
-                for (j = 0; j<PlArray.size(); j++) {
+                int j = 0;
+                for (; j < (int)PlArray.size(); j++) {
                     if (appendok = PlArray[j]->Append(pEpl))
                         break;
                 }
@@ -83,13 +84,13 @@ ELoop* Layer::BuildLayerLoopOriginal(ELayer*pLayer) {
     }
 
     if (PlArray.size() > 0)
-        for (i = 0; i < PlArray.size(); i++)
+        for (int i = 0; i < (int)PlArray.size(); i++)
             delete PlArray[i];
     LoopNum = (int)LoopArray.size();
     if (LoopNum == 0) {
         return NULL;
     }
-    for (i = 0; i<LoopNum; i++) {
+    for (int i = 0; i<LoopNum; i++) {
         ELoopArray.push_back(m_cLoop.EGetLoop(LoopArray[i]->pLoop, LoopArray[i]->pRear));
         delete LoopArray[i];
     }

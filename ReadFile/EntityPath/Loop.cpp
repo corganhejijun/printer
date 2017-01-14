@@ -862,19 +862,16 @@ void Loop::LoopSfxCheck(ELoop*& ploop, BOOL exterior) {
         if (plp) {
             LoopArray.push_back(plp);
             p = ploop->loop; q = p->next; i = j = 1;
-        }
-        else if (j == i) {
+        } else if (j == i) {
             p = p->next;
             q = q->next;
             if (p == ploop->loop) {
                 i++; j++; q = q->next;
             }
-        }
-        else if (j<i) {
+        } else if (j<i) {
             if (k<j) {
                 p = p->next; q = q->next; k++;
-            }
-            else if (k == j) {
+            } else if (k == j) {
                 p = ph = ph->pre;
                 j++; q = pr; k = 1;
             }
@@ -887,7 +884,7 @@ void Loop::LoopSfxCheck(ELoop*& ploop, BOOL exterior) {
         ndir = -1;
     else
         ndir = 1;
-    for (i = 0; i<LoopArray.size(); i++) {
+    for (i = 0; i < (int)LoopArray.size(); i++) {
         LoopGetExt(LoopArray[i]);
         ldir = LoopDirection(LoopArray[i]);
         if (ldir == ndir) {
@@ -897,7 +894,7 @@ void Loop::LoopSfxCheck(ELoop*& ploop, BOOL exterior) {
         }
     }
     if (LoopArray.size()>0) {
-        for (i = 0; i<LoopArray.size() - 1; i++)LoopArray[i]->next = LoopArray[i + 1];
+        for (i = 0; i < (int)LoopArray.size() - 1; i++)LoopArray[i]->next = LoopArray[i + 1];
         LoopArray[i]->next = NULL;
         ploop = LoopArray[0];
         if (next)
@@ -1061,7 +1058,6 @@ void Loop::LoopToParellelNC(ELoop* ploop, double angle, float d, float lenmin, v
     double xs, ys, xe, ye;
     double a, b;
     BOOL forward = TRUE;
-    int i;
     size_t size; 
     NcEnt e; e.iscircle = 0; e.reserved = 0;
     vector<EXPoint> xps;
@@ -1088,16 +1084,14 @@ void Loop::LoopToParellelNC(ELoop* ploop, double angle, float d, float lenmin, v
         NcXLineLoop(a, b, c, angle, ploop, &xps);
         if (forward) { 
             ax = b; bx = -a; 
-        }
-        else { 
+        } else { 
             ax = -b; bx = a; 
         }
         size = xps.size();
         if (size > 1) {
             sort(xps.begin(), xps.end(), Loop::xpCompare);
-            for (i = 0; i<size - 1; i++) {
-                if (fabs(ax*(xps[i].x - xps[i + 1].x) + bx*(xps[i].y - xps[i + 1].y))<lenmin)
-                {
+            for (int i = 0; i < (int)(size - 1); i++) {
+                if (fabs(ax*(xps[i].x - xps[i + 1].x) + bx*(xps[i].y - xps[i + 1].y))<lenmin) {
                     xps.erase(xps.begin() + i, xps.begin() + i + 2);
                     size -= 2;
                     i--;
@@ -1112,16 +1106,17 @@ void Loop::LoopToParellelNC(ELoop* ploop, double angle, float d, float lenmin, v
             if (forward) {
                 xs = xps[0].x - b*d; ys = xps[0].y + a*d;
                 xe = xps[size - 1].x + b*d; ye = xps[size - 1].y - a*d;
-            }
-            else {
+            } else {
                 xs = xps[0].x + b*d; ys = xps[0].y - a*d;
                 xe = xps[size - 1].x - b*d; ye = xps[size - 1].y + a*d;
             }
             e.on_contour = FALSE; e.ms = FALSE;
             e.type = NCG00; e.x = (float)xs; e.y = (float)ys; ncar.push_back(e);
-            for (i = 0; i<size; i++) {
-                if (e.ms)e.type = NCLINE;
-                else e.type = NCG00;
+            for (int i = 0; i < (int)size; i++) {
+                if (e.ms)
+                    e.type = NCLINE;
+                else
+                    e.type = NCG00;
                 e.x = xps[i].x; e.y = xps[i].y;
                 ncar.push_back(e);
                 e.ms = !e.ms;
