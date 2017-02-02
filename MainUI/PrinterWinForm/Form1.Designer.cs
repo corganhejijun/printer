@@ -48,6 +48,8 @@
             this.buttonOptic = new System.Windows.Forms.Button();
             this.checkBoxReverse = new System.Windows.Forms.CheckBox();
             this.buttonManufact = new System.Windows.Forms.Button();
+            this.buttonDisp2D = new System.Windows.Forms.Button();
+            this.panel2D = new System.Windows.Forms.Panel();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -96,7 +98,7 @@
             this.panelDisplay.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.panelDisplay.Location = new System.Drawing.Point(81, 28);
             this.panelDisplay.Name = "panelDisplay";
-            this.panelDisplay.Size = new System.Drawing.Size(456, 351);
+            this.panelDisplay.Size = new System.Drawing.Size(456, 366);
             this.panelDisplay.TabIndex = 2;
             this.panelDisplay.Resize += new System.EventHandler(this.panelDisplay_Resize);
             // 
@@ -104,7 +106,7 @@
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip.Location = new System.Drawing.Point(0, 382);
+            this.statusStrip.Location = new System.Drawing.Point(0, 397);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(537, 22);
             this.statusStrip.TabIndex = 3;
@@ -247,11 +249,31 @@
             this.buttonManufact.UseVisualStyleBackColor = true;
             this.buttonManufact.Click += new System.EventHandler(this.buttonManufact_Click);
             // 
+            // buttonDisp2D
+            // 
+            this.buttonDisp2D.Location = new System.Drawing.Point(0, 366);
+            this.buttonDisp2D.Name = "buttonDisp2D";
+            this.buttonDisp2D.Size = new System.Drawing.Size(75, 23);
+            this.buttonDisp2D.TabIndex = 10;
+            this.buttonDisp2D.Text = "显示2D视图";
+            this.buttonDisp2D.UseVisualStyleBackColor = true;
+            this.buttonDisp2D.Click += new System.EventHandler(this.buttonDisp2D_Click);
+            // 
+            // panel2D
+            // 
+            this.panel2D.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2D.Location = new System.Drawing.Point(335, 28);
+            this.panel2D.Name = "panel2D";
+            this.panel2D.Size = new System.Drawing.Size(202, 165);
+            this.panel2D.TabIndex = 0;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(537, 404);
+            this.ClientSize = new System.Drawing.Size(537, 419);
+            this.Controls.Add(this.panel2D);
+            this.Controls.Add(this.buttonDisp2D);
             this.Controls.Add(this.buttonManufact);
             this.Controls.Add(this.checkBoxReverse);
             this.Controls.Add(this.buttonOptic);
@@ -299,6 +321,8 @@
         private System.Windows.Forms.Button buttonOptic;
         private System.Windows.Forms.CheckBox checkBoxReverse;
         private System.Windows.Forms.Button buttonManufact;
+        private System.Windows.Forms.Button buttonDisp2D;
+        private System.Windows.Forms.Panel panel2D;
     }
 }
 

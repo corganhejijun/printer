@@ -26,12 +26,14 @@ namespace PrinterWinForm
             }
         }
         IntPtr param;
+        IntPtr param2D;
         ART m_art;
         Speed m_speed;
         public Form1()
         {
             InitializeComponent();
             param = ClassDisplay.glInit(panelDisplay.Handle);
+            param2D = ClassDisplay.glInit(panel2D.Handle);
             m_art = new ART();
             m_speed = new Speed();
         }
@@ -59,11 +61,17 @@ namespace PrinterWinForm
         {
             ClassDisplay.resize(panelDisplay.Handle, param);
             ClassDisplay.drawEntity(panelDisplay.Handle, param);
+            if (panel2D.Visible)
+            {
+                ClassDisplay.resize(panel2D.Handle, param2D);
+                ClassDisplay.drawEntity(panel2D.Handle, param2D);
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             ClassDisplay.glDispose(param);
+            ClassDisplay.glDispose(param2D);
         }
 
         private void toolStripMenuItemOpenFile_Click(object sender, EventArgs e)
@@ -75,6 +83,12 @@ namespace PrinterWinForm
             ClassDisplay.displayDxf(param, dlg.FileName);
             ClassDisplay.resize(panelDisplay.Handle, param);
             ClassDisplay.drawEntity(panelDisplay.Handle, param);
+            ClassDisplay.set2DView(param, param2D);
+            if (panel2D.Visible)
+            {
+                ClassDisplay.resize(panel2D.Handle, param2D);
+                ClassDisplay.drawEntity(panel2D.Handle, param2D);
+            }
         }
 
         private void buttonSpeed_Click(object sender, EventArgs e)
@@ -170,6 +184,17 @@ namespace PrinterWinForm
         private void buttonManufact_Click(object sender, EventArgs e)
         {
             ClassDisplay.slowDrawEntity(panelDisplay.Handle, param, 100);
+            if (panel2D.Visible)
+                ClassDisplay.slowDrawEntity(panel2D.Handle, param2D, 100);
+        }
+
+        private void buttonDisp2D_Click(object sender, EventArgs e)
+        {
+            panel2D.Visible = !panel2D.Visible;
+            if (panel2D.Visible)
+                buttonDisp2D.Text = "关闭2D视图";
+            else
+                buttonDisp2D.Text = "显示2D视图";
         }
     }
 }

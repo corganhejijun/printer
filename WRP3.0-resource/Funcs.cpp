@@ -810,18 +810,22 @@ BOOL glDrawEntOn2dView(CGLView*pView,EntFull*pEnt,BOOL ms,BOOL on_contour){
 					glColorNoRandom(pView->m_pColor+2);
 					if(pView->m_pColor[2].is_havewidth)
 						glDrawEntFace(pEnt,AppParam.fOffsetDist);
-					else glDrawEntLine(pEnt);	
+					else 
+                        glDrawEntLine(pEnt);	
 				}else{
 					glColorNoRandom(pView->m_pColor);					
 					if(pView->m_pColor->is_havewidth)
 						glDrawEntFace(pEnt,AppParam.fOffsetDist);
-					else glDrawEntLine(pEnt);					
+					else 
+                        glDrawEntLine(pEnt);					
 				}
 			}else{
-				if(pView->m_pColor[1].is_visible){
-					glColorNoRandom(pView->m_pColor+1);
-					glDrawEntLine(pEnt);
-				}
+                if (pView->m_pColor[1].is_visible) {
+                    glColorNoRandom(pView->m_pColor + 1);
+                    glDrawEntLine(pEnt);
+                }
+                else
+                    ;
 			}
 
 

@@ -19,7 +19,8 @@
 class DrawEntity {
 public:
     void glDrawNcEntSolid(EntFull *pEnt, float d, float z, float zh, BOOL prems);
-    void glDrawEntFace(EntFull *pEnt, float d, float z, BOOL upper, BOOL prems);
+    void glDrawEntFace(EntFull *pEnt, float d, float z = 0, BOOL upper = TRUE, BOOL prems = FALSE);
+    void glDrawEntLine(EntFull *pEnt);
     void glDrawPartDisk(float xc, float yc, float d, double sa, float z, double ag = M_PI);
     void glDrawCylinder(float xc, float yc, float d, double sa, double ag, float z, float zh, BOOL exterior = TRUE);
     double glDeltaAngleForArcSplit(float r);

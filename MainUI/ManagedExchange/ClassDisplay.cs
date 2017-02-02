@@ -13,6 +13,9 @@ namespace ManagedExchange
         public extern static IntPtr glInit(IntPtr hWnd);
 
         [DllImport("printerDisplay.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+        public extern static int set2DView(IntPtr gl, IntPtr gl2D);
+
+        [DllImport("printerDisplay.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
         public extern static int paint(IntPtr hWnd, IntPtr param);
 
         [DllImport("printerDisplay.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]

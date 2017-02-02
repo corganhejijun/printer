@@ -3,6 +3,7 @@
 #define _EXTERN_C_  extern "C"  _declspec(dllexport)
 
 _EXTERN_C_ void* glInit(void* hWnd);
+_EXTERN_C_ int set2DView(void* gl, void* gl2D);
 _EXTERN_C_ int paint(void* hWnd, void* param);
 _EXTERN_C_ int resize(void* hWnd, void* param);
 _EXTERN_C_ int glDispose(void* param);

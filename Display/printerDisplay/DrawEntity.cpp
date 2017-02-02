@@ -169,6 +169,44 @@ void DrawEntity::glDrawEntFace(EntFull *pEnt, float d, float z, BOOL upper, BOOL
     }
 }
 
+void DrawEntity::glDrawEntLine(EntFull *pEnt)
+{
+    if (!pEnt)return;
+    //		glColor3f(rand()%256/255.f,rand()%256/255.f,rand()%256/255.f);
+    if (pEnt->flag&ENT_ISLINE)
+    {
+        glBegin(GL_LINES);
+        glVertex2f(pEnt->xstart, pEnt->ystart);
+        glVertex2f(pEnt->xend, pEnt->yend);
+        glEnd();
+    }
+    else
+    {
+        float x, y;
+        /*da*/		double a, da = glDeltaAngleForArcSplit(pEnt->r);
+        glBegin(GL_LINE_STRIP);
+        glVertex2f(pEnt->xstart, pEnt->ystart);
+        if (pEnt->angle>0) {
+            for (a = pEnt->gstart + da; a<pEnt->gend; a += da) {
+                x = float(pEnt->xc + pEnt->r*cos(a));
+                y = float(pEnt->yc + pEnt->r*sin(a));
+                glVertex2f(x, y);
+            }
+        }
+        else {
+            for (a = pEnt->gstart - da; a>pEnt->gend; a -= da) {
+                x = float(pEnt->xc + pEnt->r*cos(a));
+                y = float(pEnt->yc + pEnt->r*sin(a));
+                glVertex2f(x, y);
+            }
+        }
+        glVertex2f(pEnt->xend, pEnt->yend);
+        glEnd();
+
+    }
+
+}
+
 //////////////ªÊ÷∆∞Î‘≤
 void DrawEntity::glDrawPartDisk(float xc, float yc, float d, double sa, float z, double ag) {
     float x, y; 

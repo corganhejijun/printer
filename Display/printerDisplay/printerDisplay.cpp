@@ -26,7 +26,9 @@ public:
     float fCncAngleDelta;
     float fOffsetDist;
     Global global;
+    bool is2D;
     GlParam() {
+        is2D = false;
         hrc = NULL;
         bkColor = 0xffffff;
         RotateX = RotateY = RotateZ = 0;
@@ -66,6 +68,17 @@ void* glInit(void* hWnd) {
     glDrawBuffer(GL_BACK);
 
     return glParam;
+}
+
+int set2DView(void* gl, void* gl2D){
+    GlParam* glParam = (GlParam*)gl;
+    GlParam* glParam2D = (GlParam*)gl2D;
+    glParam2D->global.drawEntity = glParam->global.drawEntity;
+    glParam2D->global.eSpace = glParam->global.eSpace;
+    glParam2D->global.layer = glParam->global.layer;
+    glParam2D->global.reader = glParam->global.reader;
+    glParam2D->is2D = true;
+    return 0;
 }
 
 void displayClear(void* param) {
@@ -120,10 +133,12 @@ int resize(void* hWnd, void* param) {
 int glDispose(void* param) {
     GlParam* glParam = (GlParam*)param;
     wglDeleteContext(glParam->hrc);
-    delete glParam->global.reader;
-    delete glParam->global.eSpace;
-    delete glParam->global.layer;
-    delete glParam->global.drawEntity;
+    if (!glParam->is2D) {
+        delete glParam->global.reader;
+        delete glParam->global.eSpace;
+        delete glParam->global.layer;
+        delete glParam->global.drawEntity;
+    }
     delete glParam;
     return 0;
 }
@@ -156,9 +171,8 @@ int displayDxf(void *gl, char* fileName) {
     return TRUE;
 }
 
-void glCordinationTransform(void* gl)
+void glCordinationTransform(GlParam* glParam)
 {
-    GlParam* glParam = (GlParam*)gl;
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(glParam->TransX, glParam->TransY, 0.0f);
@@ -168,8 +182,7 @@ void glCordinationTransform(void* gl)
     glRotatef(glParam->RotateZ, 0.0f, 0.0f, 1.0f);
 }
 
-void glPreDraw3D(void* gl, BOOL useZoom = TRUE) {
-    GlParam* glParam = (GlParam*)gl;
+void glPreDraw3D(GlParam* glParam, BOOL useZoom = TRUE) {
     glRotatef(-45, 1.0f, .0f, 0.0f);
     glRotatef(30, .0f, .0f, 1.0f);
     float scale = 1.0f;
@@ -185,8 +198,7 @@ void glPreDraw3D(void* gl, BOOL useZoom = TRUE) {
     glScalef(scale, scale, scale);
 }
 
-BOOL glDrawEntOn3dView(void* param, void* hWnd, EntFull*pEnt, float z, float zh, BOOL prems, BOOL ms) {
-    GlParam* glParam = (GlParam*)param;
+BOOL glDrawEntOn3dView(GlParam* glParam, void* hWnd, EntFull*pEnt, float z, float zh, BOOL prems, BOOL ms) {
     RECT rect;
     GetClientRect((HWND)hWnd, &rect);
     if (rect.right>0) {
@@ -200,6 +212,44 @@ BOOL glDrawEntOn3dView(void* param, void* hWnd, EntFull*pEnt, float z, float zh,
         return TRUE;
 }
 
+void glPreDraw2D(GlParam* glParam) {
+    float scale = 1.0f;
+    float xext = 1.1f*(glParam->global.eSpace->xmax - glParam->global.eSpace->xmin);
+    float yext = 1.1f*(glParam->global.eSpace->ymax - glParam->global.eSpace->ymin);
+    if (xext == 0 || yext == 0)scale = 1.0f;
+    else if (xext>yext)scale = 2 / xext;
+    else scale = 2 / yext;
+    scale /= glParam->Scale;
+    glScalef(scale, scale, 1.0f);
+
+
+}
+
+
+BOOL glDrawEntOn2dView(GlParam* glParam, void* hWnd, EntFull*pEnt, BOOL ms, BOOL on_contour) {
+    RECT rect;
+    GetClientRect((HWND)hWnd, &rect);
+    displayClear(glParam);
+    if(rect.right>0) {
+        glCordinationTransform(glParam);
+        glPreDraw2D(glParam);
+        if (ms) {
+            if (on_contour) {
+                glParam->global.drawEntity->glDrawEntFace(pEnt, glParam->fOffsetDist);
+            }
+            else {
+                glParam->global.drawEntity->glDrawEntFace(pEnt, glParam->fOffsetDist);
+            }
+        }
+        else {
+            glParam->global.drawEntity->glDrawEntLine(pEnt);
+        }
+        SwapBuffers(GetDC((HWND)hWnd));
+        return FALSE;
+    }
+    return TRUE;
+}
+
 int drawEntity(void* hWnd, void* gl) {
     GlParam* glParam = (GlParam*)gl;
     NcEnt*pEnt; 
@@ -210,8 +260,8 @@ int drawEntity(void* hWnd, void* gl) {
         return -1;
     wglMakeCurrent(GetDC((HWND)hWnd), glParam->hrc);
     displayClear(glParam);
-    glCordinationTransform(gl);
-    glPreDraw3D(gl);
+    glCordinationTransform(glParam);
+    glPreDraw3D(glParam);
     for (int iz = 0; iz < glParam->global.eSpace->LayerNum - 1; iz++) {
         BOOL prems = FALSE;
         pEnt = glParam->global.eSpace->pLayer[iz].pNcEnt;
@@ -221,8 +271,10 @@ int drawEntity(void* hWnd, void* gl) {
         for (int i = 0; i < glParam->global.eSpace->pLayer[iz].iNcEntNum; i++) {
             if (!glParam->global.layer->m_cLoop.m_entity.NcToEntFull(pEnt + i, Px, Py, e))
                 continue;
-            glDrawEntOn3dView(gl, hWnd, &e, z, zh, prems, pEnt[i].ms);
-            //glDrawEntOn2dView(pView2d, &e, pEnt[i].ms, pEnt[i].on_contour);
+            if (glParam->is2D)
+                glDrawEntOn2dView(glParam, hWnd, &e, pEnt[i].ms, pEnt[i].on_contour);
+            else
+                glDrawEntOn3dView(glParam, hWnd, &e, z, zh, prems, pEnt[i].ms);
             prems = pEnt[i].ms;
         }
     }
@@ -250,8 +302,10 @@ int slowDrawEntity(void* hWnd, void* gl, int sleepMillisecond) {
         for (int i = 0; i < glParam->global.eSpace->pLayer[iz].iNcEntNum; i++) {
             if (!glParam->global.layer->m_cLoop.m_entity.NcToEntFull(pEnt + i, Px, Py, e))
                 continue;
-            glDrawEntOn3dView(gl, hWnd, &e, z, zh, prems, pEnt[i].ms);
-            //glDrawEntOn2dView(pView2d, &e, pEnt[i].ms, pEnt[i].on_contour);
+            if (glParam->is2D)
+                glDrawEntOn2dView(glParam, hWnd, &e, pEnt[i].ms, pEnt[i].on_contour);
+            else
+                glDrawEntOn3dView(glParam, hWnd, &e, z, zh, prems, pEnt[i].ms);
             prems = pEnt[i].ms;
             glFlush();
             glFinish();
