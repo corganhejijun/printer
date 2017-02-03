@@ -10,5 +10,8 @@ _EXTERN_C_ int glDispose(void* param);
 _EXTERN_C_ int displayDxf(void *param, char* fileName);
 _EXTERN_C_ int drawEntity(void* hWnd, void* param);
 _EXTERN_C_ int slowDrawEntity(void* hWnd, void* gl, int sleepMillisecond);
+_EXTERN_C_ int getLayerCount(void* gl);
+_EXTERN_C_ int getEntCount(void* gl, int layerNum);
+_EXTERN_C_ int draw1Step(void* hWnd, void* gl, int currentEnt, int currentLayer, int* prevMs, float* prevX, float* prevY);
 
 #endif

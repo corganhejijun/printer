@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.buttonConnectPCI = new System.Windows.Forms.Button();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.ToolStripMenuItemFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,9 +51,14 @@
             this.buttonManufact = new System.Windows.Forms.Button();
             this.buttonDisp2D = new System.Windows.Forms.Button();
             this.panel2D = new System.Windows.Forms.Panel();
+            this.timerManufact = new System.Windows.Forms.Timer(this.components);
+            this.numericUpDownManufactSpeed = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownManufactSpeed)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonConnectPCI
@@ -71,7 +77,7 @@
             this.ToolStripMenuItemFile});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(537, 25);
+            this.menuStrip.Size = new System.Drawing.Size(597, 25);
             this.menuStrip.TabIndex = 1;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -98,7 +104,7 @@
             this.panelDisplay.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.panelDisplay.Location = new System.Drawing.Point(81, 28);
             this.panelDisplay.Name = "panelDisplay";
-            this.panelDisplay.Size = new System.Drawing.Size(456, 366);
+            this.panelDisplay.Size = new System.Drawing.Size(516, 417);
             this.panelDisplay.TabIndex = 2;
             this.panelDisplay.Resize += new System.EventHandler(this.panelDisplay_Resize);
             // 
@@ -106,9 +112,9 @@
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip.Location = new System.Drawing.Point(0, 397);
+            this.statusStrip.Location = new System.Drawing.Point(0, 448);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(537, 22);
+            this.statusStrip.Size = new System.Drawing.Size(597, 22);
             this.statusStrip.TabIndex = 3;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -262,16 +268,58 @@
             // panel2D
             // 
             this.panel2D.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel2D.Location = new System.Drawing.Point(335, 28);
+            this.panel2D.Location = new System.Drawing.Point(395, 28);
             this.panel2D.Name = "panel2D";
             this.panel2D.Size = new System.Drawing.Size(202, 165);
             this.panel2D.TabIndex = 0;
+            // 
+            // timerManufact
+            // 
+            this.timerManufact.Tick += new System.EventHandler(this.timerManufact_Tick);
+            // 
+            // numericUpDownManufactSpeed
+            // 
+            this.numericUpDownManufactSpeed.Location = new System.Drawing.Point(0, 407);
+            this.numericUpDownManufactSpeed.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDownManufactSpeed.Name = "numericUpDownManufactSpeed";
+            this.numericUpDownManufactSpeed.Size = new System.Drawing.Size(35, 21);
+            this.numericUpDownManufactSpeed.TabIndex = 11;
+            this.numericUpDownManufactSpeed.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(-2, 392);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(77, 12);
+            this.label3.TabIndex = 12;
+            this.label3.Text = "单步制造时间";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(34, 409);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(41, 12);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "x100ms";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(537, 419);
+            this.ClientSize = new System.Drawing.Size(597, 470);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.numericUpDownManufactSpeed);
             this.Controls.Add(this.panel2D);
             this.Controls.Add(this.buttonDisp2D);
             this.Controls.Add(this.buttonManufact);
@@ -294,6 +342,7 @@
             this.statusStrip.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownManufactSpeed)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -323,6 +372,10 @@
         private System.Windows.Forms.Button buttonManufact;
         private System.Windows.Forms.Button buttonDisp2D;
         private System.Windows.Forms.Panel panel2D;
+        private System.Windows.Forms.Timer timerManufact;
+        private System.Windows.Forms.NumericUpDown numericUpDownManufactSpeed;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
     }
 }
 

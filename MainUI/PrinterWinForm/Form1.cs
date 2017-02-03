@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Collections;
 
 using ManagedExchange;
-using System.Runtime.InteropServices;
 using Driver;
 
 namespace PrinterWinForm
@@ -29,6 +22,8 @@ namespace PrinterWinForm
         IntPtr param2D;
         ART m_art;
         Speed m_speed;
+        ArrayList layerList;
+
         public Form1()
         {
             InitializeComponent();
@@ -36,6 +31,7 @@ namespace PrinterWinForm
             param2D = ClassDisplay.glInit(panel2D.Handle);
             m_art = new ART();
             m_speed = new Speed();
+            layerList = new ArrayList();
         }
 
         private void buttonConnectPCI_Click(object sender, EventArgs e)
@@ -88,6 +84,13 @@ namespace PrinterWinForm
             {
                 ClassDisplay.resize(panel2D.Handle, param2D);
                 ClassDisplay.drawEntity(panel2D.Handle, param2D);
+            }
+            layerList.Clear();
+            int layerCount = ClassDisplay.getLayerCount(param);
+            for (int i = 0; i < layerCount; i++)
+            {
+                int number = ClassDisplay.getEntCount(param, i);
+                layerList.Add(number);
             }
         }
 
@@ -181,13 +184,6 @@ namespace PrinterWinForm
 
         }
 
-        private void buttonManufact_Click(object sender, EventArgs e)
-        {
-            ClassDisplay.slowDrawEntity(panelDisplay.Handle, param, 100);
-            if (panel2D.Visible)
-                ClassDisplay.slowDrawEntity(panel2D.Handle, param2D, 100);
-        }
-
         private void buttonDisp2D_Click(object sender, EventArgs e)
         {
             panel2D.Visible = !panel2D.Visible;
@@ -195,6 +191,68 @@ namespace PrinterWinForm
                 buttonDisp2D.Text = "关闭2D视图";
             else
                 buttonDisp2D.Text = "显示2D视图";
+        }
+
+        bool beginManufact = false;
+        int currentLayer = 0;
+        int currentEnt = 0;
+        int prevMs = 0;
+        float prevX = 0;
+        float prevY = 0;
+
+        private void manufactStop()
+        {
+            beginManufact = false;
+            buttonManufact.Text = "制造开始";
+            timerManufact.Stop();
+        }
+
+        private void buttonManufact_Click(object sender, EventArgs e)
+        {
+            if (beginManufact)
+            {
+                manufactStop();
+            }
+            else
+            {
+                buttonManufact.Text = "制造停止";
+                currentLayer = 0;
+                currentEnt = 0;
+                beginManufact = true;
+                timerManufact.Start();
+            }
+            //ClassDisplay.slowDrawEntity(panel2D.Handle, param2D, 1000);
+        }
+
+        int tickCount = 0;
+        private void timerManufact_Tick(object sender, EventArgs e)
+        {
+            tickCount++;
+            if (tickCount < numericUpDownManufactSpeed.Value)
+            {
+                return;
+            }
+            tickCount = 0;
+            if (currentEnt == 0)
+            {
+                prevX = prevY = 0;
+                prevMs = 0;
+            }
+            int pm = prevMs;
+            float px = prevX;
+            float py = prevY;
+            ClassDisplay.draw1Step(panelDisplay.Handle, param, currentEnt, currentLayer, ref pm, ref px, ref py);
+            ClassDisplay.draw1Step(panel2D.Handle, param2D, currentEnt, currentLayer, ref prevMs, ref prevX, ref prevY);
+            currentEnt++;
+            if (currentEnt >= (int)layerList[currentLayer])
+            {
+                currentEnt = 0;
+                currentLayer++;
+                if (currentLayer == layerList.Count)
+                {
+                    manufactStop();
+                }
+            }
         }
     }
 }
