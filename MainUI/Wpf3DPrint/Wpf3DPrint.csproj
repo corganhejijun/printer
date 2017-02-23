@@ -103,7 +103,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\samples\CSharp\OCCTProxy_D3D\OCCTProxy_D3D.vcxproj">
+    <ProjectReference Include="..\..\ReadFile\stpReader\OCCTProxy_D3D\OCCTProxy_D3D.vcxproj">
       <Project>{969912d9-78e7-4ab8-b4ff-6b52b4f03991}</Project>
       <Name>OCCTProxy_D3D</Name>
     </ProjectReference>

@@ -78,7 +78,7 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\win32\bin\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)build\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">obj\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\win64\bin\</OutDir>
@@ -87,7 +87,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir)..\src\OpenGl;$(ProjectDir)..\inc;$(ProjectDir)..\src\InterfaceGraphic;$(ProjectDir)..\src\Standard;$(ProjectDir)..\src\Aspect;$(ProjectDir)..\src\NCollection;$(ProjectDir)..\src\Graphic3d;$(ProjectDir)..\src\TCollection;$(ProjectDir)..\src\Image;$(ProjectDir)..\src\Message;$(ProjectDir)..\src\WNT;$(ProjectDir)..\src\BVH;$(ProjectDir)..\src\gp;$(ProjectDir)..\src\Bnd;$(ProjectDir)..\src\Precision;$(ProjectDir)..\src\V3d;$(ProjectDir)..\src\PrsMgr;$(ProjectDir)..\src\AIS;$(ProjectDir)..\src\TopLoc;$(ProjectDir)..\src\TopoDS;$(ProjectDir)..\src\SelectMgr;$(ProjectDir)..\src\Prs3d;$(ProjectDir)..\src\BRep;$(ProjectDir)..\src\FSD;$(ProjectDir)..\src\Storage;$(ProjectDir)..\src\IGESControl;$(ProjectDir)..\src\Interface;$(ProjectDir)..\src\MoniTool;$(ProjectDir)..\src\TopExp;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\static;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

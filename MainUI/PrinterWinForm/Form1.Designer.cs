@@ -53,9 +53,11 @@
             this.panel2D = new System.Windows.Forms.Panel();
             this.timerManufact = new System.Windows.Forms.Timer(this.components);
             this.numericUpDownManufactSpeed = new System.Windows.Forms.NumericUpDown();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.labelStepTime1 = new System.Windows.Forms.Label();
+            this.labelStepTime2 = new System.Windows.Forms.Label();
+            this.buttonRepaint = new System.Windows.Forms.Button();
             this.menuStrip.SuspendLayout();
+            this.panelDisplay.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownManufactSpeed)).BeginInit();
@@ -102,6 +104,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelDisplay.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.panelDisplay.Controls.Add(this.buttonRepaint);
             this.panelDisplay.Location = new System.Drawing.Point(81, 28);
             this.panelDisplay.Name = "panelDisplay";
             this.panelDisplay.Size = new System.Drawing.Size(516, 417);
@@ -268,9 +271,10 @@
             // panel2D
             // 
             this.panel2D.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel2D.Location = new System.Drawing.Point(395, 28);
+            this.panel2D.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2D.Location = new System.Drawing.Point(349, 28);
             this.panel2D.Name = "panel2D";
-            this.panel2D.Size = new System.Drawing.Size(202, 165);
+            this.panel2D.Size = new System.Drawing.Size(248, 216);
             this.panel2D.TabIndex = 0;
             // 
             // timerManufact
@@ -293,32 +297,46 @@
             0,
             0,
             0});
+            this.numericUpDownManufactSpeed.Visible = false;
             // 
-            // label3
+            // labelStepTime1
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(-2, 392);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(77, 12);
-            this.label3.TabIndex = 12;
-            this.label3.Text = "单步制造时间";
+            this.labelStepTime1.AutoSize = true;
+            this.labelStepTime1.Location = new System.Drawing.Point(-2, 392);
+            this.labelStepTime1.Name = "labelStepTime1";
+            this.labelStepTime1.Size = new System.Drawing.Size(53, 12);
+            this.labelStepTime1.TabIndex = 12;
+            this.labelStepTime1.Text = "单步时间";
+            this.labelStepTime1.Visible = false;
             // 
-            // label4
+            // labelStepTime2
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(34, 409);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(41, 12);
-            this.label4.TabIndex = 13;
-            this.label4.Text = "x100ms";
+            this.labelStepTime2.AutoSize = true;
+            this.labelStepTime2.Location = new System.Drawing.Point(34, 409);
+            this.labelStepTime2.Name = "labelStepTime2";
+            this.labelStepTime2.Size = new System.Drawing.Size(41, 12);
+            this.labelStepTime2.TabIndex = 13;
+            this.labelStepTime2.Text = "x100ms";
+            this.labelStepTime2.Visible = false;
+            // 
+            // buttonRepaint
+            // 
+            this.buttonRepaint.Location = new System.Drawing.Point(3, 3);
+            this.buttonRepaint.Name = "buttonRepaint";
+            this.buttonRepaint.Size = new System.Drawing.Size(75, 23);
+            this.buttonRepaint.TabIndex = 0;
+            this.buttonRepaint.Text = "重新绘制";
+            this.buttonRepaint.UseVisualStyleBackColor = true;
+            this.buttonRepaint.Visible = false;
+            this.buttonRepaint.Click += new System.EventHandler(this.buttonRepaint_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(597, 470);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.labelStepTime2);
+            this.Controls.Add(this.labelStepTime1);
             this.Controls.Add(this.numericUpDownManufactSpeed);
             this.Controls.Add(this.panel2D);
             this.Controls.Add(this.buttonDisp2D);
@@ -338,6 +356,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
+            this.panelDisplay.ResumeLayout(false);
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -374,8 +393,9 @@
         private System.Windows.Forms.Panel panel2D;
         private System.Windows.Forms.Timer timerManufact;
         private System.Windows.Forms.NumericUpDown numericUpDownManufactSpeed;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label labelStepTime1;
+        private System.Windows.Forms.Label labelStepTime2;
+        private System.Windows.Forms.Button buttonRepaint;
     }
 }
 

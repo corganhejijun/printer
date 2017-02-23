@@ -53,8 +53,9 @@ namespace PrinterWinForm
             }
         }
 
-        private void panelDisplay_Resize(object sender, EventArgs e)
+        private void buttonRepaint_Click(object sender, EventArgs e)
         {
+            buttonRepaint.Visible = false;
             ClassDisplay.resize(panelDisplay.Handle, param);
             ClassDisplay.drawEntity(panelDisplay.Handle, param);
             if (panel2D.Visible)
@@ -62,6 +63,12 @@ namespace PrinterWinForm
                 ClassDisplay.resize(panel2D.Handle, param2D);
                 ClassDisplay.drawEntity(panel2D.Handle, param2D);
             }
+        }
+
+        private void panelDisplay_Resize(object sender, EventArgs e)
+        {
+            buttonRepaint.Visible = true;
+            ClassDisplay.paint(panelDisplay.Handle, param);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -212,10 +219,12 @@ namespace PrinterWinForm
             if (beginManufact)
             {
                 manufactStop();
+                labelStepTime1.Visible = labelStepTime2.Visible = numericUpDownManufactSpeed.Visible = false;
             }
             else
             {
                 buttonManufact.Text = "制造停止";
+                labelStepTime1.Visible = labelStepTime2.Visible = numericUpDownManufactSpeed.Visible = true;
                 currentLayer = 0;
                 currentEnt = 0;
                 beginManufact = true;
