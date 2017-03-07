@@ -51,6 +51,9 @@
 #include <gp_Pln.hxx>
 #include <BRepBndLib.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
+#include <sstream>
 
 
 #define EXPORT extern "C" __declspec( dllexport )
@@ -124,6 +127,8 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double Zmax, double Zmin
     gp_Pln originPlane = gp_Pln(0, 0, 1, -height);
     BRepAlgo_Section section(shape->Shape, originPlane, Standard_True);
     TopoDS_Shape sectionShape = section.Shape();
+    if (sectionShape.IsNull())
+        return NULL;
     ShapeContainer* container = new ShapeContainer(sectionShape);
     return container;
 

@@ -51,6 +51,8 @@
 #include <gp_Pln.hxx>
 #include <BRepBndLib.hxx>
 #include <TopExp_Explorer.hxx>
+#include <AIS_ListIteratorOfListOfInteractive.hxx>
+#include <AIS_ListOfInteractive.hxx>
 
 /// <summary>
 /// Proxy class encapsulating calls to OCCT C++ classes within
@@ -612,11 +614,18 @@ public:
         {
             return;
         }
+        myAISContext()->EraseAll();
+        /*
         for (myAISContext()->InitCurrent(); myAISContext()->MoreCurrent(); myAISContext()->NextCurrent())
         {
             myAISContext()->Erase(myAISContext()->Current(), Standard_True);
         }
         myAISContext()->ClearCurrents();
+        */
+    }
+
+    void removeObjects() {
+        myAISContext()->RemoveAll();
     }
 
     /// <summary>
@@ -760,7 +769,9 @@ public:
     bool displayShape(System::IntPtr pt)
     {
         ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
-        myAISContext()->Display(new AIS_Shape(shape->Shape), Standard_True);
+        Handle(AIS_Shape) aisShape = new AIS_Shape(shape->Shape);
+        myAISContext()->Display(aisShape, Standard_True);
+        myAISContext()->SetSelected(aisShape);
         return true;
     }
 
@@ -791,9 +802,22 @@ public:
     {
         STEPControl_StepModelType aType = STEPControl_AsIs;
         STEPControl_Writer        aWriter;
-        for (myAISContext()->InitCurrent(); myAISContext()->MoreCurrent(); myAISContext()->NextCurrent())
+        AIS_ListOfInteractive ar;
+        myAISContext()->ObjectsInside(ar);
+        AIS_ListIteratorOfListOfInteractive it(ar);
+        for (; it.More(); it.Next()) {
+            Handle(AIS_InteractiveObject) aisobj = it.Value();
+            Handle(AIS_Shape) hashape = Handle(AIS_Shape)::DownCast(aisobj);
+            TopoDS_Shape aShape = hashape->Shape();
+            if (aWriter.Transfer(aShape, aType) != IFSelect_RetDone)
+            {
+                return false;
+            }
+        }
+        /*
+        for (myAISContext()->InitDetected(); myAISContext()->MoreDetected(); myAISContext()->NextDetected())
         {
-            Handle(AIS_Shape) anIS = Handle(AIS_Shape)::DownCast(myAISContext()->Current());
+            Handle(AIS_Shape) anIS = Handle(AIS_Shape)::DownCast(myAISContext()->DetectedCurrentObject());
             if (anIS.IsNull())
             {
                 return false;
@@ -805,6 +829,7 @@ public:
                 return false;
             }
         }
+        */
         return aWriter.Write(theFileName) == IFSelect_RetDone;
     }
 

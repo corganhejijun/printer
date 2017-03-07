@@ -13,16 +13,22 @@ namespace Wpf3DPrint
     public partial class MainWindow : Window
     {
         private Scene scene;
+        private Scene sliceScene;
         private FileReader fileReader;
 
         public MainWindow()
         {
             InitializeComponent();
             scene = new Scene();
+            sliceScene = new Scene();
             fileReader = new FileReader(scene);
             ImageBrush brush = new ImageBrush(scene.Image);
+            ImageBrush sliceBrush = new ImageBrush(sliceScene.Image);
             brush.RelativeTransform = new ScaleTransform(1.0, -1.0, 0.5, 0.5);
+            sliceBrush.RelativeTransform = new ScaleTransform(1.0, -1.0, 0.5, 0.5);
             GridScene.Background = brush;
+            GridSlice.Background = sliceBrush;
+            fileReader.setSliceScene(sliceScene);
         }
 
         private void buttonSelectMode_Click(object sender, RoutedEventArgs e)
@@ -87,6 +93,7 @@ namespace Wpf3DPrint
             saveFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step";
             if (false == saveFile.ShowDialog())
                 return;
+            fileReader.saveSlice(saveFile.FileName);
         }
 
         private void buttonSlice_Click(object sender, RoutedEventArgs e)
@@ -110,10 +117,16 @@ namespace Wpf3DPrint
             scene.Resize(Convert.ToInt32(e.NewSize.Width), Convert.ToInt32(e.NewSize.Height));
         }
 
+        private void GridSlice_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            sliceScene.Resize(Convert.ToInt32(e.NewSize.Width), Convert.ToInt32(e.NewSize.Height));
+        }
+
         private void Window_Closed(object sender, EventArgs e)
         {
             fileReader.releaseShape();
             scene.Dispose();
+            sliceScene.Dispose();
         }
 
         bool beginRotate = false;

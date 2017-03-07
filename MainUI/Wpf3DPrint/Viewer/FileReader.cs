@@ -20,11 +20,17 @@ namespace Wpf3DPrint.Viewer
         }
 
         Scene scene;
+        Scene sliceScene;
         ArrayList shapeList;
         public FileReader(Scene scene)
         {
             this.scene = scene;
             shapeList = new ArrayList();
+        }
+
+        public void setSliceScene(Scene sliceSene)
+        {
+            this.sliceScene = sliceSene;
         }
 
         public bool openStep(string fileName, SceneThread.afterFunction afterOpenStep)
@@ -74,7 +80,15 @@ namespace Wpf3DPrint.Viewer
         private bool displayOneShape(IntPtr shapePt)
         {
             scene.Proxy.displayShape(shapePt);
+            sliceScene.Proxy.EraseObjects();
+            sliceScene.Proxy.displayShape(shapePt);
+            sliceScene.Proxy.ZoomAllView();
             return true;
+        }
+
+        public unsafe void saveSlice(string path)
+        {
+            sliceScene.Proxy.ExportStep((sbyte*)Marshal.StringToHGlobalAnsi(path));
         }
 
         public void sliceShape(Control control, SceneThread.afterFunction afterSlice)
@@ -92,18 +106,15 @@ namespace Wpf3DPrint.Viewer
             foreach (Shape shape in shapeList)
             {
                 int count = 50;
-                for (int i = 0; i <= count; i++)
+                for (int i = 0; i < count; i++)
                 {
                     double Xmin, Xmax, Ymin, Ymax, Zmin, Zmax;
                     Xmin = Xmax = Ymin = Ymax = Zmin = Zmax = 0;
                     Cpp2Managed.getShapeBoundary(shape.shape, 0, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
-                    double height = 0;
-                    if (i == count)
-                        height = Zmax;
-                    else
-                        height = Zmin + (double)i / count * (Zmax - Zmin);
+                    double height = Zmin + (double)i / count * (Zmax - Zmin);
                     IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, Zmax, Zmin, height);
-                    control.Dispatcher.Invoke(new DisplayOneShape(displayOneShape), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice });
+                    if (slice != IntPtr.Zero)
+                        control.Dispatcher.Invoke(new DisplayOneShape(displayOneShape), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice });
                 }
             }
             return null;
@@ -121,6 +132,7 @@ namespace Wpf3DPrint.Viewer
         public void afterOpenFile()
         {
             scene.Proxy.ZoomAllView();
+            sliceScene.Proxy.TopView();
         }
     }
 }
