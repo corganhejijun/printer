@@ -814,22 +814,6 @@ public:
                 return false;
             }
         }
-        /*
-        for (myAISContext()->InitDetected(); myAISContext()->MoreDetected(); myAISContext()->NextDetected())
-        {
-            Handle(AIS_Shape) anIS = Handle(AIS_Shape)::DownCast(myAISContext()->DetectedCurrentObject());
-            if (anIS.IsNull())
-            {
-                return false;
-            }
-
-            TopoDS_Shape aShape = anIS->Shape();
-            if (aWriter.Transfer(aShape, aType) != IFSelect_RetDone)
-            {
-                return false;
-            }
-        }
-        */
         return aWriter.Write(theFileName) == IFSelect_RetDone;
     }
 

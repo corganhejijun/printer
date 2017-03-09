@@ -11,11 +11,12 @@
         <ToolBar x:Name="toolBar" Height="48" VerticalAlignment="Top" HorizontalAlignment="Left" Width="229.52" d:LayoutOverrides="HorizontalAlignment">
             <Button x:Name="buttonSelectMode" Content="选择" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSelectMode_Click"/>
             <Button x:Name="buttonWatchMode" Content="观察" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonWatchMode_Click" Background="LightSkyBlue"/>
-            <Button x:Name="buttonSlice" Content="切片" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Background="Transparent" Click="buttonSlice_Click"/>
+            <Button x:Name="buttonSlice" Content="切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Background="Transparent" Click="buttonSlice_Click"/>
         </ToolBar>
         <ToolBar x:Name="toolBar_Copy" Margin="229.52,0,0,0" Height="48" VerticalAlignment="Top" HorizontalAlignment="Left" Width="805.48">
             <Button x:Name="buttonOpen" Content="打开..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpen_Click"/>
             <Button x:Name="buttonSave" Content="保存..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSave_Click"/>
+            <Button x:Name="buttonClose" Content="关闭" Height="43" VerticalAlignment="Top" Width="75" Click="buttonClose_Click"/>
         </ToolBar>
         <Grid x:Name="GridView" Margin="0,48,0,0">
             <Grid.ColumnDefinitions>
@@ -26,6 +27,8 @@
             <Grid x:Name="GridScene" Grid.Column="0" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave"/>
             <GridSplitter Width="5" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
             <Grid x:Name="GridSlice" Grid.Column="2" Background="Aqua" SizeChanged="GridSlice_SizeChanged">
+                <TextBox x:Name="textBoxSlice" HorizontalAlignment="Left" Height="22" Margin="286,0,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="229" IsEnabled="False" Visibility="Hidden"/>
+                <Slider x:Name="sliderSlice" Margin="10,0,10,10" VerticalAlignment="Bottom" SmallChange="0" ValueChanged="sliderSlice_ValueChanged" TickPlacement="BottomRight" Value="-1" IsSnapToTickEnabled="True"/>
             </Grid>
         </Grid>
         <Grid x:Name="GridOnReading" Height="82" Margin="320,224,321,0" VerticalAlignment="Top" Background="White" Visibility="Hidden">

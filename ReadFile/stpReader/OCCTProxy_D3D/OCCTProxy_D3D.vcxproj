@@ -89,6 +89,10 @@
     <IncludePath>$(ProjectDir)..\src\OpenGl;$(ProjectDir)..\inc;$(ProjectDir)..\src\InterfaceGraphic;$(ProjectDir)..\src\Standard;$(ProjectDir)..\src\Aspect;$(ProjectDir)..\src\NCollection;$(ProjectDir)..\src\Graphic3d;$(ProjectDir)..\src\TCollection;$(ProjectDir)..\src\Image;$(ProjectDir)..\src\Message;$(ProjectDir)..\src\WNT;$(ProjectDir)..\src\BVH;$(ProjectDir)..\src\gp;$(ProjectDir)..\src\Bnd;$(ProjectDir)..\src\Precision;$(ProjectDir)..\src\V3d;$(ProjectDir)..\src\PrsMgr;$(ProjectDir)..\src\AIS;$(ProjectDir)..\src\TopLoc;$(ProjectDir)..\src\TopoDS;$(ProjectDir)..\src\SelectMgr;$(ProjectDir)..\src\Prs3d;$(ProjectDir)..\src\BRep;$(ProjectDir)..\src\FSD;$(ProjectDir)..\src\Storage;$(ProjectDir)..\src\IGESControl;$(ProjectDir)..\src\Interface;$(ProjectDir)..\src\MoniTool;$(ProjectDir)..\src\TopExp;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)..\src\OpenGl;$(ProjectDir)..\inc;$(ProjectDir)..\src\InterfaceGraphic;$(ProjectDir)..\src\Standard;$(ProjectDir)..\src\Aspect;$(ProjectDir)..\src\NCollection;$(ProjectDir)..\src\Graphic3d;$(ProjectDir)..\src\TCollection;$(ProjectDir)..\src\Image;$(ProjectDir)..\src\Message;$(ProjectDir)..\src\WNT;$(ProjectDir)..\src\BVH;$(ProjectDir)..\src\gp;$(ProjectDir)..\src\Bnd;$(ProjectDir)..\src\Precision;$(ProjectDir)..\src\V3d;$(ProjectDir)..\src\PrsMgr;$(ProjectDir)..\src\AIS;$(ProjectDir)..\src\TopLoc;$(ProjectDir)..\src\TopoDS;$(ProjectDir)..\src\SelectMgr;$(ProjectDir)..\src\Prs3d;$(ProjectDir)..\src\BRep;$(ProjectDir)..\src\FSD;$(ProjectDir)..\src\Storage;$(ProjectDir)..\src\IGESControl;$(ProjectDir)..\src\Interface;$(ProjectDir)..\src\MoniTool;$(ProjectDir)..\src\TopExp;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>

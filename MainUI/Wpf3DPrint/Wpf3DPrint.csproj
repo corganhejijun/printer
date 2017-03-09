@@ -59,10 +59,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialog\DialogSlice.xaml.cs">
+      <DependentUpon>DialogSlice.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Viewer\Cpp2Managed.cs" />
     <Compile Include="Viewer\FileReader.cs" />
     <Compile Include="Viewer\Scene.cs" />
     <Compile Include="Viewer\SceneThread.cs" />
+    <Compile Include="Viewer\Shape.cs" />
+    <Page Include="Dialog\DialogSlice.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -120,6 +120,12 @@ EXPORT void getShapeBoundary(void** pt, int index, double* Zmin, double* Zmax, d
     B.Get(*Xmin, *Ymin, *Zmin, *Xmax, *Ymax, *Zmax);
 }
 
+EXPORT void deleteSlice(void* pt)
+{
+    ShapeContainer* container = (ShapeContainer*)pt;
+    delete container;
+}
+
 EXPORT ShapeContainer* SliceShape(void** pt, int index, double Zmax, double Zmin, double height)
 {
     ShapeContainer* shape = ShapeContainer::getContainer(pt, index);

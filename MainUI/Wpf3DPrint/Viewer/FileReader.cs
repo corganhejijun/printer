@@ -8,17 +8,6 @@ namespace Wpf3DPrint.Viewer
 {
     class FileReader
     {
-        class Shape
-        {
-            public IntPtr shape;
-            public int count;
-            public Shape(IntPtr shape, int count)
-            {
-                this.shape = shape;
-                this.count = count;
-            }
-        }
-
         Scene scene;
         Scene sliceScene;
         ArrayList shapeList;
@@ -26,6 +15,22 @@ namespace Wpf3DPrint.Viewer
         {
             this.scene = scene;
             shapeList = new ArrayList();
+        }
+
+        public Shape Shape
+        {
+            get
+            {
+                return (Shape)shapeList[0];
+            }
+        }
+
+        public bool HasFile
+        {
+            get
+            {
+                return shapeList.Count > 0;
+            }
         }
 
         public void setSliceScene(Scene sliceSene)
@@ -50,8 +55,8 @@ namespace Wpf3DPrint.Viewer
             bool result = Cpp2Managed.ImportStep(Marshal.StringToHGlobalAnsi(fileName), ref count, shapePt);
             list.Clear();
             list.Add(result);
-            list.Add(shapePt);
-            list.Add(count);
+            Shape shape = new Shape(shapePt, count);
+            list.Add(shape);
             return list;
         }
 
@@ -63,27 +68,32 @@ namespace Wpf3DPrint.Viewer
             {
                 return result;
             }
-            IntPtr shapePt = (IntPtr)list[1];
-            int count = (int)list[2];
-            Shape shape = new Shape(shapePt, count);
+            Shape shape = (Shape)list[1];
             shapeList.Add(shape);
-            return displayShape(shapePt, 0);
+            Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
+            return displayShape(shape.shape);
         }
 
-        private bool displayShape(IntPtr shapePt, int index)
+        private bool displayShape(IntPtr shapePt)
         {
             scene.Proxy.SetDisplayMode(1);
-            scene.Proxy.displayShape(shapePt, index, 0.7);
+            scene.Proxy.displayShape(shapePt, 0, 0.7);
             return true;
         }
 
-        private bool displayOneShape(IntPtr shapePt)
+        private bool displayOneShape(IntPtr shapePt, SceneThread.onFunction onSlice, ArrayList onArgs)
         {
             scene.Proxy.displayShape(shapePt);
-            sliceScene.Proxy.EraseObjects();
-            sliceScene.Proxy.displayShape(shapePt);
-            sliceScene.Proxy.ZoomAllView();
+            displaySlice(shapePt);
+            onSlice(onArgs);
             return true;
+        }
+
+        private void displaySlice(IntPtr slice)
+        {
+            sliceScene.Proxy.EraseObjects();
+            sliceScene.Proxy.displayShape(slice);
+            sliceScene.Proxy.ZoomAllView();
         }
 
         public unsafe void saveSlice(string path)
@@ -91,42 +101,60 @@ namespace Wpf3DPrint.Viewer
             sliceScene.Proxy.ExportStep((sbyte*)Marshal.StringToHGlobalAnsi(path));
         }
 
-        public void sliceShape(Control control, SceneThread.afterFunction afterSlice)
+        public void sliceShape(Control control, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)
         {
             ArrayList args = new ArrayList();
             args.Add(control);
+            args.Add(onSlice);
             scene.D3DThread.addWork(sliceShapeWork, args, afterSlice);
         }
 
-        delegate bool DisplayOneShape(IntPtr shape);
+        delegate bool DisplayOneShape(IntPtr shape, SceneThread.onFunction onSlice, ArrayList args);
         private object sliceShapeWork(object args)
         {
             ArrayList list = (ArrayList)args;
             Control control = (Control)list[0];
+            SceneThread.onFunction onslice = (SceneThread.onFunction)list[1];
             foreach (Shape shape in shapeList)
             {
-                int count = 50;
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < shape.sliceCnt; i++)
                 {
-                    double Xmin, Xmax, Ymin, Ymax, Zmin, Zmax;
-                    Xmin = Xmax = Ymin = Ymax = Zmin = Zmax = 0;
-                    Cpp2Managed.getShapeBoundary(shape.shape, 0, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
-                    double height = Zmin + (double)i / count * (Zmax - Zmin);
-                    IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, Zmax, Zmin, height);
+                    double height = shape.Zmin + (double)i / shape.sliceCnt * (shape.Zmax - shape.Zmin);
+                    IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, shape.Zmax, shape.Zmin, height);
+                    shape.sliceList.Add(slice);
                     if (slice != IntPtr.Zero)
-                        control.Dispatcher.Invoke(new DisplayOneShape(displayOneShape), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice });
+                    {
+                        ArrayList onArgs = new ArrayList();
+                        onArgs.Add(shape);
+                        onArgs.Add(i);
+                        control.Dispatcher.Invoke(new DisplayOneShape(displayOneShape), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, onslice, onArgs });
+                    }
                 }
             }
             return null;
+        }
+
+        public void displaySlice(int index)
+        {
+            Shape shape = (Shape)shapeList[0];
+            IntPtr slice = (IntPtr)shape.sliceList[index];
+            displaySlice(slice);
         }
 
         public void releaseShape()
         {
             foreach (Shape shape in shapeList)
             {
+                foreach (IntPtr slice in shape.sliceList)
+                {
+                    Cpp2Managed.deleteSlice(slice);
+                }
                 Cpp2Managed.deleteShape(shape.shape, shape.count);
                 Marshal.FreeHGlobal(shape.shape);
             }
+            shapeList.Clear();
+            scene.Proxy.removeObjects();
+            sliceScene.Proxy.removeObjects();
         }
 
         public void afterOpenFile()

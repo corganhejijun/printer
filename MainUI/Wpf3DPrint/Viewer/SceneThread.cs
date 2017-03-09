@@ -13,6 +13,7 @@ namespace Wpf3DPrint.Viewer
 
         public delegate object function(object arg);
         public delegate void afterFunction(object result);
+        public delegate void onFunction(object result);
 
         public bool IsBusy
         {

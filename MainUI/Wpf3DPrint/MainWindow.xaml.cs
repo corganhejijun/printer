@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -60,6 +61,11 @@ namespace Wpf3DPrint
 
         private void buttonOpen_Click(object sender, RoutedEventArgs e)
         {
+            if (fileReader.HasFile)
+            {
+                MessageBox.Show("请先关闭已打开的文件");
+                return;
+            }
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.DefaultExt = ".stp";
             openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step";
@@ -98,8 +104,23 @@ namespace Wpf3DPrint
 
         private void buttonSlice_Click(object sender, RoutedEventArgs e)
         {
+            if (!fileReader.HasFile)
+                return;
+            Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape);
+            if (dlSlice.ShowDialog() == false)
+                return;
             buttonSlice.IsEnabled = false;
-            fileReader.sliceShape((Control)this, onAfterSlice);
+            textBoxSlice.Visibility = Visibility.Visible;
+            fileReader.sliceShape((Control)this, onAfterSlice, new SceneThread.onFunction(onSlice));
+            sliderSlice.Maximum = fileReader.Shape.sliceCnt - 1;
+        }
+
+        private void onSlice(object args)
+        {
+            ArrayList argList = (ArrayList)args;
+            Shape shape = (Shape)argList[0];
+            int currentSlice = (int)argList[1];
+            textBoxSlice.Text = "总层数：" + shape.sliceCnt + " 当前层数：" + currentSlice;
         }
 
         private void onAfterSlice(object args)
@@ -110,6 +131,7 @@ namespace Wpf3DPrint
         private void afterSlice(object args)
         {
             buttonSlice.IsEnabled = true;
+            textBoxSlice.Visibility = Visibility.Hidden;
         }
 
         private void GridScene_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -159,6 +181,16 @@ namespace Wpf3DPrint
         private void GridScene_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
             beginRotate = false;
+        }
+
+        private void buttonClose_Click(object sender, RoutedEventArgs e)
+        {
+            fileReader.releaseShape();
+        }
+
+        private void sliderSlice_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            fileReader.displaySlice((int)sliderSlice.Value);
         }
     }
 }
