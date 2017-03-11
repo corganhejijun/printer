@@ -54,6 +54,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <sstream>
+#include <TopTools_HSequenceOfShape.hxx>
 
 
 #define EXPORT extern "C" __declspec( dllexport )
@@ -86,20 +87,26 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes)
         int aNbShap = aReader.NbShapes();
         if (aNbShap > 0)
         {
-            for (int aShapeIter = 1; aShapeIter <= aNbShap; ++aShapeIter)
+            Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
+            //for (int aShapeIter = 1; aShapeIter <= aNbShap; ++aShapeIter)
             {
-                TopoDS_Shape shape = aReader.Shape(aShapeIter);
-                ShapeContainer* sc = new ShapeContainer(shape);
-                *(shapes + (*cnt)*sizeof(void*)) = sc;
-                (*cnt)++;
-                if (*cnt >= length)
-                {
-                    return false;
-                }
+                TopoDS_Shape shape = aReader.Shape(aNbShap);
+                aHSequenceOfShape->Append(shape);
             }
+            ShapeContainer* sc = new ShapeContainer(aHSequenceOfShape);
+            *(shapes + (*cnt)*sizeof(void*)) = sc;
+            (*cnt)++;
         }
     }
+    if ((*cnt) == 1) {
+        ShapeContainer* shape = ShapeContainer::getContainer(shapes, 0);
+        shape->Shape = shape->shapeSequence->Value(1);
+    }
     return true;
+}
+
+EXPORT void* getSliceFromShape(void** shapes, int index) {
+    return *(shapes + index*sizeof(void*));
 }
 
 EXPORT bool deleteShape(void** pt, int count)
@@ -107,6 +114,10 @@ EXPORT bool deleteShape(void** pt, int count)
     for (int i = 0; i < count; i++)
     {
         ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
+        if (shape->type == ShapeContainer::Slice) {
+            shape->shapeSequence->Clear();
+            shape->shapeSequence->Delete();
+        }
         delete shape;
     }
     return true;
@@ -123,7 +134,8 @@ EXPORT void getShapeBoundary(void** pt, int index, double* Zmin, double* Zmax, d
 EXPORT void deleteSlice(void* pt)
 {
     ShapeContainer* container = (ShapeContainer*)pt;
-    delete container;
+    if (container->type == ShapeContainer::Entity)
+        delete container;
 }
 
 EXPORT ShapeContainer* SliceShape(void** pt, int index, double Zmax, double Zmin, double height)

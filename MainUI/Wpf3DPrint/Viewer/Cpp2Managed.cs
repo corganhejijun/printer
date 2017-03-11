@@ -23,5 +23,8 @@ namespace Wpf3DPrint.Viewer
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void deleteSlice(IntPtr pt);
+
+        [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr getSliceFromShape(IntPtr pt, int index);
     }
 }

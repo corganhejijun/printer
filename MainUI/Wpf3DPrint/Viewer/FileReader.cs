@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 
@@ -50,7 +49,7 @@ namespace Wpf3DPrint.Viewer
         {
             ArrayList list = (ArrayList)args;
             string fileName = (string)list[0];
-            int count = 100;
+            int count = 500;
             IntPtr shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)) * count);
             bool result = Cpp2Managed.ImportStep(Marshal.StringToHGlobalAnsi(fileName), ref count, shapePt);
             list.Clear();
@@ -71,20 +70,20 @@ namespace Wpf3DPrint.Viewer
             Shape shape = (Shape)list[1];
             shapeList.Add(shape);
             Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
-            return displayShape(shape.shape);
+            return displayShape(shape);
         }
 
-        private bool displayShape(IntPtr shapePt)
+        private bool displayShape(Shape shape)
         {
             scene.Proxy.SetDisplayMode(1);
-            scene.Proxy.displayShape(shapePt, 0, 0.7);
+            scene.Proxy.displayShape(shape.shape, 0, 0.7);
             return true;
         }
 
-        private bool displayOneShape(IntPtr shapePt, SceneThread.onFunction onSlice, ArrayList onArgs)
+        private bool displaySlice(IntPtr slice, SceneThread.onFunction onSlice, ArrayList onArgs)
         {
-            scene.Proxy.displayShape(shapePt);
-            displaySlice(shapePt);
+            scene.Proxy.displaySlice(slice);
+            displaySlice(slice);
             onSlice(onArgs);
             return true;
         }
@@ -92,7 +91,7 @@ namespace Wpf3DPrint.Viewer
         private void displaySlice(IntPtr slice)
         {
             sliceScene.Proxy.EraseObjects();
-            sliceScene.Proxy.displayShape(slice);
+            sliceScene.Proxy.displaySlice(slice);
             sliceScene.Proxy.ZoomAllView();
         }
 
@@ -127,7 +126,7 @@ namespace Wpf3DPrint.Viewer
                         ArrayList onArgs = new ArrayList();
                         onArgs.Add(shape);
                         onArgs.Add(i);
-                        control.Dispatcher.Invoke(new DisplayOneShape(displayOneShape), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, onslice, onArgs });
+                        control.Dispatcher.Invoke(new DisplayOneShape(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, onslice, onArgs });
                     }
                 }
             }
@@ -139,6 +138,25 @@ namespace Wpf3DPrint.Viewer
             Shape shape = (Shape)shapeList[0];
             IntPtr slice = (IntPtr)shape.sliceList[index];
             displaySlice(slice);
+        }
+
+        public int afterOpenSlice(object workResult)
+        {
+            ArrayList list = (ArrayList)workResult;
+            bool result = (bool)list[0];
+            if (!result)
+            {
+                return -1;
+            }
+            Shape shape = (Shape)list[1];
+            shapeList.Add(shape);
+            for (int i = 0; i < shape.count; i++)
+            {
+                shape.sliceCnt = shape.count;
+                shape.sliceList.Add(Cpp2Managed.getSliceFromShape(shape.shape, i));
+            }
+            displaySlice(0);
+            return shape.count;
         }
 
         public void releaseShape()

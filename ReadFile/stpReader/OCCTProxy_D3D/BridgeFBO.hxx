@@ -5,6 +5,7 @@
 #include <OpenGl_FrameBuffer.hxx>
 
 #include <TopoDS_Shape.hxx>
+#include <TopTools_HSequenceOfShape.hxx>
 
 //! Implements bridge FBO for direct rendering to Direct3D surfaces.
 class BridgeFBO : public OpenGl_FrameBuffer
@@ -52,11 +53,23 @@ private:
   HANDLE myGlD3DSharedColorHandle;
 };
 
-class ShapeContainer
+public class ShapeContainer
 {
 public:
-    ShapeContainer(const TopoDS_Shape& shape) : Shape(shape){}
+    enum ShapeType
+    {
+        Entity, Slice
+    };
+    ShapeType type;
+    ShapeContainer(const Handle(TopTools_HSequenceOfShape) shape){
+        type = ShapeType::Slice;
+        shapeSequence = shape;
+    }
+    ShapeContainer(const TopoDS_Shape& shape) : Shape(shape){
+        type = ShapeType::Entity;
+    }
     TopoDS_Shape Shape;
+    Handle(TopTools_HSequenceOfShape) shapeSequence;
 
     static ShapeContainer* getContainer(void** pt, int index)
     {

@@ -53,6 +53,7 @@
 #include <TopExp_Explorer.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 #include <AIS_ListOfInteractive.hxx>
+#include <TopTools_HSequenceOfShape.hxx>
 
 /// <summary>
 /// Proxy class encapsulating calls to OCCT C++ classes within
@@ -766,12 +767,21 @@ public:
         return true;
     }
 
-    bool displayShape(System::IntPtr pt)
+    bool displaySlice(System::IntPtr pt)
     {
         ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
-        Handle(AIS_Shape) aisShape = new AIS_Shape(shape->Shape);
-        myAISContext()->Display(aisShape, Standard_True);
-        myAISContext()->SetSelected(aisShape);
+        if (shape->type == ShapeContainer::Entity) {
+            Handle(AIS_Shape) aisShape = new AIS_Shape(shape->Shape);
+            myAISContext()->Display(aisShape, Standard_True);
+            myAISContext()->SetSelected(aisShape);
+        }
+        else if (shape->type == ShapeContainer::Slice) {
+            Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = shape->shapeSequence;
+            for (int i = 1; i <= aHSequenceOfShape->Length(); i++) {
+                Handle(AIS_Shape) aisShape = new AIS_Shape(aHSequenceOfShape->Value(i));
+                myAISContext()->Display(aisShape, Standard_True);
+            }
+        }
         return true;
     }
 

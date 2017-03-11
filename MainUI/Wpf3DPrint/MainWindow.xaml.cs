@@ -192,5 +192,38 @@ namespace Wpf3DPrint
         {
             fileReader.displaySlice((int)sliderSlice.Value);
         }
+
+        private void buttonOpenSlice_Click(object sender, RoutedEventArgs e)
+        {
+            if (fileReader.HasFile)
+            {
+                MessageBox.Show("请先关闭已打开的文件");
+                return;
+            }
+            OpenFileDialog openFile = new OpenFileDialog();
+            openFile.DefaultExt = ".stp";
+            openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step";
+            if (openFile.ShowDialog() == false)
+                return;
+            if (!fileReader.openStep(openFile.FileName, afterOpenSlice))
+            {
+                MessageBox.Show("Open file Failed!");
+                return;
+            }
+            onOpeningFile(openFile.FileName);
+        }
+
+        private void afterOpenSlice(object args)
+        {
+            this.Dispatcher.Invoke(new SceneThread.afterFunction(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { args });
+        }
+
+        private void displaySlice(object workResult)
+        {
+            int count = fileReader.afterOpenSlice(workResult);
+            sliderSlice.Maximum = count - 1;
+            fileReader.afterOpenFile();
+            afterOpenFile();
+        }
     }
 }
