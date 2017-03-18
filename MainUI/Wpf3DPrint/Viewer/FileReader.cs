@@ -37,10 +37,11 @@ namespace Wpf3DPrint.Viewer
             this.sliceScene = sliceSene;
         }
 
-        public bool openStep(string fileName, SceneThread.afterFunction afterOpenStep)
+        public bool openStep(string fileName, SceneThread.afterFunction afterOpenStep, bool isSlice)
         {
             ArrayList list = new ArrayList();
             list.Add(fileName);
+            list.Add(isSlice);
             scene.D3DThread.addWork(openStepWork, list, afterOpenStep);
             return true;
         }
@@ -49,9 +50,10 @@ namespace Wpf3DPrint.Viewer
         {
             ArrayList list = (ArrayList)args;
             string fileName = (string)list[0];
+            bool isSlice = (bool)list[1];
             int count = 500;
             IntPtr shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)) * count);
-            bool result = Cpp2Managed.ImportStep(Marshal.StringToHGlobalAnsi(fileName), ref count, shapePt);
+            bool result = Cpp2Managed.ImportStep(Marshal.StringToHGlobalAnsi(fileName), ref count, shapePt, isSlice);
             list.Clear();
             list.Add(result);
             Shape shape = new Shape(shapePt, count);
@@ -97,7 +99,14 @@ namespace Wpf3DPrint.Viewer
 
         public unsafe void saveSlice(string path)
         {
-            sliceScene.Proxy.ExportStep((sbyte*)Marshal.StringToHGlobalAnsi(path));
+            Shape shape = (Shape)shapeList[0];
+            IntPtr[] slices = new IntPtr[shape.sliceList.Count];
+            int i = 0;
+            foreach (IntPtr slice in shape.sliceList)
+            {
+                slices[i++] = slice;
+            }
+            Cpp2Managed.exportStep(Marshal.StringToHGlobalAnsi(path), slices, shape.sliceList.Count);
         }
 
         public void sliceShape(Control control, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)

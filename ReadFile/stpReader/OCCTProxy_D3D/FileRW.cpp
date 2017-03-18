@@ -55,7 +55,15 @@
 #include <TopoDS_Edge.hxx>
 #include <sstream>
 #include <TopTools_HSequenceOfShape.hxx>
+#include <BRepAdaptor_Curve.hxx>
+#include <gp_Circ.hxx>
+#include <Geom_BSplineCurve.hxx>
+#include <TColStd_Array1OfReal.hxx>
+#include <TColgp_Array1OfPnt.hxx>
 
+#include <iostream>
+#include <fstream>
+#include <math.h>
 
 #define EXPORT extern "C" __declspec( dllexport )
 
@@ -66,7 +74,74 @@
 ///Import Step file
 /// </summary>
 /// <param name="theFileName">Name of import file</param>
-EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes)
+int layer = 1;
+const char* TopAbs_ShapeEnum_str[] = { "COMPOUND", "COMPSOLID", "SOLID", "SHELL", "FACE", "WIRE", "EDGE", "VERTEX", "SHAPE" };
+const char* GeomAbs_CurveType_str[] = { "Line", "Circle", "Ellipse", "Hyperbola", "Parabola", "BezierCurve", "BSplineCurve", "OtherCurve" };
+
+void showType(TopoDS_Shape shape, ofstream& file) {
+    layer++;
+    for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
+        TopoDS_Shape child = anIt.Value();
+        if (child.ShapeType() == TopAbs_ShapeEnum::TopAbs_EDGE) {
+            BRepAdaptor_Curve adpCurve = BRepAdaptor_Curve(TopoDS::Edge(child));
+            if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_Circle) {
+                gp_Circ circle = adpCurve.Circle();
+                gp_Pnt center = circle.Location();
+                Standard_Real first = 0, last = 0;
+                Handle_Geom_Curve theCurve = BRep_Tool::Curve(TopoDS::Edge(child), first, last);
+                for (int i = 0; i < layer; i++)
+                    file << '\t';
+                file << "circle radius is " << circle.Radius() << 
+                    ", center is (" << center.X() << "," << center.Y() << "," << center.Z() << ")" 
+                    ", start angle is " << (first/M_PI*360) << ", end angle is " << (last/M_PI*360) << endl;
+            } else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_BSplineCurve) {
+                Handle_Geom_BSplineCurve bSpline = adpCurve.BSpline();
+                for (int i = 0; i < layer; i++)
+                    file << '\t';
+                file << "B spline ";
+                if (bSpline->IsPeriodic())
+                    file << "is periodic";
+                if (bSpline->IsRational())
+                    file << " weights are same";
+                int knotsCount = bSpline->NbKnots();
+                int polesCount = bSpline->NbPoles();
+                file << " degree is " << bSpline->Degree() << " has " << knotsCount << " knots " << polesCount << " poles " << endl;
+                TColStd_Array1OfReal knots(1, knotsCount);
+                bSpline->Knots(knots);
+                file << " knots value ";
+                for (int i = 1; i < knotsCount; i++)
+                    file << knots(i) << " ";
+                file << endl;
+                TColgp_Array1OfPnt Poles(1, polesCount);
+                bSpline->Poles(Poles);
+                file << " poles value";
+                for (int i = 1; i < polesCount; i++) {
+                    gp_Pnt pt = Poles(i);
+                    file << "(" << pt.X() << "," << pt.Y() << "," << pt.Z() << ") ";
+                }
+                file << endl;
+            } else {
+                for (int i = 0; i < layer; i++)
+                    file << '\t';
+                file << "edge type is " << GeomAbs_CurveType_str[adpCurve.GetType()] << endl;
+            }
+        } else if (child.ShapeType() == TopAbs_ShapeEnum::TopAbs_VERTEX) {
+            TopoDS_Vertex vertex = TopoDS::Vertex(child);
+            gp_Pnt pt = BRep_Tool::Pnt(vertex);
+            for (int i = 0; i < layer; i++)
+                file << '\t';
+            file << "vertex postion is (" << pt.X() << "," << pt.Y() << "," << pt.Z() << ")" << endl;
+        } else {
+            for (int i = 0; i < layer; i++)
+                file << '\t';
+            file << "type is " << TopAbs_ShapeEnum_str[child.ShapeType()] << endl;
+        }
+        showType(child, file);
+    }
+    --layer;
+}
+
+EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice)
 {
     int length = *cnt;
     *cnt = 0;
@@ -81,6 +156,7 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes)
 
     int aNbRoot = aReader.NbRootsForTransfer();
     aReader.PrintCheckTransfer(isFailsonly, IFSelect_ItemsByEntity);
+    ofstream file("log.txt");
     for (Standard_Integer aRootIter = 1; aRootIter <= aNbRoot; ++aRootIter)
     {
         aReader.TransferRoot(aRootIter);
@@ -91,6 +167,27 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes)
             //for (int aShapeIter = 1; aShapeIter <= aNbShap; ++aShapeIter)
             {
                 TopoDS_Shape shape = aReader.Shape(aNbShap);
+                if (isSlice) {
+                    file << "begin shape" << endl;
+                    showType(shape, file);
+                    file << "end shape" << endl;
+                    /*
+                    for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
+                        TopoDS_Shape aChild = anIt.Value();
+                        for (TopoDS_Iterator childIt(aChild); childIt.More(); childIt.Next()) {
+                            const TopoDS_Shape childChild = childIt.Value();
+                            printf("child type is %d", childChild.ShapeType());
+                            TopoDS_Vertex vertex = TopoDS::Vertex(childChild);
+                            gp_Pnt pt = BRep_Tool::Pnt(vertex);
+                            printf(" (%f, %f, %f)\n", pt.X(), pt.Y(), pt.Z());
+                        }
+                        Standard_Real first = 0, last = 0;
+                        Handle_Geom_Curve theCurve = BRep_Tool::Curve(TopoDS::Edge(aChild), first, last);
+                        BRepAdaptor_Curve adpCurve = BRepAdaptor_Curve(TopoDS::Edge(aChild));
+                        printf("type is %d, %d, (%f, %f)\n", aChild.ShapeType(), adpCurve.GetType(), first, last);
+                    }
+                    */
+                }
                 aHSequenceOfShape->Append(shape);
             }
             ShapeContainer* sc = new ShapeContainer(aHSequenceOfShape);
@@ -162,4 +259,14 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double Zmax, double Zmin
     myAISContext()->Display(new AIS_Shape(currentFace), Standard_True);
     }
     */
+}
+
+EXPORT bool exportStep(char* fileName, ShapeContainer** slices, int length) {
+    STEPControl_StepModelType aType = STEPControl_AsIs;
+    STEPControl_Writer        aWriter;
+    for (int i = 0; i < length; i++){
+        if (aWriter.Transfer(slices[i]->Shape, aType) != IFSelect_RetDone)
+            return false;
+    }
+    return aWriter.Write(fileName) == IFSelect_RetDone;
 }

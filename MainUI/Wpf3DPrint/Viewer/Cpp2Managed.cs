@@ -10,7 +10,7 @@ namespace Wpf3DPrint.Viewer
     class Cpp2Managed
     {
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImportStep(IntPtr theFileName, ref int cnt, IntPtr shapes);
+        public static extern bool ImportStep(IntPtr theFileName, ref int cnt, IntPtr shapes, bool isSlice);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool deleteShape(IntPtr shapes, int cnt);
@@ -26,5 +26,8 @@ namespace Wpf3DPrint.Viewer
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr getSliceFromShape(IntPtr pt, int index);
+
+        [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool exportStep(IntPtr fileName, IntPtr[] slices, int length);
     }
 }

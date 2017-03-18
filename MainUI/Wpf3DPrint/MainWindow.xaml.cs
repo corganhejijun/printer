@@ -71,7 +71,7 @@ namespace Wpf3DPrint
             openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step";
             if (openFile.ShowDialog() == false)
                 return;
-            if (!fileReader.openStep(openFile.FileName, afterOpenStep))
+            if (!fileReader.openStep(openFile.FileName, afterOpenStep, false))
             {
                 MessageBox.Show("Open file Failed!");
                 return;
@@ -205,7 +205,7 @@ namespace Wpf3DPrint
             openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step";
             if (openFile.ShowDialog() == false)
                 return;
-            if (!fileReader.openStep(openFile.FileName, afterOpenSlice))
+            if (!fileReader.openStep(openFile.FileName, afterOpenSlice, true))
             {
                 MessageBox.Show("Open file Failed!");
                 return;
@@ -224,6 +224,16 @@ namespace Wpf3DPrint
             sliderSlice.Maximum = count - 1;
             fileReader.afterOpenFile();
             afterOpenFile();
+        }
+
+        private void menuQuit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void menuCloseFile_Click(object sender, RoutedEventArgs e)
+        {
+            fileReader.releaseShape();
         }
     }
 }

@@ -7,17 +7,47 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="686" Width="1043" Closed="Window_Closed">
     <Grid x:Name="GridMain">
-        <ToolBarTray Height="48" VerticalAlignment="Top"/>
-        <ToolBar x:Name="toolBar" Height="48" VerticalAlignment="Top" HorizontalAlignment="Left" Width="229.52" d:LayoutOverrides="HorizontalAlignment">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="文件" HorizontalAlignment="Right" Width="38">
+                <MenuItem Header="打开..."></MenuItem>
+                <MenuItem Header="另存为..."></MenuItem>
+                <MenuItem x:Name="menuCloseFile" Header="关闭" Click="menuCloseFile_Click"></MenuItem>
+                <MenuItem x:Name="menuQuit" Header="退出" Click="menuQuit_Click"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="编辑">
+                <MenuItem Header="对齐">
+                    <MenuItem Header="几何中心对齐"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="旋转..."></MenuItem>
+                <MenuItem Header="移动..."></MenuItem>
+            </MenuItem>
+            <MenuItem Header="工具">
+                <MenuItem Header="工艺参数设置..."></MenuItem>
+                <MenuItem Header="图形处理..."></MenuItem>
+                <MenuItem Header="路径规划..."></MenuItem>
+                <MenuItem Header="仿真..."></MenuItem>
+                <MenuItem Header="加工..."></MenuItem>
+            </MenuItem>
+            <MenuItem Header="机器">
+                <MenuItem Header="基本信息"></MenuItem>
+                <MenuItem Header="调试..."></MenuItem>
+                <MenuItem Header="运动参数..."></MenuItem>
+                <MenuItem Header="功能参数..."></MenuItem>
+            </MenuItem>
+            <MenuItem Header="帮助">
+                <MenuItem Header="关于..."></MenuItem>
+            </MenuItem>
+        </Menu>
+        <ToolBar x:Name="toolBar" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="230" Margin="0,24,0,0">
             <Button x:Name="buttonSelectMode" Content="选择" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSelectMode_Click"/>
             <Button x:Name="buttonWatchMode" Content="观察" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonWatchMode_Click" Background="LightSkyBlue"/>
             <Button x:Name="buttonSlice" Content="切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Background="Transparent" Click="buttonSlice_Click"/>
         </ToolBar>
-        <ToolBar x:Name="toolBar_Copy" Margin="229.52,0,0,0" Height="48" VerticalAlignment="Top" HorizontalAlignment="Left" Width="805.48">
+        <ToolBar x:Name="toolBar_Copy" Margin="230,24,0,0" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="805">
             <Button x:Name="buttonOpen" Content="打开..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpen_Click"/>
             <Button x:Name="buttonSave" Content="保存..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSave_Click"/>
-            <Button x:Name="buttonOpenSlice" Content="打开切片..." Height="43" VerticalAlignment="Top" Width="74" Click="buttonOpenSlice_Click"/>
-            <Button x:Name="buttonClose" Content="关闭" Height="43" VerticalAlignment="Top" Width="75" Click="buttonClose_Click"/>
+            <Button x:Name="buttonOpenSlice" Content="打开切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpenSlice_Click"/>
+            <Button x:Name="buttonClose" Content="关闭" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonClose_Click"/>
         </ToolBar>
         <Grid x:Name="GridView" Margin="0,48,0,0">
             <Grid.ColumnDefinitions>
