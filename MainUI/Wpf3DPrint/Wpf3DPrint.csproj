@@ -41,6 +41,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -53,6 +55,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -65,6 +68,7 @@
     <Compile Include="Viewer\Cpp2Managed.cs" />
     <Compile Include="Viewer\FileReader.cs" />
     <Compile Include="Viewer\Scene.cs" />
+    <Compile Include="Viewer\Scene2D.cs" />
     <Compile Include="Viewer\SceneThread.cs" />
     <Compile Include="Viewer\Shape.cs" />
     <Page Include="Dialog\DialogSlice.xaml">

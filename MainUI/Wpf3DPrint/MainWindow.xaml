@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint"
+        xmlns:WinForms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
         Title="MainWindow" Height="686" Width="1043" Closed="Window_Closed">
     <Grid x:Name="GridMain">
@@ -57,7 +58,10 @@
             </Grid.ColumnDefinitions>
             <Grid x:Name="GridScene" Grid.Column="0" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave"/>
             <GridSplitter Width="5" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
-            <Grid x:Name="GridSlice" Grid.Column="2" Background="Aqua" SizeChanged="GridSlice_SizeChanged">
+            <Grid x:Name="GridSlice" Grid.Column="2" Background="Aqua">
+                <WindowsFormsHost Margin="0,0,0,0">
+                    <WinForms:Panel x:Name="PanelSlice" BackColor="Black" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
+                </WindowsFormsHost>
                 <TextBox x:Name="textBoxSlice" HorizontalAlignment="Left" Height="22" Margin="286,0,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="229" IsEnabled="False" Visibility="Hidden"/>
                 <Slider x:Name="sliderSlice" Margin="10,0,10,10" VerticalAlignment="Bottom" SmallChange="0" ValueChanged="sliderSlice_ValueChanged" TickPlacement="BottomRight" Value="-1" IsSnapToTickEnabled="True"/>
             </Grid>

@@ -64,6 +64,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
+#include "slice.h"
 
 #define EXPORT extern "C" __declspec( dllexport )
 
@@ -78,7 +79,91 @@ int layer = 1;
 const char* TopAbs_ShapeEnum_str[] = { "COMPOUND", "COMPSOLID", "SOLID", "SHELL", "FACE", "WIRE", "EDGE", "VERTEX", "SHAPE" };
 const char* GeomAbs_CurveType_str[] = { "Line", "Circle", "Ellipse", "Hyperbola", "Parabola", "BezierCurve", "BSplineCurve", "OtherCurve" };
 
-void showType(TopoDS_Shape shape, ofstream& file) {
+Slice* getEmptySlice(Slice* slice) {
+    Slice* target = slice;
+    Slice* prev = NULL;
+    while (target != NULL && target->type != EdgeType::unknown) {
+        prev = target;
+        target = target->next;
+    }
+    if (target == NULL){
+        prev->next = new Slice();
+        target = prev->next;
+        target->next = NULL;
+        target->prev = prev;
+    }
+    return target;
+}
+
+void addCircle(Slice* slice, double centerX, double centerY, double startAngle, double endAngle, double radius) {
+    Slice* target = getEmptySlice(slice);
+    target->type = EdgeType::circle;
+    target->data = new Circle();
+    Circle* circle = (Circle*)(target->data);
+    circle->center.x = centerX;
+    circle->center.y = centerY;
+    circle->startAngle = startAngle;
+    circle->endAngle = endAngle;
+    circle->radius = radius;
+}
+
+void addLine(Slice* slice, double beginX, double beginY, double endX, double endY) {
+    Slice* target = getEmptySlice(slice);
+    target->type = EdgeType::line;
+    target->data = new Line();
+    Line* line = (Line*)(target->data);
+    line->start.x = beginX;
+    line->start.y = beginY;
+    line->end.x = endX;
+    line->end.y = endY;
+}
+
+void addBSpline(Slice* slice, double beginX, double beginY, double endX, double endY, Point* bSplinePoles, int polesCnt) {
+    Slice* target = getEmptySlice(slice);
+    target->type = EdgeType::bSplice;
+    target->data = new BSpline();
+    BSpline* b = (BSpline*)(target->data);
+    b->start.x = beginX;
+    b->start.y = beginY;
+    b->end.x = endX;
+    b->end.y = endY;
+    b->poles = bSplinePoles;
+    b->polesCnt = polesCnt;
+}
+
+void addVertex(TopoDS_Shape shape, Slice* slice, Point* bSplinePoles, int polesCnt) {
+    int i = 0;
+    double beginX, beginY, endX, endY;
+    for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
+        i++;
+        TopoDS_Shape child = anIt.Value();
+        if (child.ShapeType() == TopAbs_ShapeEnum::TopAbs_VERTEX){
+            TopoDS_Vertex vertex = TopoDS::Vertex(child);
+            gp_Pnt pt = BRep_Tool::Pnt(vertex);
+            switch (i)
+            {
+            case 1:
+                beginX = pt.X();
+                beginY = pt.Y();
+                break;
+            case 2:
+                endX = pt.X();
+                endY = pt.Y();
+                break;
+            default:
+                printf("error on add line with %d vertex\n", i);
+                break;
+            }
+        }
+    }
+    if (bSplinePoles != NULL) {
+        addBSpline(slice, beginX, beginY, endX, endY, bSplinePoles, polesCnt);
+    }
+    else
+        addLine(slice, beginX, beginY, endX, endY);
+}
+
+void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
     layer++;
     for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
         TopoDS_Shape child = anIt.Value();
@@ -89,6 +174,7 @@ void showType(TopoDS_Shape shape, ofstream& file) {
                 gp_Pnt center = circle.Location();
                 Standard_Real first = 0, last = 0;
                 Handle_Geom_Curve theCurve = BRep_Tool::Curve(TopoDS::Edge(child), first, last);
+                addCircle(slice, center.X(), center.Y(), first, last, circle.Radius());
                 for (int i = 0; i < layer; i++)
                     file << '\t';
                 file << "circle radius is " << circle.Radius() << 
@@ -115,12 +201,20 @@ void showType(TopoDS_Shape shape, ofstream& file) {
                 TColgp_Array1OfPnt Poles(1, polesCount);
                 bSpline->Poles(Poles);
                 file << " poles value";
+                Point* pointArray = new Point[polesCount];
                 for (int i = 1; i < polesCount; i++) {
                     gp_Pnt pt = Poles(i);
+                    pointArray[i].x = pt.X();
+                    pointArray[i].y = pt.Y();
                     file << "(" << pt.X() << "," << pt.Y() << "," << pt.Z() << ") ";
                 }
                 file << endl;
-            } else {
+                addVertex(child, slice, pointArray, polesCount);
+            }
+            else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_Line) {
+                addVertex(child, slice, NULL, 0);
+            }
+            else {
                 for (int i = 0; i < layer; i++)
                     file << '\t';
                 file << "edge type is " << GeomAbs_CurveType_str[adpCurve.GetType()] << endl;
@@ -136,12 +230,12 @@ void showType(TopoDS_Shape shape, ofstream& file) {
                 file << '\t';
             file << "type is " << TopAbs_ShapeEnum_str[child.ShapeType()] << endl;
         }
-        showType(child, file);
+        showType(child, file, slice);
     }
     --layer;
 }
 
-EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice)
+EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice, void** slice)
 {
     int length = *cnt;
     *cnt = 0;
@@ -157,6 +251,8 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice)
     int aNbRoot = aReader.NbRootsForTransfer();
     aReader.PrintCheckTransfer(isFailsonly, IFSelect_ItemsByEntity);
     ofstream file("log.txt");
+    Slice** ss = (Slice**)slice;
+    *ss = new Slice[aNbRoot];
     for (Standard_Integer aRootIter = 1; aRootIter <= aNbRoot; ++aRootIter)
     {
         aReader.TransferRoot(aRootIter);
@@ -169,7 +265,10 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice)
                 TopoDS_Shape shape = aReader.Shape(aNbShap);
                 if (isSlice) {
                     file << "begin shape" << endl;
-                    showType(shape, file);
+                    Slice* sss = &(*ss)[(*cnt)];
+                    sss->data = sss->next = sss->prev = NULL;
+                    sss->type = EdgeType::unknown;
+                    showType(shape, file, sss);
                     file << "end shape" << endl;
                     /*
                     for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {

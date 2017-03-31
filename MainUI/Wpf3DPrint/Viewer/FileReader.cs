@@ -8,7 +8,6 @@ namespace Wpf3DPrint.Viewer
     class FileReader
     {
         Scene scene;
-        Scene sliceScene;
         ArrayList shapeList;
         public FileReader(Scene scene)
         {
@@ -32,11 +31,6 @@ namespace Wpf3DPrint.Viewer
             }
         }
 
-        public void setSliceScene(Scene sliceSene)
-        {
-            this.sliceScene = sliceSene;
-        }
-
         public bool openStep(string fileName, SceneThread.afterFunction afterOpenStep, bool isSlice)
         {
             ArrayList list = new ArrayList();
@@ -53,10 +47,13 @@ namespace Wpf3DPrint.Viewer
             bool isSlice = (bool)list[1];
             int count = 500;
             IntPtr shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)) * count);
-            bool result = Cpp2Managed.ImportStep(Marshal.StringToHGlobalAnsi(fileName), ref count, shapePt, isSlice);
+            IntPtr slice = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)));
+            bool result = Cpp2Managed.ImportStep(Marshal.StringToHGlobalAnsi(fileName), ref count, shapePt, isSlice, slice);
             list.Clear();
             list.Add(result);
             Shape shape = new Shape(shapePt, count);
+            if (isSlice)
+                shape.stepSlice = slice;
             list.Add(shape);
             return list;
         }
@@ -80,21 +77,6 @@ namespace Wpf3DPrint.Viewer
             scene.Proxy.SetDisplayMode(1);
             scene.Proxy.displayShape(shape.shape, 0, 0.7);
             return true;
-        }
-
-        private bool displaySlice(IntPtr slice, SceneThread.onFunction onSlice, ArrayList onArgs)
-        {
-            scene.Proxy.displaySlice(slice);
-            displaySlice(slice);
-            onSlice(onArgs);
-            return true;
-        }
-
-        private void displaySlice(IntPtr slice)
-        {
-            sliceScene.Proxy.EraseObjects();
-            sliceScene.Proxy.displaySlice(slice);
-            sliceScene.Proxy.ZoomAllView();
         }
 
         public unsafe void saveSlice(string path)
@@ -130,23 +112,9 @@ namespace Wpf3DPrint.Viewer
                     double height = shape.Zmin + (double)i / shape.sliceCnt * (shape.Zmax - shape.Zmin);
                     IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, shape.Zmax, shape.Zmin, height);
                     shape.sliceList.Add(slice);
-                    if (slice != IntPtr.Zero)
-                    {
-                        ArrayList onArgs = new ArrayList();
-                        onArgs.Add(shape);
-                        onArgs.Add(i);
-                        control.Dispatcher.Invoke(new DisplayOneShape(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, onslice, onArgs });
-                    }
                 }
             }
             return null;
-        }
-
-        public void displaySlice(int index)
-        {
-            Shape shape = (Shape)shapeList[0];
-            IntPtr slice = (IntPtr)shape.sliceList[index];
-            displaySlice(slice);
         }
 
         public int afterOpenSlice(object workResult)
@@ -164,7 +132,6 @@ namespace Wpf3DPrint.Viewer
                 shape.sliceCnt = shape.count;
                 shape.sliceList.Add(Cpp2Managed.getSliceFromShape(shape.shape, i));
             }
-            displaySlice(0);
             return shape.count;
         }
 
@@ -181,13 +148,11 @@ namespace Wpf3DPrint.Viewer
             }
             shapeList.Clear();
             scene.Proxy.removeObjects();
-            sliceScene.Proxy.removeObjects();
         }
 
         public void afterOpenFile()
         {
             scene.Proxy.ZoomAllView();
-            sliceScene.Proxy.TopView();
         }
     }
 }

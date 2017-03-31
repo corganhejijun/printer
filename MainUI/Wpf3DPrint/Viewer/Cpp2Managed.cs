@@ -10,7 +10,7 @@ namespace Wpf3DPrint.Viewer
     class Cpp2Managed
     {
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImportStep(IntPtr theFileName, ref int cnt, IntPtr shapes, bool isSlice);
+        public static extern bool ImportStep(IntPtr theFileName, ref int cnt, IntPtr shapes, bool isSlice, IntPtr slice);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool deleteShape(IntPtr shapes, int cnt);
@@ -29,5 +29,23 @@ namespace Wpf3DPrint.Viewer
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool exportStep(IntPtr fileName, IntPtr[] slices, int length);
+
+        [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr create2D(IntPtr hWnd);
+
+        [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int displaySlice(IntPtr device2D, IntPtr slice, int sliceNum);
+
+        [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void cleanScreen(IntPtr device2D);
+
+        [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void resizeWindow(IntPtr device2D);
+
+        [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void delete2DSlice(IntPtr slice, int count);
+
+        [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void release2D(IntPtr device2D);
     }
 }

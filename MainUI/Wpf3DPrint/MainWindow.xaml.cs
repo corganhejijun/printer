@@ -14,22 +14,18 @@ namespace Wpf3DPrint
     public partial class MainWindow : Window
     {
         private Scene scene;
-        private Scene sliceScene;
+        private Scene2D sliceScene;
         private FileReader fileReader;
 
         public MainWindow()
         {
             InitializeComponent();
             scene = new Scene();
-            sliceScene = new Scene();
+            sliceScene = new Scene2D(PanelSlice);
             fileReader = new FileReader(scene);
             ImageBrush brush = new ImageBrush(scene.Image);
-            ImageBrush sliceBrush = new ImageBrush(sliceScene.Image);
             brush.RelativeTransform = new ScaleTransform(1.0, -1.0, 0.5, 0.5);
-            sliceBrush.RelativeTransform = new ScaleTransform(1.0, -1.0, 0.5, 0.5);
             GridScene.Background = brush;
-            GridSlice.Background = sliceBrush;
-            fileReader.setSliceScene(sliceScene);
         }
 
         private void buttonSelectMode_Click(object sender, RoutedEventArgs e)
@@ -139,11 +135,6 @@ namespace Wpf3DPrint
             scene.Resize(Convert.ToInt32(e.NewSize.Width), Convert.ToInt32(e.NewSize.Height));
         }
 
-        private void GridSlice_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            sliceScene.Resize(Convert.ToInt32(e.NewSize.Width), Convert.ToInt32(e.NewSize.Height));
-        }
-
         private void Window_Closed(object sender, EventArgs e)
         {
             fileReader.releaseShape();
@@ -190,7 +181,6 @@ namespace Wpf3DPrint
 
         private void sliderSlice_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            fileReader.displaySlice((int)sliderSlice.Value);
         }
 
         private void buttonOpenSlice_Click(object sender, RoutedEventArgs e)
@@ -205,7 +195,7 @@ namespace Wpf3DPrint
             openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step";
             if (openFile.ShowDialog() == false)
                 return;
-            if (!fileReader.openStep(openFile.FileName, afterOpenSlice, true))
+            if (!fileReader.openStep(openFile.FileName, afterOpen, true))
             {
                 MessageBox.Show("Open file Failed!");
                 return;
@@ -213,17 +203,18 @@ namespace Wpf3DPrint
             onOpeningFile(openFile.FileName);
         }
 
-        private void afterOpenSlice(object args)
+        private void afterOpen(object args)
         {
-            this.Dispatcher.Invoke(new SceneThread.afterFunction(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { args });
+            this.Dispatcher.Invoke(new SceneThread.afterFunction(afterOpenSlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { args });
         }
 
-        private void displaySlice(object workResult)
+        private void afterOpenSlice(object workResult)
         {
             int count = fileReader.afterOpenSlice(workResult);
+            sliceScene.slice(fileReader.Shape.stepSlice, count);
             sliderSlice.Maximum = count - 1;
-            fileReader.afterOpenFile();
             afterOpenFile();
+            sliceScene.drawSlice((int)sliderSlice.Value);
         }
 
         private void menuQuit_Click(object sender, RoutedEventArgs e)
@@ -234,6 +225,17 @@ namespace Wpf3DPrint
         private void menuCloseFile_Click(object sender, RoutedEventArgs e)
         {
             fileReader.releaseShape();
+        }
+
+        private void PanelSlice_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
+        {
+            sliceScene.drawSlice((int)sliderSlice.Value);
+        }
+
+        private void PanelSlice_Resize(object sender, EventArgs e)
+        {
+            if (sliceScene != null)
+                sliceScene.onResize();
         }
     }
 }

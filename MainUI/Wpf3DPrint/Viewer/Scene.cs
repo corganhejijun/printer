@@ -114,7 +114,7 @@ namespace Wpf3DPrint.Viewer
                 d3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, d3DColorSurface);
             }
             d3DImage.Unlock();
-            occtProxy.ResizeBridgeFBO(proxyWndSize.cx, proxyWndSize.cy, d3DColorSurface, colorSurf); ;
+            occtProxy.ResizeBridgeFBO(proxyWndSize.cx, proxyWndSize.cy, d3DColorSurface, colorSurf);
         }
     }
 }
