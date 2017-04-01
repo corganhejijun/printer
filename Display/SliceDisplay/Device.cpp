@@ -87,17 +87,18 @@ int SliceDevice::drawSlice(Slice* slice) {
 
     // 通过变换调整图像比例，使图像放大居中
     D2D1_SIZE_F size = m_pRenderTarget->GetSize();
-    D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(size.width / 2 + (float)boundBox.left, size.height / 2 + (float)boundBox.top);
+    D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(
+        size.width / 2 + (float)((boundBox.right - boundBox.left) / 2),
+        size.height / 2 + (float)((boundBox.bottom - boundBox.top) / 2));
     float xScale = ((float)(boundBox.right - boundBox.left)) * (1 + m_sceneMargin) / size.width;
     float yScale = ((float)(boundBox.bottom - boundBox.top)) * (1 + m_sceneMargin) / size.height;
     m_sceneScale = m_sceneScale > xScale ? m_sceneScale : xScale;
     m_sceneScale = m_sceneScale > yScale ? m_sceneScale : yScale;
-    //D2D1_SIZE_F scaleSize = D2D1::SizeF(size.width/((float)(boundBox.right - boundBox.left + margin)), size.height/((float)(boundBox.bottom - boundBox.top + margin)));
     D2D1_MATRIX_3X2_F scaleTrans = D2D1::Matrix3x2F::Scale(D2D1::SizeF(1/m_sceneScale, 1/m_sceneScale), D2D1::Point2F());
     m_pRenderTarget->SetTransform(scaleTrans * moveTrans);
 
-    //D2D1_RECT_F rectangle = D2D1::Rect(boundBox.left, boundBox.top, boundBox.right, boundBox.bottom);
-    //m_pRenderTarget->DrawRectangle(rectangle, m_pBlackBrush, m_curveWith * m_sceneScale);
+    D2D1_RECT_F rectangle = D2D1::Rect(boundBox.left, boundBox.top, boundBox.right, boundBox.bottom);
+    m_pRenderTarget->DrawRectangle(rectangle, m_pBlackBrush, m_curveWith * m_sceneScale);
     Slice* curve = slice;
     while (curve != NULL) {
         drawCurve(curve);
@@ -105,6 +106,13 @@ int SliceDevice::drawSlice(Slice* slice) {
     }
     m_pRenderTarget->EndDraw();
     return S_OK;
+}
+
+void SliceDevice::getBSplineBoundBox(BoundBox* box, BSpline* spline) {
+    setBoundBox(box, spline->start.y, spline->end.y, spline->start.x, spline->end.x);
+    for (int i = 0; i < spline->polesCnt; i+=2) {
+        //setBoundBox(box, spline->poles[i].y, spline->poles[i + 1].y, spline->poles[i].x, spline->poles[i + 1].x);
+    }
 }
 
 void SliceDevice::getBoundBox(BoundBox* box, Slice* slice) {
@@ -117,7 +125,7 @@ void SliceDevice::getBoundBox(BoundBox* box, Slice* slice) {
         {
         case EdgeType::bSplice:
             b = (BSpline*)(ss->data);
-            // TODO
+            getBSplineBoundBox(box, b);
             break;
         case EdgeType::line:
             line = (Line*)(ss->data);
@@ -277,6 +285,39 @@ int SliceDevice::drawCircle(Circle* circle) {
 }
 
 int SliceDevice::drawBSpline(BSpline* spline) {
+    ID2D1PathGeometry *pGeometry = NULL;
+    ID2D1GeometrySink *pSink = NULL;
+    HRESULT hr = m_pD2DFactory->CreatePathGeometry(&pGeometry);
+    if (FAILED(hr))
+        return hr;
+    hr = pGeometry->Open(&pSink);
+    if (FAILED(hr)) {
+        pGeometry->Release();
+        return hr;
+    }
+    pSink->SetFillMode(D2D1_FILL_MODE_WINDING);
+    D2D1_POINT_2F point = D2D1::Point2F(spline->start.x, spline->start.y);
+    pSink->BeginFigure(point, D2D1_FIGURE_BEGIN_HOLLOW);
+    D2D1_POINT_2F point2 = point;
+    int totalLine = 10;
+    int skipCount = spline->polesCnt / totalLine;
+    for (int i = 0; i < spline->polesCnt; i++) {
+        if (i % skipCount < skipCount - 1)
+            continue;
+        point2 = D2D1::Point2F(spline->poles[i].x, spline->poles[i].y); 
+        float x = point2.x - point.x;
+        float y = point2.y - point.y;
+        if (sqrt(x * x + y * y) > m_curveWith / m_sceneScale * 2) {
+            pSink->AddLine(point2);
+            point = point2;
+        }
+    }
+    pSink->AddLine(D2D1::Point2F(spline->end.x, spline->end.y));
+    pSink->EndFigure(D2D1_FIGURE_END_OPEN);
+    pSink->Close();
+    pSink->Release();
+    m_pRenderTarget->DrawGeometry(pGeometry, m_pBlackBrush, m_curveWith * m_sceneScale);
+    pGeometry->Release();
     return S_OK;
 }
 

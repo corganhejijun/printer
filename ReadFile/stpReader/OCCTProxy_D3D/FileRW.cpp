@@ -202,10 +202,10 @@ void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
                 bSpline->Poles(Poles);
                 file << " poles value";
                 Point* pointArray = new Point[polesCount];
-                for (int i = 1; i < polesCount; i++) {
+                for (int i = 1; i <= polesCount; i++) {
                     gp_Pnt pt = Poles(i);
-                    pointArray[i].x = pt.X();
-                    pointArray[i].y = pt.Y();
+                    pointArray[i - 1].x = pt.X();
+                    pointArray[i - 1].y = pt.Y();
                     file << "(" << pt.X() << "," << pt.Y() << "," << pt.Z() << ") ";
                 }
                 file << endl;

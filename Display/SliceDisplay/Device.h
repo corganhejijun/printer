@@ -31,6 +31,7 @@ class SliceDevice{
     int drawCircle(Circle* circle);
     int drawBSpline(BSpline* spline);
     void getBoundBox(BoundBox* box, Slice* slice);
+    void getBSplineBoundBox(BoundBox* box, BSpline* spline);
     void setBoundBox(BoundBox* box, double top, double bottom, double left, double right);
     vector<vector<Point>*> getInterSect(Slice* slice, BoundBox boundBox);
     vector<Point>* interSecLine(Line* line, BoundBox bound);
