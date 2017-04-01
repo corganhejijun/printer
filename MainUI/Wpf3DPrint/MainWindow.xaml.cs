@@ -181,6 +181,7 @@ namespace Wpf3DPrint
 
         private void sliderSlice_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            sliceScene.drawSlice((int)sliderSlice.Value);
         }
 
         private void buttonOpenSlice_Click(object sender, RoutedEventArgs e)

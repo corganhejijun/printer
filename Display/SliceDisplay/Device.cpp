@@ -11,6 +11,8 @@ SliceDevice::SliceDevice(HWND hWnd) {
     m_pBlackBrush = NULL;
     m_curveWith = 1;
     m_manuStep = 5;
+    m_sceneScale = -1;
+    m_sceneMargin = 0.5;
 }
 
 SliceDevice::~SliceDevice() {
@@ -86,17 +88,19 @@ int SliceDevice::drawSlice(Slice* slice) {
     // 通过变换调整图像比例，使图像放大居中
     D2D1_SIZE_F size = m_pRenderTarget->GetSize();
     D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(size.width / 2 + (float)boundBox.left, size.height / 2 + (float)boundBox.top);
-    float margin = 10;
-    D2D1_SIZE_F scaleSize = D2D1::SizeF(size.width/((float)(boundBox.right - boundBox.left + margin)), size.height/((float)(boundBox.bottom - boundBox.top + margin)));
-    D2D1_MATRIX_3X2_F scaleTrans = D2D1::Matrix3x2F::Scale(scaleSize, D2D1::Point2F());
-    float curveWith = m_curveWith / scaleSize.width;
+    float xScale = ((float)(boundBox.right - boundBox.left)) * (1 + m_sceneMargin) / size.width;
+    float yScale = ((float)(boundBox.bottom - boundBox.top)) * (1 + m_sceneMargin) / size.height;
+    m_sceneScale = m_sceneScale > xScale ? m_sceneScale : xScale;
+    m_sceneScale = m_sceneScale > yScale ? m_sceneScale : yScale;
+    //D2D1_SIZE_F scaleSize = D2D1::SizeF(size.width/((float)(boundBox.right - boundBox.left + margin)), size.height/((float)(boundBox.bottom - boundBox.top + margin)));
+    D2D1_MATRIX_3X2_F scaleTrans = D2D1::Matrix3x2F::Scale(D2D1::SizeF(1/m_sceneScale, 1/m_sceneScale), D2D1::Point2F());
     m_pRenderTarget->SetTransform(scaleTrans * moveTrans);
 
     //D2D1_RECT_F rectangle = D2D1::Rect(boundBox.left, boundBox.top, boundBox.right, boundBox.bottom);
-    //m_pRenderTarget->DrawRectangle(rectangle, m_pBlackBrush, curveWith);
+    //m_pRenderTarget->DrawRectangle(rectangle, m_pBlackBrush, m_curveWith * m_sceneScale);
     Slice* curve = slice;
     while (curve != NULL) {
-        drawCurve(curve, curveWith);
+        drawCurve(curve);
         curve = curve->next;
     }
     m_pRenderTarget->EndDraw();
@@ -177,6 +181,7 @@ vector<Point>* SliceDevice::interSecLine(Line* line, BoundBox boundBox) {
 vector<Point>* SliceDevice::interSecCircle(Circle* circle, BoundBox boundBox) {
     vector<Point>* list = new vector<Point>;
     Point pt;
+    memset(&pt, 0, sizeof(Point));
     double xMax = circle->center.x + circle->radius;
     double xMin = circle->center.x - circle->radius;
     pt.x = boundBox.left;
@@ -206,18 +211,18 @@ vector<Point>* SliceDevice::interSecBspline(BSpline* bSplice, BoundBox boundBox)
     return list;
 }
     
-int SliceDevice::drawCurve(Slice* curve, float lineWidth) {
+int SliceDevice::drawCurve(Slice* curve) {
     if (curve->data == NULL)
         return S_OK;
     switch (curve->type) {
     case EdgeType::bSplice:
-        return drawBSpline((BSpline*)(curve->data), lineWidth);
+        return drawBSpline((BSpline*)(curve->data));
         break;
     case EdgeType::circle:
-        return drawCircle((Circle*)(curve->data), lineWidth);
+        return drawCircle((Circle*)(curve->data));
         break;
     case EdgeType::line:
-        return drawLine((Line*)(curve->data), lineWidth);
+        return drawLine((Line*)(curve->data));
         break;
     default:
         printf_s("unknow curve type\n");
@@ -225,17 +230,53 @@ int SliceDevice::drawCurve(Slice* curve, float lineWidth) {
     return S_OK;
 }
 
-int SliceDevice::drawLine(Line* line, float lineWidth) {
-    m_pRenderTarget->DrawLine(D2D1::Point2F(line->start.x, line->start.y), D2D1::Point2F(line->end.x, line->end.y), m_pBlackBrush, lineWidth);
+int SliceDevice::drawLine(Line* line) {
+    m_pRenderTarget->DrawLine(
+        D2D1::Point2F(line->start.x, line->start.y),
+        D2D1::Point2F(line->end.x, line->end.y),
+        m_pBlackBrush, m_curveWith * m_sceneScale);
     return S_OK;
 }
 
-int SliceDevice::drawCircle(Circle* circle, float lineWidth) {
-    m_pRenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(circle->center.x, circle->center.y), circle->radius, circle->radius), m_pBlackBrush, lineWidth);
+int SliceDevice::drawCircle(Circle* circle) {
+    if (circle->endAngle - circle->startAngle > M_PI * 2 - 0.1) {
+        m_pRenderTarget->DrawEllipse(
+            D2D1::Ellipse(D2D1::Point2F(circle->center.x, circle->center.y),
+                circle->radius, circle->radius),
+                m_pBlackBrush, m_curveWith * m_sceneScale);
+        return S_OK;
+    }
+    ID2D1PathGeometry *pGeometry = NULL;
+    ID2D1GeometrySink *pSink = NULL;
+    HRESULT hr = m_pD2DFactory->CreatePathGeometry(&pGeometry);
+    if (FAILED(hr))
+        return hr;
+    hr = pGeometry->Open(&pSink);
+    if (FAILED(hr)) {
+        pGeometry->Release();
+        return hr;
+    }
+    pSink->SetFillMode(D2D1_FILL_MODE_WINDING);
+    float beginX = circle->center.x + circle->radius * cos(circle->startAngle);
+    float beginY = circle->center.y + circle->radius * sin(circle->startAngle);
+    float endX = circle->center.x + circle->radius * cos(circle->endAngle);
+    float endY = circle->center.y + circle->radius * sin(circle->endAngle);
+    D2D1_ARC_SIZE size = D2D1_ARC_SIZE_SMALL;
+    if (circle->endAngle - circle->startAngle > M_PI)
+        size = D2D1_ARC_SIZE_LARGE;
+    pSink->BeginFigure(D2D1::Point2F(beginX, beginY), D2D1_FIGURE_BEGIN_HOLLOW);
+    pSink->AddArc(D2D1::ArcSegment(
+        D2D1::Point2F(endX, endY), D2D1::SizeF(circle->radius, circle->radius), 0.0, 
+        D2D1_SWEEP_DIRECTION_CLOCKWISE, size));
+    pSink->EndFigure(D2D1_FIGURE_END_OPEN);
+    pSink->Close();
+    pSink->Release();
+    m_pRenderTarget->DrawGeometry(pGeometry, m_pBlackBrush, m_curveWith * m_sceneScale);
+    pGeometry->Release();
     return S_OK;
 }
 
-int SliceDevice::drawBSpline(BSpline* spline, float lineWidth) {
+int SliceDevice::drawBSpline(BSpline* spline) {
     return S_OK;
 }
 

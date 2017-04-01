@@ -59,11 +59,20 @@
             <Grid x:Name="GridScene" Grid.Column="0" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave"/>
             <GridSplitter Width="5" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
             <Grid x:Name="GridSlice" Grid.Column="2" Background="Aqua">
-                <WindowsFormsHost Margin="0,0,0,0">
+                <WindowsFormsHost Margin="0,0,0,35">
                     <WinForms:Panel x:Name="PanelSlice" BackColor="Black" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
                 </WindowsFormsHost>
                 <TextBox x:Name="textBoxSlice" HorizontalAlignment="Left" Height="22" Margin="286,0,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="229" IsEnabled="False" Visibility="Hidden"/>
-                <Slider x:Name="sliderSlice" Margin="10,0,10,10" VerticalAlignment="Bottom" SmallChange="0" ValueChanged="sliderSlice_ValueChanged" TickPlacement="BottomRight" Value="-1" IsSnapToTickEnabled="True"/>
+                <Slider x:Name="sliderSlice" Margin="7,0,13,3" VerticalAlignment="Bottom" SmallChange="0" ValueChanged="sliderSlice_ValueChanged" TickPlacement="BottomRight" Value="-1" IsSnapToTickEnabled="True" Height="43" RenderTransformOrigin="0.5,0.5">
+                    <Slider.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleY="-1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Slider.RenderTransform>
+                </Slider>
             </Grid>
         </Grid>
         <Grid x:Name="GridOnReading" Height="82" Margin="320,224,321,0" VerticalAlignment="Top" Background="White" Visibility="Hidden">

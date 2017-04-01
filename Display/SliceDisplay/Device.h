@@ -23,12 +23,13 @@ class SliceDevice{
     const D2D1::ColorF CLEAR_COLOR = D2D1::ColorF(D2D1::ColorF::White);
     float m_curveWith;
     float m_manuStep;
-
+    float m_sceneScale;
+    float m_sceneMargin;
     int CreateD2DResource();
-    int drawCurve(Slice* curve, float lineWidth);
-    int drawLine(Line* line, float lineWidth);
-    int drawCircle(Circle* circle, float lineWidth);
-    int drawBSpline(BSpline* spline, float lineWidth);
+    int drawCurve(Slice* curve);
+    int drawLine(Line* line);
+    int drawCircle(Circle* circle);
+    int drawBSpline(BSpline* spline);
     void getBoundBox(BoundBox* box, Slice* slice);
     void setBoundBox(BoundBox* box, double top, double bottom, double left, double right);
     vector<vector<Point>*> getInterSect(Slice* slice, BoundBox boundBox);
