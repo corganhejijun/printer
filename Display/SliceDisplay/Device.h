@@ -41,6 +41,7 @@ public:
     SliceDevice(HWND hWnd);
     ~SliceDevice();
     int init();
+    void resetScene();
     int clearScene();
     int drawSlice(Slice* slice);
     int resizeWindow();

@@ -8,5 +8,6 @@ _EXTERN_C_ void cleanScreen(void* device);
 _EXTERN_C_ void resizeWindow(void* device);
 _EXTERN_C_ void delete2DSlice(void** slice, int count);
 _EXTERN_C_ void release2D(void* device);
+_EXTERN_C_ void reset2D(void* device);
 
 #endif

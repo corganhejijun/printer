@@ -47,5 +47,8 @@ namespace Wpf3DPrint.Viewer
 
         [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void release2D(IntPtr device2D);
+
+        [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void reset2D(IntPtr device);
     }
 }

@@ -58,3 +58,8 @@ void release2D(void* device) {
     SliceDevice* cDevice = (SliceDevice*)device;
     delete cDevice;
 }
+
+void reset2D(void* device) {
+    SliceDevice* cDevcie = (SliceDevice*)device;
+    cDevcie->resetScene();
+}

@@ -9,10 +9,7 @@ SliceDevice::SliceDevice(HWND hWnd) {
     m_pD2DFactory = NULL;
     m_pRenderTarget = NULL;
     m_pBlackBrush = NULL;
-    m_curveWith = 1;
-    m_manuStep = 5;
-    m_sceneScale = -1;
-    m_sceneMargin = 0.3;
+    resetScene();
 }
 
 SliceDevice::~SliceDevice() {
@@ -60,6 +57,13 @@ int SliceDevice::CreateD2DResource() {
     return S_OK;
 }
 
+void SliceDevice::resetScene() {
+    m_curveWith = 1;
+    m_manuStep = 5;
+    m_sceneScale = -1;
+    m_sceneMargin = 0.1f;
+}
+
 int SliceDevice::clearScene() {
     if (m_pRenderTarget == NULL)
         return E_HANDLE;
@@ -93,8 +97,11 @@ int SliceDevice::drawSlice(Slice* slice) {
     float yScale = yLength * (1 + m_sceneMargin) / size.height;
     m_sceneScale = m_sceneScale > xScale ? m_sceneScale : xScale;
     m_sceneScale = m_sceneScale > yScale ? m_sceneScale : yScale;
+    // objectCenter may be not at (0, 0)
+    float objCenterX = (abs(boundBox.left) - abs(boundBox.right)) / 2 / xLength * size.width;
+    float objCenterY = (abs(boundBox.top) - abs(boundBox.bottom)) / 2 / yLength * size.height;
     // Move object center to screen center
-    D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(size.width / 2 + xLength / 2 / m_sceneScale, size.height / 2 + yLength / 2 / m_sceneScale);
+    D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(size.width / 2 + objCenterX, size.height / 2 + objCenterY);
     // 相同的比例保证缩放后不变形
     D2D1_MATRIX_3X2_F scaleTrans = D2D1::Matrix3x2F::Scale(D2D1::SizeF(1 / m_sceneScale, 1 / m_sceneScale), D2D1::Point2F());
     m_pRenderTarget->SetTransform(scaleTrans * moveTrans);
@@ -242,8 +249,8 @@ int SliceDevice::drawCurve(Slice* curve) {
 
 int SliceDevice::drawLine(Line* line) {
     m_pRenderTarget->DrawLine(
-        D2D1::Point2F(line->start.x, line->start.y),
-        D2D1::Point2F(line->end.x, line->end.y),
+        D2D1::Point2F((float)line->start.x, (float)line->start.y),
+        D2D1::Point2F((float)line->end.x, (float)line->end.y),
         m_pBlackBrush, m_curveWith * m_sceneScale);
     return S_OK;
 }
@@ -251,8 +258,8 @@ int SliceDevice::drawLine(Line* line) {
 int SliceDevice::drawCircle(Circle* circle) {
     if (circle->endAngle - circle->startAngle > M_PI * 2 - 0.1) {
         m_pRenderTarget->DrawEllipse(
-            D2D1::Ellipse(D2D1::Point2F(circle->center.x, circle->center.y),
-                circle->radius, circle->radius),
+            D2D1::Ellipse(D2D1::Point2F((float)circle->center.x, (float)circle->center.y),
+                (float)circle->radius, (float)circle->radius),
                 m_pBlackBrush, m_curveWith * m_sceneScale);
         return S_OK;
     }
@@ -267,10 +274,10 @@ int SliceDevice::drawCircle(Circle* circle) {
         return hr;
     }
     pSink->SetFillMode(D2D1_FILL_MODE_WINDING);
-    float beginX = circle->center.x + circle->radius * cos(circle->startAngle);
-    float beginY = circle->center.y + circle->radius * sin(circle->startAngle);
-    float endX = circle->center.x + circle->radius * cos(circle->endAngle);
-    float endY = circle->center.y + circle->radius * sin(circle->endAngle);
+    double beginX = circle->center.x + circle->radius * cos(circle->startAngle);
+    double beginY = circle->center.y + circle->radius * sin(circle->startAngle);
+    double endX = circle->center.x + circle->radius * cos(circle->endAngle);
+    double endY = circle->center.y + circle->radius * sin(circle->endAngle);
     D2D1_ARC_SIZE size = D2D1_ARC_SIZE_SMALL;
     if (circle->endAngle - circle->startAngle > M_PI)
         size = D2D1_ARC_SIZE_LARGE;

@@ -48,6 +48,8 @@ namespace Wpf3DPrint.Viewer
         {
             Cpp2Managed.delete2DSlice(m_slice, sliceCount);
             Marshal.FreeHGlobal(m_slice);
+            m_slice = IntPtr.Zero;
+            Cpp2Managed.reset2D(device);
         }
     }
 }
