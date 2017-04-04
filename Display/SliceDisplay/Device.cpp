@@ -12,7 +12,7 @@ SliceDevice::SliceDevice(HWND hWnd) {
     m_curveWith = 1;
     m_manuStep = 5;
     m_sceneScale = -1;
-    m_sceneMargin = 0.5;
+    m_sceneMargin = 0.3;
 }
 
 SliceDevice::~SliceDevice() {
@@ -87,14 +87,16 @@ int SliceDevice::drawSlice(Slice* slice) {
 
     // 通过变换调整图像比例，使图像放大居中
     D2D1_SIZE_F size = m_pRenderTarget->GetSize();
-    D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(
-        size.width / 2 + (float)((boundBox.right - boundBox.left) / 2),
-        size.height / 2 + (float)((boundBox.bottom - boundBox.top) / 2));
-    float xScale = ((float)(boundBox.right - boundBox.left)) * (1 + m_sceneMargin) / size.width;
-    float yScale = ((float)(boundBox.bottom - boundBox.top)) * (1 + m_sceneMargin) / size.height;
+    float xLength = (float)(boundBox.right - boundBox.left);
+    float yLength = (float)(boundBox.bottom - boundBox.top);
+    float xScale = xLength * (1 + m_sceneMargin) / size.width;
+    float yScale = yLength * (1 + m_sceneMargin) / size.height;
     m_sceneScale = m_sceneScale > xScale ? m_sceneScale : xScale;
     m_sceneScale = m_sceneScale > yScale ? m_sceneScale : yScale;
-    D2D1_MATRIX_3X2_F scaleTrans = D2D1::Matrix3x2F::Scale(D2D1::SizeF(1/m_sceneScale, 1/m_sceneScale), D2D1::Point2F());
+    // Move object center to screen center
+    D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(size.width / 2 + xLength / 2 / m_sceneScale, size.height / 2 + yLength / 2 / m_sceneScale);
+    // 相同的比例保证缩放后不变形
+    D2D1_MATRIX_3X2_F scaleTrans = D2D1::Matrix3x2F::Scale(D2D1::SizeF(1 / m_sceneScale, 1 / m_sceneScale), D2D1::Point2F());
     m_pRenderTarget->SetTransform(scaleTrans * moveTrans);
 
     D2D1_RECT_F rectangle = D2D1::Rect(boundBox.left, boundBox.top, boundBox.right, boundBox.bottom);
@@ -110,8 +112,8 @@ int SliceDevice::drawSlice(Slice* slice) {
 
 void SliceDevice::getBSplineBoundBox(BoundBox* box, BSpline* spline) {
     setBoundBox(box, spline->start.y, spline->end.y, spline->start.x, spline->end.x);
-    for (int i = 0; i < spline->polesCnt; i+=2) {
-        //setBoundBox(box, spline->poles[i].y, spline->poles[i + 1].y, spline->poles[i].x, spline->poles[i + 1].x);
+    for (int i = 0; i < spline->polesCnt - 1; i+=2) {
+        setBoundBox(box, spline->poles[i].y, spline->poles[i + 1].y, spline->poles[i].x, spline->poles[i + 1].x);
     }
 }
 

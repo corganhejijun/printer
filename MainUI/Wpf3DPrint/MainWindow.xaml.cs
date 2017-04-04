@@ -177,6 +177,8 @@ namespace Wpf3DPrint
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
             fileReader.releaseShape();
+            sliceScene.closeSlice();
+            sliceScene.clearWindow();
         }
 
         private void sliderSlice_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -226,6 +228,8 @@ namespace Wpf3DPrint
         private void menuCloseFile_Click(object sender, RoutedEventArgs e)
         {
             fileReader.releaseShape();
+            sliceScene.closeSlice();
+            sliceScene.clearWindow();
         }
 
         private void PanelSlice_Paint(object sender, System.Windows.Forms.PaintEventArgs e)

@@ -40,9 +40,14 @@ namespace Wpf3DPrint.Viewer
 
         public void Dispose()
         {
+            closeSlice();
+            Cpp2Managed.release2D(device);
+        }
+
+        public void closeSlice()
+        {
             Cpp2Managed.delete2DSlice(m_slice, sliceCount);
             Marshal.FreeHGlobal(m_slice);
-            Cpp2Managed.release2D(device);
         }
     }
 }

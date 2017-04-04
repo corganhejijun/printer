@@ -112,9 +112,23 @@ namespace Wpf3DPrint.Viewer
                     double height = shape.Zmin + (double)i / shape.sliceCnt * (shape.Zmax - shape.Zmin);
                     IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, shape.Zmax, shape.Zmin, height);
                     shape.sliceList.Add(slice);
+                    if (slice != IntPtr.Zero)
+                    {
+                        ArrayList onArgs = new ArrayList();
+                        onArgs.Add(shape);
+                        onArgs.Add(i);
+                        control.Dispatcher.Invoke(new DisplayOneShape(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, onslice, onArgs });
+                    }
                 }
             }
             return null;
+        }
+
+        private bool displaySlice(IntPtr slice, SceneThread.onFunction onSlice, ArrayList onArgs)
+        {
+            scene.Proxy.displaySlice(slice);
+            onSlice(onArgs);
+            return true;
         }
 
         public int afterOpenSlice(object workResult)
