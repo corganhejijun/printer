@@ -7,7 +7,11 @@
 #include "slice.h"
 #include <vector>
 
+#define EQU_FLOAT(x, y) (abs((x) - (y)) < 0.001f)
+
 using std::vector;
+
+bool sortInterSects(Point pt1, Point pt2);
 
 class SliceDevice{
     struct BoundBox {
@@ -33,10 +37,12 @@ class SliceDevice{
     void getBoundBox(BoundBox* box, Slice* slice);
     void getBSplineBoundBox(BoundBox* box, BSpline* spline);
     void setBoundBox(BoundBox* box, double top, double bottom, double left, double right);
-    vector<vector<Point>*> getInterSect(Slice* slice, BoundBox boundBox);
-    vector<Point>* interSecLine(Line* line, BoundBox bound);
-    vector<Point>* interSecCircle(Circle* circle, BoundBox bound);
-    vector<Point>* interSecBspline(BSpline* bSplice, BoundBox bound);
+    vector<Point>* getInterSect(Slice* slice, BoundBox boundBox);
+    double interSec2Point(bool* noInter, double x, Point pt1, Point pt2);
+    void interSecLine(vector<Point>* list, Line* line, BoundBox bound);
+    void interSecCircle(vector<Point>* list, Circle* circle, BoundBox bound);
+    void interSecBspline(vector<Point>* list, BSpline* bSplice, BoundBox bound);
+    int drawInterSec(vector<Point>* list);
 public:
     SliceDevice(HWND hWnd);
     ~SliceDevice();

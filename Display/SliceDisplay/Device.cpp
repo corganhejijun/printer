@@ -1,4 +1,5 @@
 #include "Device.h"
+#include <algorithm>    // std::sort
 #include <stdio.h>
 
 #define _USE_MATH_DEFINES
@@ -59,7 +60,7 @@ int SliceDevice::CreateD2DResource() {
 
 void SliceDevice::resetScene() {
     m_curveWith = 1;
-    m_manuStep = 5;
+    m_manuStep = 1;
     m_sceneScale = -1;
     m_sceneMargin = 0.1f;
 }
@@ -87,7 +88,8 @@ int SliceDevice::drawSlice(Slice* slice) {
 
     getBoundBox(&boundBox, slice);
 
-    vector<vector<Point>*> interSectPoints = getInterSect(slice, boundBox);
+    // 获取网格线与图形的交点列表
+    vector<Point>* interSectPoints = getInterSect(slice, boundBox);
 
     // 通过变换调整图像比例，使图像放大居中
     D2D1_SIZE_F size = m_pRenderTarget->GetSize();
@@ -106,14 +108,35 @@ int SliceDevice::drawSlice(Slice* slice) {
     D2D1_MATRIX_3X2_F scaleTrans = D2D1::Matrix3x2F::Scale(D2D1::SizeF(1 / m_sceneScale, 1 / m_sceneScale), D2D1::Point2F());
     m_pRenderTarget->SetTransform(scaleTrans * moveTrans);
 
-    D2D1_RECT_F rectangle = D2D1::Rect(boundBox.left, boundBox.top, boundBox.right, boundBox.bottom);
-    m_pRenderTarget->DrawRectangle(rectangle, m_pBlackBrush, m_curveWith * m_sceneScale);
+    //D2D1_RECT_F rectangle = D2D1::Rect(boundBox.left, boundBox.top, boundBox.right, boundBox.bottom);
+    //m_pRenderTarget->DrawRectangle(rectangle, m_pBlackBrush, m_curveWith * m_sceneScale);
     Slice* curve = slice;
     while (curve != NULL) {
         drawCurve(curve);
         curve = curve->next;
     }
+    drawInterSec(interSectPoints);
     m_pRenderTarget->EndDraw();
+    return S_OK;
+}
+
+int SliceDevice::drawInterSec(vector<Point>* list) {
+    double x = D2D1::FloatMax();
+    for (vector<Point>::iterator it = list->begin(); it < list->end(); it++) {
+        Point pt1 = *it;
+        it++;
+        if (it == list->end())
+            break;
+        Point pt2 = *it;
+        if (EQU_FLOAT(pt1.y, pt2.y))
+            continue;
+        if (!EQU_FLOAT(pt1.x, pt2.x))
+            continue;
+        m_pRenderTarget->DrawLine(
+            D2D1::Point2F((float)pt1.x, (float)pt1.y),
+            D2D1::Point2F((float)pt2.x, (float)pt2.y),
+            m_pBlackBrush, m_curveWith * m_sceneScale);
+    }
     return S_OK;
 }
 
@@ -151,21 +174,21 @@ void SliceDevice::getBoundBox(BoundBox* box, Slice* slice) {
     }
 }
 
-vector<vector<Point>*> SliceDevice::getInterSect(Slice* slice, BoundBox boundBox) {
-    vector<vector<Point>*> list;
+vector<Point>* SliceDevice::getInterSect(Slice* slice, BoundBox boundBox) {
+    vector<Point>* list = new vector<Point>;
     Slice* ss = slice;
     while (ss != NULL) {
         if (ss->data != NULL) {
             switch (ss->type)
             {
             case EdgeType::bSplice:
-                list.push_back(interSecBspline((BSpline*)(ss->data), boundBox));
+                interSecBspline(list, (BSpline*)(ss->data), boundBox);
                 break;
             case EdgeType::circle:
-                list.push_back(interSecCircle((Circle*)(ss->data), boundBox));
+                interSecCircle(list, (Circle*)(ss->data), boundBox);
                 break;
             case EdgeType::line:
-                list.push_back(interSecLine((Line*)(ss->data), boundBox));
+                interSecLine(list, (Line*)(ss->data), boundBox);
                 break;
             default:
                 break;
@@ -173,59 +196,103 @@ vector<vector<Point>*> SliceDevice::getInterSect(Slice* slice, BoundBox boundBox
         }
         ss = ss->next;
     }
+    std::sort(list->begin(), list->end(), sortInterSects);
     return list;
 }
 
-vector<Point>* SliceDevice::interSecLine(Line* line, BoundBox boundBox) {
-    vector<Point>* list = new vector<Point>;
+void SliceDevice::interSecLine(vector<Point>* list, Line* line, BoundBox boundBox) {
     Point pt;
-    double xMax = line->end.x > line->start.x ? line->end.x : line->start.x;
-    double xMin = line->end.x < line->start.x ? line->end.x : line->start.x;
-    // 直线表达式：y = kx + b
-    double k = (line->end.y - line->start.y) / (line->end.x - line->start.x);
-    double b = line->end.y - k * line->end.x;
     pt.x = boundBox.left;
     while (pt.x < boundBox.right) {
         pt.x += m_manuStep;
-        if (pt.x < xMin || pt.x > xMax)
+        if (EQU_FLOAT(pt.x, boundBox.right) || pt.x > boundBox.right)
+            break;
+        bool noInter = false;
+        pt.y = interSec2Point(&noInter, pt.x, line->start, line->end);
+        if (noInter)
             continue;
-        pt.y = k * pt.x + b;
         list->push_back(pt);
     }
-    return list;
 }
 
-vector<Point>* SliceDevice::interSecCircle(Circle* circle, BoundBox boundBox) {
-    vector<Point>* list = new vector<Point>;
-    Point pt;
-    memset(&pt, 0, sizeof(Point));
+double SliceDevice::interSec2Point(bool* noInter, double x, Point pt1, Point pt2){
+    if (EQU_FLOAT(x, pt1.x) && EQU_FLOAT(x, pt2.x)) {
+        *noInter = true;
+        return 0;
+    }
+    double xMax = pt2.x > pt1.x ? pt2.x : pt1.x;
+    double xMin = pt2.x < pt1.x ? pt2.x : pt1.x;
+    if (x < xMin || x > xMax){
+        *noInter = true;
+        return 0;
+    }
+    // 直线表达式：y = kx + b
+    double k = (pt2.y - pt1.y) / (pt2.x - pt1.x);
+    double b = pt2.y - k * pt2.x;
+    *noInter = false;
+    return k * x + b;
+}
+
+void SliceDevice::interSecCircle(vector<Point>* list, Circle* circle, BoundBox boundBox) {
     double xMax = circle->center.x + circle->radius;
     double xMin = circle->center.x - circle->radius;
-    pt.x = boundBox.left;
-    while (pt.x < boundBox.right) {
-        pt.x += m_manuStep;
-        if (pt.x < xMin || pt.x > xMax)
+    double xAxis = boundBox.left;
+    Point pt1;
+    memset(&pt1, 0, sizeof(Point));
+    Point pt2;
+    memset(&pt2, 0, sizeof(Point));
+    while (xAxis < boundBox.right) {
+        xAxis += m_manuStep;
+        if (xAxis < xMin || xAxis > xMax || EQU_FLOAT(xAxis, boundBox.right) || xAxis > boundBox.right)
             continue;
         // 圆弧表达式：x^2 + y^2 = r^2
-        double x = circle->center.x - pt.x;
+        double x = circle->center.x - xAxis;
         double y = sqrt(circle->radius * circle->radius - x * x);
         double yAngle = atan2(y, x) + M_PI;
-        if (yAngle < circle->endAngle && yAngle > circle->startAngle) {
-            pt.y = pt.y + y;
-            list->push_back(pt);
+        if (EQU_FLOAT(yAngle, 2 * M_PI))
+            yAngle = 0;
+        pt1.x = pt2.x = xAxis;
+        if ((yAngle < circle->endAngle || EQU_FLOAT(yAngle, circle->endAngle))
+            && (yAngle > circle->startAngle || EQU_FLOAT(yAngle, circle->startAngle))) {
+            // y轴方向向上为负，向下为正
+            pt1.y = circle->center.y - y;
+            list->push_back(pt1);
         }
         yAngle = atan2(-y, x) + M_PI;
-        if (yAngle < circle->endAngle && yAngle > circle->startAngle) {
-            pt.y = pt.y - y;
+        if (EQU_FLOAT(yAngle, 2 * M_PI))
+            yAngle = 0;
+        if ((yAngle < circle->endAngle || EQU_FLOAT(yAngle, circle->endAngle))
+            && (yAngle > circle->startAngle || EQU_FLOAT(yAngle, circle->startAngle))) {
+            pt2.y = circle->center.y + y;
+            list->push_back(pt2);
+        }
+    }
+}
+
+void SliceDevice::interSecBspline(vector<Point>* list, BSpline* bSplice, BoundBox boundBox) {
+    Point pt;
+    memset(&pt, 0, sizeof(Point));
+    pt.x = boundBox.left;
+    while(pt.x < boundBox.right){
+        pt.x += m_manuStep;
+        for (int i = 1; i < bSplice->polesCnt; i++){
+            Point pole1 = bSplice->poles[i - 1];
+            Point pole2 = bSplice->poles[i];
+            bool noInter = false;
+            pt.y = interSec2Point(&noInter, pt.x, pole1, pole2);
+            if (noInter)
+                continue;
             list->push_back(pt);
         }
     }
-    return list;
 }
 
-vector<Point>* SliceDevice::interSecBspline(BSpline* bSplice, BoundBox boundBox) {
-    vector<Point>* list = new vector<Point>;
-    return list;
+bool sortInterSects(Point pt1, Point pt2){
+    if (EQU_FLOAT(pt1.x, pt2.x))
+        return pt1.y < pt2.y;
+    else if (pt1.x < pt2.x)
+        return true;
+    return false;
 }
     
 int SliceDevice::drawCurve(Slice* curve) {
@@ -349,5 +416,6 @@ int SliceDevice::resizeWindow() {
     RECT rc;
     GetClientRect(m_hWnd, &rc);
     m_pRenderTarget->Resize(D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top));
+    resetScene();
     return S_OK;
 }
