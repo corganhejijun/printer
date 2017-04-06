@@ -60,7 +60,8 @@ int SliceDevice::CreateD2DResource() {
 
 void SliceDevice::resetScene() {
     m_curveWith = 1;
-    m_manuStep = 1;
+    m_manuStepX = 1;
+    m_manuStepY = 1;
     m_sceneScale = -1;
     m_sceneMargin = 0.1f;
 }
@@ -89,7 +90,9 @@ int SliceDevice::drawSlice(Slice* slice) {
     getBoundBox(&boundBox, slice);
 
     // 获取网格线与图形的交点列表
-    vector<Point>* interSectPoints = getInterSect(slice, boundBox);
+    vector<Point>* listX = new vector<Point>;
+    vector<Point>* listY = new vector<Point>;
+    getInterSect(listX, listY, slice, boundBox);
 
     // 通过变换调整图像比例，使图像放大居中
     D2D1_SIZE_F size = m_pRenderTarget->GetSize();
@@ -115,22 +118,65 @@ int SliceDevice::drawSlice(Slice* slice) {
         drawCurve(curve);
         curve = curve->next;
     }
-    drawInterSec(interSectPoints);
+    drawInterSec(listX, listY);
     m_pRenderTarget->EndDraw();
     return S_OK;
 }
 
-int SliceDevice::drawInterSec(vector<Point>* list) {
-    double x = D2D1::FloatMax();
-    for (vector<Point>::iterator it = list->begin(); it < list->end(); it++) {
+int SliceDevice::drawInterSec(vector<Point>* listX, vector<Point>* listY) {
+    for (vector<Point>::iterator it = listX->begin(); it < listX->end(); it++) {
+        // 不应有重复的点，圆的切线点应删除
         Point pt1 = *it;
-        it++;
-        if (it == list->end())
+        if ((it + 1) == listX->end())
             break;
-        Point pt2 = *it;
+        Point pt2 = *(it + 1);
+        // 两段曲线接头处，有重复的点
+        if (EQU_FLOAT(pt1.x, pt2.x) && EQU_FLOAT(pt1.y, pt2.y)) {
+            listX->erase(it + 1);
+            if ((it + 1) == listX->end())
+                break;
+            pt2 = *(it + 1);
+            // 删除一对重复点
+            if ((it + 2) != listX->end()) {
+                Point p1 = *(it + 1);
+                Point p2 = *(it + 2);
+                if (EQU_FLOAT(p1.x, p2.x) && EQU_FLOAT(p1.y, p2.y))
+                    listX->erase(it + 2);
+            }
+        }
+        if ((it + 1) == listX->end())
+            break;
+        it++;
         if (EQU_FLOAT(pt1.y, pt2.y))
             continue;
         if (!EQU_FLOAT(pt1.x, pt2.x))
+            continue;
+        m_pRenderTarget->DrawLine(
+            D2D1::Point2F((float)pt1.x, (float)pt1.y),
+            D2D1::Point2F((float)pt2.x, (float)pt2.y),
+            m_pBlackBrush, m_curveWith * m_sceneScale);
+    }
+    for (vector<Point>::iterator it = listY->begin(); it < listY->end(); it++) {
+        Point pt1 = *it;
+        if ((it + 1) == listY->end())
+            break;
+        Point pt2 = *(it + 1);
+        if (EQU_FLOAT(pt1.x, pt2.x) && EQU_FLOAT(pt1.y, pt2.y)) {
+            listY->erase(it + 1);
+            if ((it + 1) == listY->end())
+                break;
+            pt2 = *(it + 1);
+            if ((it + 2) != listY->end()){
+                Point p1 = *(it + 1);
+                Point p2 = *(it + 2);
+                if (EQU_FLOAT(p1.x, p2.x) && EQU_FLOAT(p1.y, p2.y))
+                    listY->erase(it + 2);
+            }
+        }
+        it++;
+        if (EQU_FLOAT(pt1.x, pt2.x))
+            continue;
+        if (!EQU_FLOAT(pt1.y, pt2.y))
             continue;
         m_pRenderTarget->DrawLine(
             D2D1::Point2F((float)pt1.x, (float)pt1.y),
@@ -174,21 +220,20 @@ void SliceDevice::getBoundBox(BoundBox* box, Slice* slice) {
     }
 }
 
-vector<Point>* SliceDevice::getInterSect(Slice* slice, BoundBox boundBox) {
-    vector<Point>* list = new vector<Point>;
+void SliceDevice::getInterSect(vector<Point>* listX, vector<Point>* listY, Slice* slice, BoundBox boundBox) {
     Slice* ss = slice;
     while (ss != NULL) {
         if (ss->data != NULL) {
             switch (ss->type)
             {
             case EdgeType::bSplice:
-                interSecBspline(list, (BSpline*)(ss->data), boundBox);
+                interSecBspline(listX, listY, (BSpline*)(ss->data), boundBox);
                 break;
             case EdgeType::circle:
-                interSecCircle(list, (Circle*)(ss->data), boundBox);
+                interSecCircle(listX, listY, (Circle*)(ss->data), boundBox);
                 break;
             case EdgeType::line:
-                interSecLine(list, (Line*)(ss->data), boundBox);
+                interSecLine(listX, listY, (Line*)(ss->data), boundBox);
                 break;
             default:
                 break;
@@ -196,26 +241,58 @@ vector<Point>* SliceDevice::getInterSect(Slice* slice, BoundBox boundBox) {
         }
         ss = ss->next;
     }
-    std::sort(list->begin(), list->end(), sortInterSects);
-    return list;
+    std::sort(listX->begin(), listX->end(), sortXInterSects);
+    std::sort(listY->begin(), listY->end(), sortYInterSects);
+    // TODO 应该剔除与轮廓线重合的部分
 }
 
-void SliceDevice::interSecLine(vector<Point>* list, Line* line, BoundBox boundBox) {
+void SliceDevice::interSecLine(vector<Point>* listX, vector<Point>* listY, Line* line, BoundBox boundBox) {
     Point pt;
     pt.x = boundBox.left;
     while (pt.x < boundBox.right) {
-        pt.x += m_manuStep;
+        pt.x += m_manuStepX;
         if (EQU_FLOAT(pt.x, boundBox.right) || pt.x > boundBox.right)
             break;
         bool noInter = false;
-        pt.y = interSec2Point(&noInter, pt.x, line->start, line->end);
+        pt.y = xInterSec2Point(&noInter, pt.x, line->start, line->end);
         if (noInter)
             continue;
-        list->push_back(pt);
+        listX->push_back(pt);
+    }
+    pt.y = boundBox.top;
+    while (pt.y < boundBox.bottom) {
+        pt.y += m_manuStepY;
+        if (EQU_FLOAT(pt.y, boundBox.bottom) || pt.y > boundBox.right)
+            break;
+        bool noInter = false;
+        pt.x = yInterSec2Point(&noInter, pt.y, line->start, line->end);
+        if (noInter)
+            continue;
+        listY->push_back(pt);
     }
 }
 
-double SliceDevice::interSec2Point(bool* noInter, double x, Point pt1, Point pt2){
+double SliceDevice::yInterSec2Point(bool* noInter, double y, Point pt1, Point pt2) {
+    if (EQU_FLOAT(y, pt1.y) && EQU_FLOAT(y, pt2.y)) {
+        *noInter = true;
+        return 0;
+    }
+    double yMax = pt2.y > pt1.y ? pt2.y : pt1.y;
+    double yMin = pt2.y < pt1.y ? pt2.y : pt1.y;
+    if (y < yMin || y > yMax) {
+        *noInter = true;
+        return 0;
+    }
+    // 直线表达式：x = (y - b) / k
+    if (EQU_FLOAT(pt2.x, pt1.x))
+        return pt1.x;
+    double k = (pt2.y - pt1.y) / (pt2.x - pt1.x);
+    double b = pt2.y - k * pt2.x;
+    *noInter = false;
+    return (y - b) / k;
+}
+
+double SliceDevice::xInterSec2Point(bool* noInter, double x, Point pt1, Point pt2){
     if (EQU_FLOAT(x, pt1.x) && EQU_FLOAT(x, pt2.x)) {
         *noInter = true;
         return 0;
@@ -233,66 +310,105 @@ double SliceDevice::interSec2Point(bool* noInter, double x, Point pt1, Point pt2
     return k * x + b;
 }
 
-void SliceDevice::interSecCircle(vector<Point>* list, Circle* circle, BoundBox boundBox) {
-    double xMax = circle->center.x + circle->radius;
-    double xMin = circle->center.x - circle->radius;
-    double xAxis = boundBox.left;
+void SliceDevice::interSecCircle(vector<Point>* listX, vector<Point>* listY, Circle* circle, BoundBox boundBox) {
     Point pt1;
     memset(&pt1, 0, sizeof(Point));
     Point pt2;
     memset(&pt2, 0, sizeof(Point));
+    double xMax = circle->center.x + circle->radius;
+    double xMin = circle->center.x - circle->radius;
+    double xAxis = boundBox.left;
     while (xAxis < boundBox.right) {
-        xAxis += m_manuStep;
+        xAxis += m_manuStepX;
         if (xAxis < xMin || xAxis > xMax || EQU_FLOAT(xAxis, boundBox.right) || xAxis > boundBox.right)
             continue;
         // 圆弧表达式：x^2 + y^2 = r^2
         double x = circle->center.x - xAxis;
         double y = sqrt(circle->radius * circle->radius - x * x);
-        double yAngle = atan2(y, x) + M_PI;
-        if (EQU_FLOAT(yAngle, 2 * M_PI))
-            yAngle = 0;
+        // 切线点不应作为一个交点
+        if (EQU_FLOAT(y, 0))
+            continue;
+        double yAngle1 = atan2(y, x) + M_PI;
         pt1.x = pt2.x = xAxis;
-        if ((yAngle < circle->endAngle || EQU_FLOAT(yAngle, circle->endAngle))
-            && (yAngle > circle->startAngle || EQU_FLOAT(yAngle, circle->startAngle))) {
+        if (angleInCircle(yAngle1, circle)) {
             // y轴方向向上为负，向下为正
             pt1.y = circle->center.y - y;
-            list->push_back(pt1);
+            listX->push_back(pt1);
         }
-        yAngle = atan2(-y, x) + M_PI;
-        if (EQU_FLOAT(yAngle, 2 * M_PI))
-            yAngle = 0;
-        if ((yAngle < circle->endAngle || EQU_FLOAT(yAngle, circle->endAngle))
-            && (yAngle > circle->startAngle || EQU_FLOAT(yAngle, circle->startAngle))) {
+        double yAngle2 = atan2(-y, x) + M_PI;
+        if (angleInCircle(yAngle2, circle)) {
             pt2.y = circle->center.y + y;
-            list->push_back(pt2);
+            listX->push_back(pt2);
+        }
+    }
+    double yMax = circle->center.y + circle->radius;
+    double yMin = circle->center.y - circle->radius;
+    double yAxis = boundBox.top;
+    while (yAxis < boundBox.bottom) {
+        yAxis += m_manuStepY;
+        if (yAxis < yMin || yAxis > yMax || EQU_FLOAT(yAxis, boundBox.bottom) || yAxis > boundBox.bottom)
+            continue;
+        double y = circle->center.y - yAxis;
+        double x = sqrt(circle->radius * circle->radius - y * y);
+        if (EQU_FLOAT(x, 0))
+            continue;
+        double xAngle = atan2(y, x) + M_PI;
+        pt1.y = pt2.y = yAxis;
+        if (angleInCircle(xAngle, circle)) {
+            // x轴方向左为负，右为正
+            pt1.x = circle->center.x + x;
+            listY->push_back(pt1);
+        }
+        xAngle = atan2(y, -x) + M_PI;
+        if (angleInCircle(xAngle, circle)) {
+            pt2.x = circle->center.x - x;
+            listY->push_back(pt2);
         }
     }
 }
 
-void SliceDevice::interSecBspline(vector<Point>* list, BSpline* bSplice, BoundBox boundBox) {
+bool SliceDevice::angleInCircle(float angle, Circle* circle) {
+    if ((angle < circle->endAngle || EQU_FLOAT(angle, circle->endAngle))
+        && (angle > circle->startAngle || EQU_FLOAT(angle, circle->startAngle)))
+        return true;
+    float angle1 = angle;
+    if (EQU_FLOAT(angle1, 2 * M_PI) && EQU_FLOAT(circle->startAngle, 0))
+        return true;
+    if (EQU_FLOAT(angle1, 0) && EQU_FLOAT(circle->endAngle, 2 * M_PI))
+        return true;
+    return false;
+}
+
+void SliceDevice::interSecBspline(vector<Point>* listX, vector<Point>* listY, BSpline* bSplice, BoundBox boundBox) {
     Point pt;
     memset(&pt, 0, sizeof(Point));
     pt.x = boundBox.left;
     while(pt.x < boundBox.right){
-        pt.x += m_manuStep;
+        pt.x += m_manuStepX;
         for (int i = 1; i < bSplice->polesCnt; i++){
             Point pole1 = bSplice->poles[i - 1];
             Point pole2 = bSplice->poles[i];
             bool noInter = false;
-            pt.y = interSec2Point(&noInter, pt.x, pole1, pole2);
+            pt.y = xInterSec2Point(&noInter, pt.x, pole1, pole2);
             if (noInter)
                 continue;
-            list->push_back(pt);
+            listX->push_back(pt);
         }
     }
 }
 
-bool sortInterSects(Point pt1, Point pt2){
+bool sortXInterSects(Point pt1, Point pt2){
     if (EQU_FLOAT(pt1.x, pt2.x))
         return pt1.y < pt2.y;
-    else if (pt1.x < pt2.x)
-        return true;
-    return false;
+    else
+        return pt1.x < pt2.x;
+}
+
+bool sortYInterSects(Point pt1, Point pt2) {
+    if (EQU_FLOAT(pt1.y, pt2.y))
+        return pt1.x < pt2.x;
+    else
+        return pt1.y < pt2.y;
 }
     
 int SliceDevice::drawCurve(Slice* curve) {

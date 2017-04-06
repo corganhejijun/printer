@@ -11,7 +11,8 @@
 
 using std::vector;
 
-bool sortInterSects(Point pt1, Point pt2);
+bool sortXInterSects(Point pt1, Point pt2);
+bool sortYInterSects(Point pt1, Point pt2);
 
 class SliceDevice{
     struct BoundBox {
@@ -26,7 +27,8 @@ class SliceDevice{
     ID2D1SolidColorBrush* m_pBlackBrush; // A black brush, reflect the line color
     const D2D1::ColorF CLEAR_COLOR = D2D1::ColorF(D2D1::ColorF::White);
     float m_curveWith;
-    float m_manuStep;
+    float m_manuStepX;
+    float m_manuStepY;
     float m_sceneScale;
     float m_sceneMargin;
     int CreateD2DResource();
@@ -37,12 +39,14 @@ class SliceDevice{
     void getBoundBox(BoundBox* box, Slice* slice);
     void getBSplineBoundBox(BoundBox* box, BSpline* spline);
     void setBoundBox(BoundBox* box, double top, double bottom, double left, double right);
-    vector<Point>* getInterSect(Slice* slice, BoundBox boundBox);
-    double interSec2Point(bool* noInter, double x, Point pt1, Point pt2);
-    void interSecLine(vector<Point>* list, Line* line, BoundBox bound);
-    void interSecCircle(vector<Point>* list, Circle* circle, BoundBox bound);
-    void interSecBspline(vector<Point>* list, BSpline* bSplice, BoundBox bound);
-    int drawInterSec(vector<Point>* list);
+    void getInterSect(vector<Point>* listX, vector<Point>* listY, Slice* slice, BoundBox boundBox);
+    double xInterSec2Point(bool* noInter, double x, Point pt1, Point pt2);
+    double yInterSec2Point(bool* noInter, double y, Point pt1, Point pt2);
+    void interSecLine(vector<Point>* listX, vector<Point>* listY, Line* line, BoundBox bound);
+    bool angleInCircle(float angle, Circle* circle);
+    void interSecCircle(vector<Point>* listX, vector<Point>* listY, Circle* circle, BoundBox bound);
+    void interSecBspline(vector<Point>* listX, vector<Point>* listY, BSpline* bSplice, BoundBox bound);
+    int drawInterSec(vector<Point>* listX, vector<Point>* listY);
 public:
     SliceDevice(HWND hWnd);
     ~SliceDevice();
