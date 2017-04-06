@@ -31,6 +31,8 @@ class SliceDevice{
     float m_manuStepY;
     float m_sceneScale;
     float m_sceneMargin;
+    float m_precise;
+    double getLength(Point pt1, Point pt2);
     int CreateD2DResource();
     int drawCurve(Slice* curve);
     int drawLine(Line* line);

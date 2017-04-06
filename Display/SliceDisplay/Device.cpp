@@ -60,10 +60,11 @@ int SliceDevice::CreateD2DResource() {
 
 void SliceDevice::resetScene() {
     m_curveWith = 1;
-    m_manuStepX = 5;
+    m_manuStepX = 10;
     m_manuStepY = 5;
     m_sceneScale = -1;
     m_sceneMargin = 0.1f;
+    m_precise = 1.0f;
 }
 
 int SliceDevice::clearScene() {
@@ -364,6 +365,12 @@ bool SliceDevice::angleInCircle(float angle, Circle* circle) {
     return false;
 }
 
+double SliceDevice::getLength(Point pt1, Point pt2) {
+    double x = pt1.x - pt2.x;
+    double y = pt1.y - pt2.y;
+    return x*x + y*y;
+}
+
 void SliceDevice::interSecBspline(vector<Point>* listX, vector<Point>* listY, BSpline* bSplice, BoundBox boundBox) {
     Point pt;
     memset(&pt, 0, sizeof(Point));
@@ -373,6 +380,14 @@ void SliceDevice::interSecBspline(vector<Point>* listX, vector<Point>* listY, BS
         for (int i = 1; i < bSplice->polesCnt; i++){
             Point pole1 = bSplice->poles[i - 1];
             Point pole2 = bSplice->poles[i];
+            while (getLength(pole1, pole2) < m_precise * m_precise)
+            {
+                i++;
+                if (i < bSplice->polesCnt)
+                    pole2 = bSplice->poles[i];
+                else
+                    break;
+            }
             bool noInter = false;
             pt.y = xInterSec2Point(&noInter, pt.x, pole1, pole2);
             if (noInter)

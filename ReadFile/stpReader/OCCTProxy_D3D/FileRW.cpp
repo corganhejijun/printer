@@ -127,6 +127,8 @@ void addBSpline(Slice* slice, double beginX, double beginY, double endX, double 
     b->start.y = beginY;
     b->end.x = endX;
     b->end.y = endY;
+    bSplinePoles[polesCnt - 1].x = endX;
+    bSplinePoles[polesCnt - 1].y = endY;
     b->poles = bSplinePoles;
     b->polesCnt = polesCnt;
 }
@@ -209,7 +211,7 @@ void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
                     file << "(" << pt.X() << "," << pt.Y() << "," << pt.Z() << ") ";
                 }
                 file << endl;
-                addVertex(child, slice, pointArray, polesCount - 1);
+                addVertex(child, slice, pointArray, polesCount);
             }
             else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_Line) {
                 addVertex(child, slice, NULL, 0);
