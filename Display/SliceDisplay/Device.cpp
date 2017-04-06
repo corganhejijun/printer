@@ -60,8 +60,8 @@ int SliceDevice::CreateD2DResource() {
 
 void SliceDevice::resetScene() {
     m_curveWith = 1;
-    m_manuStepX = 1;
-    m_manuStepY = 1;
+    m_manuStepX = 5;
+    m_manuStepY = 5;
     m_sceneScale = -1;
     m_sceneMargin = 0.1f;
 }
@@ -125,35 +125,26 @@ int SliceDevice::drawSlice(Slice* slice) {
 
 int SliceDevice::drawInterSec(vector<Point>* listX, vector<Point>* listY) {
     for (vector<Point>::iterator it = listX->begin(); it < listX->end(); it++) {
-        // 不应有重复的点，圆的切线点应删除
+        // 不应有重复的点，圆的切线点已删除
         Point pt1 = *it;
         if ((it + 1) == listX->end())
             break;
         Point pt2 = *(it + 1);
-        // 两段曲线接头处，有重复的点
+        int add = 2;
         if (EQU_FLOAT(pt1.x, pt2.x) && EQU_FLOAT(pt1.y, pt2.y)) {
             listX->erase(it + 1);
-            if ((it + 1) == listX->end())
-                break;
             pt2 = *(it + 1);
-            // 删除一对重复点
-            if ((it + 2) != listX->end()) {
-                Point p1 = *(it + 1);
-                Point p2 = *(it + 2);
-                if (EQU_FLOAT(p1.x, p2.x) && EQU_FLOAT(p1.y, p2.y))
-                    listX->erase(it + 2);
-            }
+            add = 1;
         }
-        if ((it + 1) == listX->end())
-            break;
+        if ((it + add) != listX->end()) {
+            Point pt3 = *(it + 2);
+            if (EQU_FLOAT(pt3.x, pt2.x) && EQU_FLOAT(pt3.y, pt2.y))
+                listX->erase(it + 2);
+        }
         it++;
-        if (EQU_FLOAT(pt1.y, pt2.y))
-            continue;
         if (!EQU_FLOAT(pt1.x, pt2.x))
             continue;
-        m_pRenderTarget->DrawLine(
-            D2D1::Point2F((float)pt1.x, (float)pt1.y),
-            D2D1::Point2F((float)pt2.x, (float)pt2.y),
+        m_pRenderTarget->DrawLine(D2D1::Point2F((float)pt1.x, (float)pt1.y), D2D1::Point2F((float)pt2.x, (float)pt2.y),
             m_pBlackBrush, m_curveWith * m_sceneScale);
     }
     for (vector<Point>::iterator it = listY->begin(); it < listY->end(); it++) {
@@ -161,26 +152,21 @@ int SliceDevice::drawInterSec(vector<Point>* listX, vector<Point>* listY) {
         if ((it + 1) == listY->end())
             break;
         Point pt2 = *(it + 1);
+        int add = 2;
         if (EQU_FLOAT(pt1.x, pt2.x) && EQU_FLOAT(pt1.y, pt2.y)) {
             listY->erase(it + 1);
-            if ((it + 1) == listY->end())
-                break;
             pt2 = *(it + 1);
-            if ((it + 2) != listY->end()){
-                Point p1 = *(it + 1);
-                Point p2 = *(it + 2);
-                if (EQU_FLOAT(p1.x, p2.x) && EQU_FLOAT(p1.y, p2.y))
-                    listY->erase(it + 2);
-            }
+            add = 1;
+        }
+        if ((it + add) != listY->end()) {
+            Point pt3 = *(it + 2);
+            if (EQU_FLOAT(pt3.x, pt2.x) && EQU_FLOAT(pt3.y, pt2.y))
+                listY->erase(it + 2);
         }
         it++;
-        if (EQU_FLOAT(pt1.x, pt2.x))
-            continue;
         if (!EQU_FLOAT(pt1.y, pt2.y))
             continue;
-        m_pRenderTarget->DrawLine(
-            D2D1::Point2F((float)pt1.x, (float)pt1.y),
-            D2D1::Point2F((float)pt2.x, (float)pt2.y),
+        m_pRenderTarget->DrawLine(D2D1::Point2F((float)pt1.x, (float)pt1.y), D2D1::Point2F((float)pt2.x, (float)pt2.y),
             m_pBlackBrush, m_curveWith * m_sceneScale);
     }
     return S_OK;
@@ -188,9 +174,8 @@ int SliceDevice::drawInterSec(vector<Point>* listX, vector<Point>* listY) {
 
 void SliceDevice::getBSplineBoundBox(BoundBox* box, BSpline* spline) {
     setBoundBox(box, spline->start.y, spline->end.y, spline->start.x, spline->end.x);
-    for (int i = 0; i < spline->polesCnt - 1; i+=2) {
+    for (int i = 0; i < spline->polesCnt - 1; i+=2)
         setBoundBox(box, spline->poles[i].y, spline->poles[i + 1].y, spline->poles[i].x, spline->poles[i + 1].x);
-    }
 }
 
 void SliceDevice::getBoundBox(BoundBox* box, Slice* slice) {
@@ -279,7 +264,7 @@ double SliceDevice::yInterSec2Point(bool* noInter, double y, Point pt1, Point pt
     }
     double yMax = pt2.y > pt1.y ? pt2.y : pt1.y;
     double yMin = pt2.y < pt1.y ? pt2.y : pt1.y;
-    if (y < yMin || y > yMax) {
+    if ((y < yMin && !EQU_FLOAT(y, yMin)) || (y > yMax && !EQU_FLOAT(y, yMax))) {
         *noInter = true;
         return 0;
     }
@@ -299,7 +284,7 @@ double SliceDevice::xInterSec2Point(bool* noInter, double x, Point pt1, Point pt
     }
     double xMax = pt2.x > pt1.x ? pt2.x : pt1.x;
     double xMin = pt2.x < pt1.x ? pt2.x : pt1.x;
-    if (x < xMin || x > xMax){
+    if ((x < xMin && !EQU_FLOAT(x, xMin)) || (x > xMax && !EQU_FLOAT(x, xMax))){
         *noInter = true;
         return 0;
     }

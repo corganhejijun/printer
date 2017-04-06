@@ -45,8 +45,8 @@
             <Button x:Name="buttonSlice" Content="切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Background="Transparent" Click="buttonSlice_Click"/>
         </ToolBar>
         <ToolBar x:Name="toolBar_Copy" Margin="230,24,0,0" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="805">
-            <Button x:Name="buttonOpen" Content="打开..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpen_Click"/>
-            <Button x:Name="buttonSave" Content="保存..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSave_Click"/>
+            <Button x:Name="buttonOpen" Content="打开实体..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpen_Click"/>
+            <Button x:Name="buttonSave" Content="保存切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSave_Click"/>
             <Button x:Name="buttonOpenSlice" Content="打开切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpenSlice_Click"/>
             <Button x:Name="buttonClose" Content="关闭" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonClose_Click"/>
         </ToolBar>
