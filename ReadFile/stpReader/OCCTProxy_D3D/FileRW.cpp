@@ -95,7 +95,7 @@ Slice* getEmptySlice(Slice* slice) {
     return target;
 }
 
-void addCircle(Slice* slice, double centerX, double centerY, double startAngle, double endAngle, double radius) {
+Slice* addCircle(Slice* slice, double centerX, double centerY, double startAngle, double endAngle, double radius) {
     Slice* target = getEmptySlice(slice);
     target->type = EdgeType::circle;
     target->data = new Circle();
@@ -105,6 +105,15 @@ void addCircle(Slice* slice, double centerX, double centerY, double startAngle, 
     circle->startAngle = startAngle;
     circle->endAngle = endAngle;
     circle->radius = radius;
+    return target;
+}
+
+void addCircleVertex(Slice* slice, double beginX, double beginY, double endX, double endY) {
+    Circle* circle = (Circle*)(slice->data);
+    circle->start.x = beginX;
+    circle->start.y = beginY;
+    circle->end.x = endX;
+    circle->end.y = endY;
 }
 
 void addLine(Slice* slice, double beginX, double beginY, double endX, double endY) {
@@ -161,8 +170,12 @@ void addVertex(TopoDS_Shape shape, Slice* slice, Point* bSplinePoles, int polesC
     if (bSplinePoles != NULL) {
         addBSpline(slice, beginX, beginY, endX, endY, bSplinePoles, polesCnt);
     }
-    else
-        addLine(slice, beginX, beginY, endX, endY);
+    else {
+        if (polesCnt == 0)
+            addLine(slice, beginX, beginY, endX, endY);
+        if (polesCnt == 1)
+            addCircleVertex(slice, beginX, beginY, endX, endY);
+    }
 }
 
 void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
@@ -176,12 +189,13 @@ void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
                 gp_Pnt center = circle.Location();
                 Standard_Real first = 0, last = 0;
                 Handle_Geom_Curve theCurve = BRep_Tool::Curve(TopoDS::Edge(child), first, last);
-                addCircle(slice, center.X(), center.Y(), first, last, circle.Radius());
+                Slice* target = addCircle(slice, center.X(), center.Y(), first, last, circle.Radius());
                 for (int i = 0; i < layer; i++)
                     file << '\t';
                 file << "circle radius is " << circle.Radius() << 
                     ", center is (" << center.X() << "," << center.Y() << "," << center.Z() << ")" 
-                    ", start angle is " << (first/M_PI*360) << ", end angle is " << (last/M_PI*360) << endl;
+                    ", start angle is " << (first/M_PI*180) << ", end angle is " << (last/M_PI*180) << endl;
+                addVertex(child, target, NULL, 1);
             } else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_BSplineCurve) {
                 Handle_Geom_BSplineCurve bSpline = adpCurve.BSpline();
                 for (int i = 0; i < layer; i++)

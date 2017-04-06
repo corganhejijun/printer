@@ -46,6 +46,7 @@ class SliceDevice{
     double yInterSec2Point(bool* noInter, double y, Point pt1, Point pt2);
     void interSecLine(vector<Point>* listX, vector<Point>* listY, Line* line, BoundBox bound);
     bool angleInCircle(float angle, Circle* circle);
+    double atan2Pi(double atanValue);
     void interSecCircle(vector<Point>* listX, vector<Point>* listY, Circle* circle, BoundBox bound);
     void interSecBspline(vector<Point>* listX, vector<Point>* listY, BSpline* bSplice, BoundBox bound);
     int drawInterSec(vector<Point>* listX, vector<Point>* listY);

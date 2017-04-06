@@ -309,21 +309,22 @@ void SliceDevice::interSecCircle(vector<Point>* listX, vector<Point>* listY, Cir
         if (xAxis < xMin || xAxis > xMax || EQU_FLOAT(xAxis, boundBox.right) || xAxis > boundBox.right)
             continue;
         // 圆弧表达式：x^2 + y^2 = r^2
-        double x = circle->center.x - xAxis;
+        double x = xAxis - circle->center.x;
         double y = sqrt(circle->radius * circle->radius - x * x);
         // 切线点不应作为一个交点
         if (EQU_FLOAT(y, 0))
             continue;
-        double yAngle1 = atan2(y, x) + M_PI;
+        // 圆弧角度y=0, x>0为0度，顺时针方向由0~2pi，y=0，x<0为180度
+        double yAngle1 = atan2Pi(atan2(y, x));
         pt1.x = pt2.x = xAxis;
         if (angleInCircle(yAngle1, circle)) {
             // y轴方向向上为负，向下为正
-            pt1.y = circle->center.y - y;
+            pt1.y = circle->center.y + y;
             listX->push_back(pt1);
         }
-        double yAngle2 = atan2(-y, x) + M_PI;
+        double yAngle2 = atan2Pi(atan2(-y, x));
         if (angleInCircle(yAngle2, circle)) {
-            pt2.y = circle->center.y + y;
+            pt2.y = circle->center.y - y;
             listX->push_back(pt2);
         }
     }
@@ -334,18 +335,18 @@ void SliceDevice::interSecCircle(vector<Point>* listX, vector<Point>* listY, Cir
         yAxis += m_manuStepY;
         if (yAxis < yMin || yAxis > yMax || EQU_FLOAT(yAxis, boundBox.bottom) || yAxis > boundBox.bottom)
             continue;
-        double y = circle->center.y - yAxis;
+        double y = yAxis - circle->center.y;
         double x = sqrt(circle->radius * circle->radius - y * y);
         if (EQU_FLOAT(x, 0))
             continue;
-        double xAngle = atan2(y, x) + M_PI;
+        double xAngle = atan2Pi(atan2(y, x));
         pt1.y = pt2.y = yAxis;
         if (angleInCircle(xAngle, circle)) {
             // x轴方向左为负，右为正
             pt1.x = circle->center.x + x;
             listY->push_back(pt1);
         }
-        xAngle = atan2(y, -x) + M_PI;
+        xAngle = atan2Pi(atan2(y, -x));
         if (angleInCircle(xAngle, circle)) {
             pt2.x = circle->center.x - x;
             listY->push_back(pt2);
@@ -353,14 +354,33 @@ void SliceDevice::interSecCircle(vector<Point>* listX, vector<Point>* listY, Cir
     }
 }
 
+double SliceDevice::atan2Pi(double atanValue) {
+    if (atanValue < 0)
+        return atanValue + 2 * M_PI;
+    return atanValue;
+}
+
 bool SliceDevice::angleInCircle(float angle, Circle* circle) {
-    if ((angle < circle->endAngle || EQU_FLOAT(angle, circle->endAngle))
-        && (angle > circle->startAngle || EQU_FLOAT(angle, circle->startAngle)))
+    float startAngle = circle->startAngle;
+    float endAngle = circle->endAngle;
+    double yStart = circle->start.y - circle->center.y;
+    double xStart = circle->start.x - circle->center.x;
+    double yEnd = circle->end.y - circle->center.y;
+    double xEnd = circle->end.x - circle->center.x;
+    /*
+    startAngle = atan2Pi(atan2(-yStart, xStart));
+    // y轴向下为正向
+    if (EQU_FLOAT(circle->end.x, circle->start.x) && EQU_FLOAT(circle->end.y, circle->end.y))
+        endAngle = 2 * M_PI;
+    else
+        endAngle = atan2Pi(atan2(-yEnd, xEnd));
+        */
+    if ((angle < endAngle || EQU_FLOAT(angle, endAngle)) && (angle > startAngle || EQU_FLOAT(angle, startAngle)))
         return true;
     float angle1 = angle;
-    if (EQU_FLOAT(angle1, 2 * M_PI) && EQU_FLOAT(circle->startAngle, 0))
+    if (EQU_FLOAT(angle1, 2 * M_PI) && EQU_FLOAT(startAngle, 0))
         return true;
-    if (EQU_FLOAT(angle1, 0) && EQU_FLOAT(circle->endAngle, 2 * M_PI))
+    if (EQU_FLOAT(angle1, 0) && EQU_FLOAT(endAngle, 2 * M_PI))
         return true;
     return false;
 }
@@ -380,14 +400,6 @@ void SliceDevice::interSecBspline(vector<Point>* listX, vector<Point>* listY, BS
         for (int i = 1; i < bSplice->polesCnt; i++){
             Point pole1 = bSplice->poles[i - 1];
             Point pole2 = bSplice->poles[i];
-            while (getLength(pole1, pole2) < m_precise * m_precise)
-            {
-                i++;
-                if (i < bSplice->polesCnt)
-                    pole2 = bSplice->poles[i];
-                else
-                    break;
-            }
             bool noInter = false;
             pt.y = xInterSec2Point(&noInter, pt.x, pole1, pole2);
             if (noInter)
@@ -464,9 +476,9 @@ int SliceDevice::drawCircle(Circle* circle) {
     D2D1_ARC_SIZE size = D2D1_ARC_SIZE_SMALL;
     if (circle->endAngle - circle->startAngle > M_PI)
         size = D2D1_ARC_SIZE_LARGE;
-    pSink->BeginFigure(D2D1::Point2F(beginX, beginY), D2D1_FIGURE_BEGIN_HOLLOW);
+    pSink->BeginFigure(D2D1::Point2F(circle->start.x, circle->start.y), D2D1_FIGURE_BEGIN_HOLLOW);
     pSink->AddArc(D2D1::ArcSegment(
-        D2D1::Point2F(endX, endY), D2D1::SizeF(circle->radius, circle->radius), 0.0, 
+        D2D1::Point2F(circle->end.x, circle->end.y), D2D1::SizeF(circle->radius, circle->radius), 0.0, 
         D2D1_SWEEP_DIRECTION_CLOCKWISE, size));
     pSink->EndFigure(D2D1_FIGURE_END_OPEN);
     pSink->Close();

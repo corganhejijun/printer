@@ -16,6 +16,8 @@ typedef struct {
     double startAngle;
     double endAngle;
     double radius;
+    Point start;
+    Point end;
 }Circle;
 
 typedef struct {
