@@ -124,47 +124,77 @@ int SliceDevice::drawSlice(Slice* slice) {
     return S_OK;
 }
 
-int SliceDevice::drawInterSec(vector<Point>* listX, vector<Point>* listY) {
-    for (vector<Point>::iterator it = listX->begin(); it < listX->end(); it++) {
-        // 不应有重复的点，圆的切线点已删除
-        Point pt1 = *it;
-        if ((it + 1) == listX->end())
+bool SliceDevice::deleteDuplicatePt(vector<Point>* list, vector<Point>::iterator it) {
+    if ((it + 1) == list->end())
+        return false;
+    Point pt1 = *it;
+    Point pt2 = *(it + 1);
+    while (EQU_FLOAT(pt1.x, pt2.x) && EQU_FLOAT(pt1.y, pt2.y)) {
+        list->erase(it + 1);
+        if ((it + 1) == list->end()) {
+            return false;
+        }
+        pt2 = *(it + 1);
+    }
+    while ((it + 2) != list->end()) {
+        Point pt3 = *(it + 2);
+        if (EQU_FLOAT(pt3.x, pt2.x) && EQU_FLOAT(pt3.y, pt2.y))
+            list->erase(it + 2);
+        else
             break;
-        Point pt2 = *(it + 1);
+    }
+    return true;
+}
+
+int SliceDevice::drawInterSec(vector<Point>* listX, vector<Point>* listY) {
+    for (vector<Point>::iterator it = listX->begin(); it < listX->end(); it += 2) {
+        // 不应有重复的点，圆的切线点等奇异点应删除
+        if (!deleteDuplicatePt(listX, it))
+            break;
+        /*
         int add = 2;
         if (EQU_FLOAT(pt1.x, pt2.x) && EQU_FLOAT(pt1.y, pt2.y)) {
             listX->erase(it + 1);
+            if ((it + 1) == listX->end())
+                break;
             pt2 = *(it + 1);
             add = 1;
         }
         if ((it + add) != listX->end()) {
-            Point pt3 = *(it + 2);
+            Point pt3 = *(it + add);
             if (EQU_FLOAT(pt3.x, pt2.x) && EQU_FLOAT(pt3.y, pt2.y))
                 listX->erase(it + 2);
         }
         it++;
+        */
+        Point pt1 = *it;
+        Point pt2 = *(it + 1);
         if (!EQU_FLOAT(pt1.x, pt2.x))
             continue;
         m_pRenderTarget->DrawLine(D2D1::Point2F((float)pt1.x, (float)pt1.y), D2D1::Point2F((float)pt2.x, (float)pt2.y),
             m_pBlackBrush, m_curveWith * m_sceneScale);
     }
-    for (vector<Point>::iterator it = listY->begin(); it < listY->end(); it++) {
-        Point pt1 = *it;
-        if ((it + 1) == listY->end())
+    for (vector<Point>::iterator it = listY->begin(); it < listY->end(); it += 2) {
+        if (!deleteDuplicatePt(listY, it))
             break;
+        Point pt1 = *it;
         Point pt2 = *(it + 1);
+        /*
         int add = 2;
         if (EQU_FLOAT(pt1.x, pt2.x) && EQU_FLOAT(pt1.y, pt2.y)) {
             listY->erase(it + 1);
+            if ((it + 1) == listY->end())
+                break;
             pt2 = *(it + 1);
             add = 1;
         }
         if ((it + add) != listY->end()) {
-            Point pt3 = *(it + 2);
+            Point pt3 = *(it + add);
             if (EQU_FLOAT(pt3.x, pt2.x) && EQU_FLOAT(pt3.y, pt2.y))
                 listY->erase(it + 2);
         }
         it++;
+        */
         if (!EQU_FLOAT(pt1.y, pt2.y))
             continue;
         m_pRenderTarget->DrawLine(D2D1::Point2F((float)pt1.x, (float)pt1.y), D2D1::Point2F((float)pt2.x, (float)pt2.y),
@@ -357,6 +387,8 @@ void SliceDevice::interSecCircle(vector<Point>* listX, vector<Point>* listY, Cir
 double SliceDevice::atan2Pi(double atanValue) {
     if (atanValue < 0)
         return atanValue + 2 * M_PI;
+    if (EQU_FLOAT(0, atanValue))
+        return 0;
     return atanValue;
 }
 
@@ -367,14 +399,34 @@ bool SliceDevice::angleInCircle(float angle, Circle* circle) {
     double xStart = circle->start.x - circle->center.x;
     double yEnd = circle->end.y - circle->center.y;
     double xEnd = circle->end.x - circle->center.x;
-    /*
-    startAngle = atan2Pi(atan2(-yStart, xStart));
+    bool overPI = false;
+    if (endAngle - startAngle > M_PI && !EQU_FLOAT(endAngle - startAngle, M_PI))
+        overPI = true;
+    startAngle = atan2Pi(atan2(yStart, xStart));
+    if (EQU_FLOAT(startAngle, 2 * M_PI))
+        startAngle = 0;
     // y轴向下为正向
-    if (EQU_FLOAT(circle->end.x, circle->start.x) && EQU_FLOAT(circle->end.y, circle->end.y))
+    if (EQU_FLOAT(circle->end.x, circle->start.x) && EQU_FLOAT(circle->end.y, circle->end.y)) {
         endAngle = 2 * M_PI;
+        startAngle = 0;
+    }
     else
-        endAngle = atan2Pi(atan2(-yEnd, xEnd));
-        */
+        endAngle = atan2Pi(atan2(yEnd, xEnd));
+    if (EQU_FLOAT(endAngle, 0))
+        endAngle = 2 * M_PI;
+    if (((endAngle - startAngle) < M_PI && overPI) || ((endAngle - startAngle) > M_PI && !overPI)) {
+        if (EQU_FLOAT(endAngle - startAngle, M_PI) && !overPI)
+            ;
+        else
+            endAngle = 2 * M_PI - endAngle;
+    }
+    if (endAngle < startAngle) {
+        if (((angle > startAngle || EQU_FLOAT(angle, startAngle)) && (angle < 2 * M_PI || EQU_FLOAT(angle, 2 * M_PI)))
+            || ((angle > 0 || EQU_FLOAT(angle, 0)) && (angle < endAngle || EQU_FLOAT(angle, endAngle))))
+        {
+            return true;
+        }
+    }
     if ((angle < endAngle || EQU_FLOAT(angle, endAngle)) && (angle > startAngle || EQU_FLOAT(angle, startAngle)))
         return true;
     float angle1 = angle;
@@ -404,7 +456,26 @@ void SliceDevice::interSecBspline(vector<Point>* listX, vector<Point>* listY, BS
             pt.y = xInterSec2Point(&noInter, pt.x, pole1, pole2);
             if (noInter)
                 continue;
+            // 每个短线段不取最后一点，防止出现大量重复点，但最后一点要计入
+            if (EQU_FLOAT(pt.x, pole2.x) && EQU_FLOAT(pt.y, pole2.y) && i != bSplice->polesCnt - 1)
+                continue;
             listX->push_back(pt);
+        }
+    }
+    memset(&pt, 0, sizeof(Point));
+    pt.y = boundBox.top;
+    while (pt.y < boundBox.bottom) {
+        pt.y += m_manuStepY;
+        for (int i = 1; i < bSplice->polesCnt; i++) {
+            Point pole1 = bSplice->poles[i - 1];
+            Point pole2 = bSplice->poles[i];
+            bool noInter = false;
+            pt.x = yInterSec2Point(&noInter, pt.y, pole1, pole2);
+            if (noInter)
+                continue;
+            if (EQU_FLOAT(pt.x, pole2.x) && EQU_FLOAT(pt.y, pole2.y) && i != bSplice->polesCnt - 1)
+                continue;
+            listY->push_back(pt);
         }
     }
 }

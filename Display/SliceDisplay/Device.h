@@ -49,6 +49,7 @@ class SliceDevice{
     double atan2Pi(double atanValue);
     void interSecCircle(vector<Point>* listX, vector<Point>* listY, Circle* circle, BoundBox bound);
     void interSecBspline(vector<Point>* listX, vector<Point>* listY, BSpline* bSplice, BoundBox bound);
+    bool deleteDuplicatePt(vector<Point>* list, vector<Point>::iterator it);
     int drawInterSec(vector<Point>* listX, vector<Point>* listY);
 public:
     SliceDevice(HWND hWnd);
