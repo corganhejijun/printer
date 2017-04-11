@@ -395,13 +395,15 @@ double SliceDevice::atan2Pi(double atanValue) {
 bool SliceDevice::angleInCircle(float angle, Circle* circle) {
     float startAngle = circle->startAngle;
     float endAngle = circle->endAngle;
+    float angleDiff = abs(startAngle - endAngle);
     double yStart = circle->start.y - circle->center.y;
     double xStart = circle->start.x - circle->center.x;
     double yEnd = circle->end.y - circle->center.y;
     double xEnd = circle->end.x - circle->center.x;
     bool overPI = false;
-    if (endAngle - startAngle > M_PI && !EQU_FLOAT(endAngle - startAngle, M_PI))
+    if (angleDiff > M_PI && !EQU_FLOAT(angleDiff, M_PI))
         overPI = true;
+
     startAngle = atan2Pi(atan2(yStart, xStart));
     if (EQU_FLOAT(startAngle, 2 * M_PI))
         startAngle = 0;
@@ -414,8 +416,8 @@ bool SliceDevice::angleInCircle(float angle, Circle* circle) {
         endAngle = atan2Pi(atan2(yEnd, xEnd));
     if (EQU_FLOAT(endAngle, 0))
         endAngle = 2 * M_PI;
-    if (((endAngle - startAngle) < M_PI && overPI) || ((endAngle - startAngle) > M_PI && !overPI)) {
-        if (EQU_FLOAT(endAngle - startAngle, M_PI) && !overPI)
+    if ((abs(endAngle - startAngle) < M_PI && overPI) || (abs(endAngle - startAngle) > M_PI && !overPI)) {
+        if (EQU_FLOAT(abs(endAngle - startAngle), M_PI) && !overPI)
             ;
         else
             endAngle = 2 * M_PI - endAngle;
