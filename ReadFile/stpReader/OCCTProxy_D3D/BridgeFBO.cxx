@@ -7,8 +7,8 @@
 #include <d3dx9.h>
 
 // list of required libraries
-#pragma comment(lib, "TKOpenGld.lib")
-#pragma comment(lib, "opengl32.lib")
+//#pragma comment(lib, "TKOpenGl.lib")
+//#pragma comment(lib, "opengl32.lib")
 
 // =======================================================================
 // function : Init
