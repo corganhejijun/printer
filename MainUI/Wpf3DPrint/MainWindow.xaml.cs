@@ -242,5 +242,14 @@ namespace Wpf3DPrint
             if (sliceScene != null)
                 sliceScene.onResize();
         }
+
+        private void ribbonMenu_Loaded(object sender, RoutedEventArgs e)
+        {
+            Grid child = VisualTreeHelper.GetChild((DependencyObject)sender, 0) as Grid;
+            if (child != null)
+            {
+                child.RowDefinitions[0].Height = new GridLength(0);
+            }
+        }
     }
 }

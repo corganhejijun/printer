@@ -8,76 +8,105 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="686" Width="1043" Closed="Window_Closed">
     <Grid x:Name="GridMain">
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="文件" HorizontalAlignment="Right" Width="38">
-                <MenuItem Header="打开..."></MenuItem>
-                <MenuItem Header="另存为..."></MenuItem>
-                <MenuItem x:Name="menuCloseFile" Header="关闭" Click="menuCloseFile_Click"></MenuItem>
-                <MenuItem x:Name="menuQuit" Header="退出" Click="menuQuit_Click"></MenuItem>
-            </MenuItem>
-            <MenuItem Header="编辑">
-                <MenuItem Header="对齐">
-                    <MenuItem Header="几何中心对齐"></MenuItem>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Ribbon x:Name="ribbonMenu" Grid.Row="0" Loaded="ribbonMenu_Loaded">
+            <Ribbon.HelpPaneContent>
+                <RibbonButton SmallImageSource="images/Help.ico"></RibbonButton>
+            </Ribbon.HelpPaneContent>
+            <Ribbon.ApplicationMenu>
+                <RibbonApplicationMenu>
+                    <RibbonApplicationMenuItem Header="设置..." ImageSource="images/Option.ico"></RibbonApplicationMenuItem>
+                    <RibbonApplicationMenuItem Header="退出" ImageSource="images/Exit.ico"></RibbonApplicationMenuItem>
+                </RibbonApplicationMenu>
+            </Ribbon.ApplicationMenu>
+            <RibbonTab Header="文件">
+                <RibbonGroup Header="打开文件" LargeImageSource="images/Open.ico">
+                    <RibbonButton Label="打开实体"  LargeImageSource="images/Open.ico"></RibbonButton>
+                    <RibbonButton Label="打开切片" LargeImageSource="images/OpenSlice.ico"></RibbonButton>
+                </RibbonGroup>
+                <RibbonGroup Header="关闭文件">
+                    <RibbonButton Label="关闭文件" LargeImageSource="images/CloseFile.ico"></RibbonButton>
+                </RibbonGroup>
+            </RibbonTab>
+            <RibbonTab Header="编辑"></RibbonTab>
+            <RibbonTab Header="工具"></RibbonTab>
+            <RibbonTab Header="机器"></RibbonTab>
+        </Ribbon>
+        <Grid Grid.Row="1">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="文件" HorizontalAlignment="Right" Width="38">
+                    <MenuItem Header="打开..."></MenuItem>
+                    <MenuItem Header="另存为..."></MenuItem>
+                    <MenuItem x:Name="menuCloseFile" Header="关闭" Click="menuCloseFile_Click"></MenuItem>
+                    <MenuItem x:Name="menuQuit" Header="退出" Click="menuQuit_Click"></MenuItem>
                 </MenuItem>
-                <MenuItem Header="旋转..."></MenuItem>
-                <MenuItem Header="移动..."></MenuItem>
-            </MenuItem>
-            <MenuItem Header="工具">
-                <MenuItem Header="工艺参数设置..."></MenuItem>
-                <MenuItem Header="图形处理..."></MenuItem>
-                <MenuItem Header="路径规划..."></MenuItem>
-                <MenuItem Header="仿真..."></MenuItem>
-                <MenuItem Header="加工..."></MenuItem>
-            </MenuItem>
-            <MenuItem Header="机器">
-                <MenuItem Header="基本信息"></MenuItem>
-                <MenuItem Header="调试..."></MenuItem>
-                <MenuItem Header="运动参数..."></MenuItem>
-                <MenuItem Header="功能参数..."></MenuItem>
-            </MenuItem>
-            <MenuItem Header="帮助">
-                <MenuItem Header="关于..."></MenuItem>
-            </MenuItem>
-        </Menu>
-        <ToolBar x:Name="toolBar" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="230" Margin="0,24,0,0">
-            <Button x:Name="buttonSelectMode" Content="选择" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSelectMode_Click"/>
-            <Button x:Name="buttonWatchMode" Content="观察" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonWatchMode_Click" Background="LightSkyBlue"/>
-            <Button x:Name="buttonSlice" Content="切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Background="Transparent" Click="buttonSlice_Click"/>
-        </ToolBar>
-        <ToolBar x:Name="toolBar_Copy" Margin="230,24,0,0" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="805">
-            <Button x:Name="buttonOpen" Content="打开实体..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpen_Click"/>
-            <Button x:Name="buttonSave" Content="保存切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSave_Click"/>
-            <Button x:Name="buttonOpenSlice" Content="打开切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpenSlice_Click"/>
-            <Button x:Name="buttonClose" Content="关闭" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonClose_Click"/>
-        </ToolBar>
-        <Grid x:Name="GridView" Margin="0,48,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="50*"/>
-            </Grid.ColumnDefinitions>
-            <Grid x:Name="GridScene" Grid.Column="0" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave">
-                <TextBox x:Name="textBoxSlice" HorizontalAlignment="Left" Height="22" Margin="286,0,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="229" IsEnabled="False" Visibility="Hidden"/>
+                <MenuItem Header="编辑">
+                    <MenuItem Header="对齐">
+                        <MenuItem Header="几何中心对齐"></MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="旋转..."></MenuItem>
+                    <MenuItem Header="移动..."></MenuItem>
+                </MenuItem>
+                <MenuItem Header="工具">
+                    <MenuItem Header="工艺参数设置..."></MenuItem>
+                    <MenuItem Header="图形处理..."></MenuItem>
+                    <MenuItem Header="路径规划..."></MenuItem>
+                    <MenuItem Header="仿真..."></MenuItem>
+                    <MenuItem Header="加工..."></MenuItem>
+                </MenuItem>
+                <MenuItem Header="机器">
+                    <MenuItem Header="基本信息"></MenuItem>
+                    <MenuItem Header="调试..."></MenuItem>
+                    <MenuItem Header="运动参数..."></MenuItem>
+                    <MenuItem Header="功能参数..."></MenuItem>
+                </MenuItem>
+                <MenuItem Header="帮助">
+                    <MenuItem Header="关于..."></MenuItem>
+                </MenuItem>
+            </Menu>
+            <ToolBar x:Name="toolBar" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="230" Margin="0,24,0,0">
+                <Button x:Name="buttonSelectMode" Content="选择" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSelectMode_Click"/>
+                <Button x:Name="buttonWatchMode" Content="观察" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonWatchMode_Click" Background="LightSkyBlue"/>
+                <Button x:Name="buttonSlice" Content="切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Background="Transparent" Click="buttonSlice_Click"/>
+            </ToolBar>
+            <ToolBar x:Name="toolBar_Copy" Margin="230,24,0,0" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="805">
+                <Button x:Name="buttonOpen" Content="打开实体..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpen_Click"/>
+                <Button x:Name="buttonSave" Content="保存切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSave_Click"/>
+                <Button x:Name="buttonOpenSlice" Content="打开切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpenSlice_Click"/>
+                <Button x:Name="buttonClose" Content="关闭" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonClose_Click"/>
+            </ToolBar>
+            <Grid x:Name="GridView" Margin="0,48,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="50*"/>
+                </Grid.ColumnDefinitions>
+                <Grid x:Name="GridScene" Grid.Column="0" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave">
+                    <TextBox x:Name="textBoxSlice" HorizontalAlignment="Left" Height="22" Margin="286,0,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="229" IsEnabled="False" Visibility="Hidden"/>
+                </Grid>
+                <GridSplitter Width="5" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
+                <Grid x:Name="GridSlice" Grid.Column="2" Background="White">
+                    <WindowsFormsHost Margin="0,0,0,35" Panel.ZIndex="-1">
+                        <WinForms:Panel x:Name="PanelSlice" BackColor="Black" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
+                    </WindowsFormsHost>
+                    <Slider x:Name="sliderSlice" Margin="2,0,0,3" VerticalAlignment="Bottom" SmallChange="0" ValueChanged="sliderSlice_ValueChanged" TickPlacement="BottomRight" Value="-1" IsSnapToTickEnabled="True" Height="32" RenderTransformOrigin="0.5,0.5">
+                        <Slider.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleY="-1"/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Slider.RenderTransform>
+                    </Slider>
+                </Grid>
             </Grid>
-            <GridSplitter Width="5" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
-            <Grid x:Name="GridSlice" Grid.Column="2" Background="White">
-                <WindowsFormsHost Margin="0,0,0,35" Panel.ZIndex="-1">
-                    <WinForms:Panel x:Name="PanelSlice" BackColor="Black" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
-                </WindowsFormsHost>
-                <Slider x:Name="sliderSlice" Margin="2,0,0,3" VerticalAlignment="Bottom" SmallChange="0" ValueChanged="sliderSlice_ValueChanged" TickPlacement="BottomRight" Value="-1" IsSnapToTickEnabled="True" Height="32" RenderTransformOrigin="0.5,0.5">
-                    <Slider.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform ScaleY="-1"/>
-                            <SkewTransform/>
-                            <RotateTransform/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </Slider.RenderTransform>
-                </Slider>
+            <Grid x:Name="GridOnReading" Height="82" Margin="320,224,321,0" VerticalAlignment="Top" Background="White" Visibility="Hidden">
+                <Label x:Name="labelOnReading" Content="Label" Margin="10,32,10,0" VerticalAlignment="Top" Panel.ZIndex="9999"/>
             </Grid>
-        </Grid>
-        <Grid x:Name="GridOnReading" Height="82" Margin="320,224,321,0" VerticalAlignment="Top" Background="White" Visibility="Hidden">
-            <Label x:Name="labelOnReading" Content="Label" Margin="10,32,10,0" VerticalAlignment="Top" Panel.ZIndex="9999"/>
         </Grid>
     </Grid>
 </Window>
