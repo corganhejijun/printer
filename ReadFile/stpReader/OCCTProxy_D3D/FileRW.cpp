@@ -350,7 +350,7 @@ EXPORT void deleteSlice(void* pt)
         delete container;
 }
 
-EXPORT ShapeContainer* SliceShape(void** pt, int index, double Zmax, double Zmin, double height)
+EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
 {
     ShapeContainer* shape = ShapeContainer::getContainer(pt, index);
     // 生成水平面，进行逐层切割
@@ -361,19 +361,35 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double Zmax, double Zmin
         return NULL;
     ShapeContainer* container = new ShapeContainer(sectionShape);
     return container;
+}
 
+EXPORT ShapeContainer** getLocatPlane(void** pt, int index, int* count) {
     // 显示定位面
-    /*
+    ShapeContainer* containers[128] = {0};
+    ShapeContainer* shape = ShapeContainer::getContainer(pt, index);
     TopExp_Explorer explorer;
-    for (explorer.Init(shape->Shape, TopAbs_WIRE); explorer.More(); explorer.Next()) {
-    TopoDS_Shape currentFace = explorer.Current();
-    Bnd_Box C;
-    BRepBndLib::Add(currentFace, C);
-    C.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
-    if (Zmax - Zmin < 0.0001)
-    myAISContext()->Display(new AIS_Shape(currentFace), Standard_True);
+    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
+    int counter = 0;
+    for (explorer.Init(shape->Shape, TopAbs_FACE); explorer.More(); explorer.Next()) {
+        TopoDS_Shape currentFace = explorer.Current();
+        Bnd_Box C;
+        BRepBndLib::Add(currentFace, C);
+        C.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
+        if (Zmax - Zmin < 0.0001) {
+            containers[counter++] = new ShapeContainer(currentFace);
+        }
     }
-    */
+    ShapeContainer** result = new ShapeContainer*[counter];
+    for (int i = 0; i < counter; i++) {
+        result[i] = containers[i];
+    }
+    *count = counter;
+    return result;
+}
+
+EXPORT ShapeContainer* getShapeContainer(void** pt, int index) {
+    ShapeContainer** containers = (ShapeContainer**)pt;
+    return containers[index];
 }
 
 EXPORT bool exportStep(char* fileName, ShapeContainer** slices, int length) {

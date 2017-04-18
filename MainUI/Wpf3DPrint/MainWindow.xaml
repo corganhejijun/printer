@@ -19,54 +19,41 @@
             <Ribbon.ApplicationMenu>
                 <RibbonApplicationMenu>
                     <RibbonApplicationMenuItem Header="设置..." ImageSource="images/Option.ico"></RibbonApplicationMenuItem>
-                    <RibbonApplicationMenuItem Header="退出" ImageSource="images/Exit.ico"></RibbonApplicationMenuItem>
+                    <RibbonApplicationMenuItem Header="退出" ImageSource="images/Exit.ico" Click="buttonQuit_Click"></RibbonApplicationMenuItem>
                 </RibbonApplicationMenu>
             </Ribbon.ApplicationMenu>
             <RibbonTab Header="文件">
                 <RibbonGroup Header="打开文件" LargeImageSource="images/Open.ico">
-                    <RibbonButton Label="打开实体"  LargeImageSource="images/Open.ico"></RibbonButton>
-                    <RibbonButton Label="打开切片" LargeImageSource="images/OpenSlice.ico"></RibbonButton>
+                    <RibbonButton Label="打开实体"  LargeImageSource="images/Open.ico" Click="buttonOpen_Click"></RibbonButton>
+                    <RibbonButton Label="打开切片" LargeImageSource="images/OpenSlice.ico" Click="buttonOpenSlice_Click"></RibbonButton>
+                </RibbonGroup>
+                <RibbonGroup Header="保存文件">
+                    <RibbonButton Label="保存切片" LargeImageSource="images/SaveSlice.ico" Click="buttonSave_Click"></RibbonButton>
                 </RibbonGroup>
                 <RibbonGroup Header="关闭文件">
-                    <RibbonButton Label="关闭文件" LargeImageSource="images/CloseFile.ico"></RibbonButton>
+                    <RibbonButton Label="关闭文件" LargeImageSource="images/CloseFile.ico" Click="buttonClose_Click"></RibbonButton>
                 </RibbonGroup>
             </RibbonTab>
-            <RibbonTab Header="编辑"></RibbonTab>
+            <RibbonTab Header="观察">
+                <RibbonGroup Header="三维视图">
+                    <RibbonCheckBox Label="实体半透明" IsChecked="True"></RibbonCheckBox>
+                </RibbonGroup>
+                <RibbonGroup Header="二维视图">
+                </RibbonGroup>
+            </RibbonTab>
+            <RibbonTab Header="编辑">
+                <RibbonGroup Header="切片">
+                    <RibbonButton Label="切片" LargeImageSource="images/Slice.ico" Click="buttonSlice_Click"></RibbonButton>
+                    <RibbonCheckBox Label="在定位面处切片" x:Name="checkBoxSliceInPlane" IsChecked="True"></RibbonCheckBox>
+                </RibbonGroup>
+                <RibbonGroup Header="操作">
+                    
+                </RibbonGroup>
+            </RibbonTab>
             <RibbonTab Header="工具"></RibbonTab>
             <RibbonTab Header="机器"></RibbonTab>
         </Ribbon>
         <Grid Grid.Row="1">
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Header="文件" HorizontalAlignment="Right" Width="38">
-                    <MenuItem Header="打开..."></MenuItem>
-                    <MenuItem Header="另存为..."></MenuItem>
-                    <MenuItem x:Name="menuCloseFile" Header="关闭" Click="menuCloseFile_Click"></MenuItem>
-                    <MenuItem x:Name="menuQuit" Header="退出" Click="menuQuit_Click"></MenuItem>
-                </MenuItem>
-                <MenuItem Header="编辑">
-                    <MenuItem Header="对齐">
-                        <MenuItem Header="几何中心对齐"></MenuItem>
-                    </MenuItem>
-                    <MenuItem Header="旋转..."></MenuItem>
-                    <MenuItem Header="移动..."></MenuItem>
-                </MenuItem>
-                <MenuItem Header="工具">
-                    <MenuItem Header="工艺参数设置..."></MenuItem>
-                    <MenuItem Header="图形处理..."></MenuItem>
-                    <MenuItem Header="路径规划..."></MenuItem>
-                    <MenuItem Header="仿真..."></MenuItem>
-                    <MenuItem Header="加工..."></MenuItem>
-                </MenuItem>
-                <MenuItem Header="机器">
-                    <MenuItem Header="基本信息"></MenuItem>
-                    <MenuItem Header="调试..."></MenuItem>
-                    <MenuItem Header="运动参数..."></MenuItem>
-                    <MenuItem Header="功能参数..."></MenuItem>
-                </MenuItem>
-                <MenuItem Header="帮助">
-                    <MenuItem Header="关于..."></MenuItem>
-                </MenuItem>
-            </Menu>
             <ToolBar x:Name="toolBar" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="230" Margin="0,24,0,0">
                 <Button x:Name="buttonSelectMode" Content="选择" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSelectMode_Click"/>
                 <Button x:Name="buttonWatchMode" Content="观察" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonWatchMode_Click" Background="LightSkyBlue"/>

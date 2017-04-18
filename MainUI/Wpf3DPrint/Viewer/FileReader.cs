@@ -110,18 +110,32 @@ namespace Wpf3DPrint.Viewer
                 for (int i = 0; i < shape.sliceCnt; i++)
                 {
                     double height = shape.Zmin + (double)i / shape.sliceCnt * (shape.Zmax - shape.Zmin);
-                    IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, shape.Zmax, shape.Zmin, height);
+                    IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, height);
                     shape.sliceList.Add(slice);
-                    if (slice != IntPtr.Zero)
-                    {
-                        ArrayList onArgs = new ArrayList();
-                        onArgs.Add(shape);
-                        onArgs.Add(i);
-                        control.Dispatcher.Invoke(new DisplayOneShape(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, onslice, onArgs });
-                    }
+                    onGetSlice(slice, shape, i, control, onslice);
                 }
+                int count = 0;
+                IntPtr containers = Cpp2Managed.getLocatPlane(shape.shape, 0, ref count);
+                for (int i = 0; i < count; i++)
+                {
+                    IntPtr slice = Cpp2Managed.getShapeContainer(containers, i);
+                    shape.sliceList.Add(slice);
+                    onGetSlice(slice, shape, shape.sliceCnt + i, control, onslice);
+                }
+                shape.sliceCnt += count;
             }
             return null;
+        }
+
+        private void onGetSlice(IntPtr slice, Shape shape, int i, Control control, SceneThread.onFunction onSlice)
+        {
+            if (slice != IntPtr.Zero)
+            {
+                ArrayList onArgs = new ArrayList();
+                onArgs.Add(shape);
+                onArgs.Add(i);
+                control.Dispatcher.Invoke(new DisplayOneShape(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, onSlice, onArgs });
+            }
         }
 
         private bool displaySlice(IntPtr slice, SceneThread.onFunction onSlice, ArrayList onArgs)

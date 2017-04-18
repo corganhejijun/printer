@@ -220,16 +220,9 @@ namespace Wpf3DPrint
             sliceScene.drawSlice((int)sliderSlice.Value);
         }
 
-        private void menuQuit_Click(object sender, RoutedEventArgs e)
+        private void buttonQuit_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
-        }
-
-        private void menuCloseFile_Click(object sender, RoutedEventArgs e)
-        {
-            fileReader.releaseShape();
-            sliceScene.closeSlice();
-            sliceScene.clearWindow();
         }
 
         private void PanelSlice_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
