@@ -310,6 +310,7 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice,
             (*cnt)++;
         }
     }
+    file.close();
     if ((*cnt) == 1) {
         ShapeContainer* shape = ShapeContainer::getContainer(shapes, 0);
         shape->Shape = shape->shapeSequence->Value(1);
@@ -355,6 +356,15 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
     ShapeContainer* shape = ShapeContainer::getContainer(pt, index);
     // 生成水平面，进行逐层切割
     gp_Pln originPlane = gp_Pln(0, 0, 1, -height);
+    TopoDS_Shape face = shape->Shape;
+    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
+    Bnd_Box C;
+    BRepBndLib::Add(face, C);
+    C.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
+    if (Zmax - Zmin < 0.0001) {
+        // 水平面，不存在交点
+        return NULL;
+    }
     BRepAlgo_Section section(shape->Shape, originPlane, Standard_True);
     TopoDS_Shape sectionShape = section.Shape();
     if (sectionShape.IsNull())

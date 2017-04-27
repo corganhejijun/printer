@@ -20,33 +20,30 @@ namespace Wpf3DPrint.Dialog
     public partial class DialogSlice : Window
     {
         Viewer.Shape shape;
-        public DialogSlice(Viewer.Shape shape)
+        double thickness;
+        public DialogSlice(Viewer.Shape shape, string thick)
         {
             this.shape = shape;
             InitializeComponent();
             labelMaxMinInfo.Content = "Z向范围：" + shape.Zmin.ToString("F") + "~" + shape.Zmax.ToString("F");
-            textBoxHeight.Text = shape.sliceCnt.ToString();
-        }
-
-        private void textBoxHeight_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (labelThickness == null)
-                return;
             try
             {
-                labelThickness.Content = "层厚：" + ((shape.Zmax - shape.Zmin)/int.Parse(textBoxHeight.Text)).ToString("F");
+                thickness = double.Parse(thick);
+                labelThickness.Content = "层厚：" + thick;
+                int cnt = (int)((shape.Zmax - shape.Zmin) / thickness);
+                labelCnt.Content = "预计层数：" + cnt;
             }
             catch
             {
-                labelThickness.Content = "层厚计算错误";
+                labelThickness.Content = "层厚数值错误";
+                buttonOK.IsEnabled = false;
             }
         }
 
         private void buttonOK_Click(object sender, RoutedEventArgs e)
         {
             try {
-                int value = int.Parse(textBoxHeight.Text);
-                shape.sliceCnt = value;
+                shape.sliceThick = thickness;
                 this.DialogResult = true;
             }
             catch

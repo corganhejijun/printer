@@ -5,14 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="切片设置" Height="300" Width="300" ResizeMode="NoResize">
+        Title="切片设置" Height="200.608" Width="332.826" ResizeMode="NoResize">
     <Grid>
-        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="127,240,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
-        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="207,240,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
+        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="162,143,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
+        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="242,143,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
         <Label x:Name="labelMaxMinInfo" Content="Label" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label" Content="层数：" HorizontalAlignment="Left" Margin="7,70,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBoxHeight" HorizontalAlignment="Left" Height="23" Margin="53,74,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" TextChanged="textBoxHeight_TextChanged"/>
         <Label x:Name="labelThickness" Content="Label" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="labelCnt" Content="Label" HorizontalAlignment="Left" Margin="10,70,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

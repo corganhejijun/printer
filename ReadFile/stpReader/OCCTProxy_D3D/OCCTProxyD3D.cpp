@@ -780,8 +780,22 @@ public:
             for (int i = 1; i <= aHSequenceOfShape->Length(); i++) {
                 Handle(AIS_Shape) aisShape = new AIS_Shape(aHSequenceOfShape->Value(i));
                 myAISContext()->Display(aisShape, Standard_True);
+                myAISContext()->SetSelected(aisShape);
             }
         }
+        return true;
+    }
+
+    bool selectSlice(System::IntPtr pt) {
+        ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
+        myAISContext()->ClearSelected();
+        Handle(AIS_Shape) aisShape = new AIS_Shape(shape->Shape);
+        int cnt = myAISContext()->NbSelected();
+        printf("selectd %d\n", cnt);
+        myAISContext()->Display(aisShape, Standard_True);
+        myAISContext()->SetSelected(aisShape);
+        cnt = myAISContext()->NbSelected();
+        printf("selectd %d\n", cnt);
         return true;
     }
 

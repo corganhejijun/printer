@@ -28,31 +28,19 @@ namespace Wpf3DPrint
             GridScene.Background = brush;
         }
 
-        private void buttonSelectMode_Click(object sender, RoutedEventArgs e)
-        {
-            buttonSelectMode.Background = Brushes.LightSkyBlue;
-            buttonWatchMode.Background = Brushes.Transparent;
-        }
-
-        private void buttonWatchMode_Click(object sender, RoutedEventArgs e)
-        {
-            buttonSelectMode.Background = Brushes.Transparent;
-            buttonWatchMode.Background = Brushes.LightSkyBlue;
-        }
-
         private void onOpeningFile(string fileName)
         {
-            GridOnReading.Visibility = Visibility.Visible;
-            labelOnReading.Content = "Reading file " + fileName + " ...";
-            buttonOpen.IsEnabled = false;
-            buttonSave.IsEnabled = false;
+            labelStatus.Content = "Reading file " + fileName + " ...";
         }
 
         private void afterOpenFile()
         {
-            GridOnReading.Visibility = Visibility.Hidden;
-            buttonOpen.IsEnabled = true;
-            buttonSave.IsEnabled = true;
+            labelStatus.Content = "X:[" + fileReader.Shape.Xmin.ToString("0.000") + "," + fileReader.Shape.Xmax.ToString("0.000")
+                + "]; Y:[" + fileReader.Shape.Ymin.ToString("0.000") + "," + fileReader.Shape.Ymax.ToString("0.000")
+                + "]; Z:[" + fileReader.Shape.Zmin.ToString("0.000") + "," + fileReader.Shape.Zmax.ToString("0.000") + "]";
+            textBoxXRange.Text = fileReader.Shape.Xmin.ToString("0.0000") + "," + fileReader.Shape.Xmax.ToString("0.0000");
+            textBoxYRange.Text = fileReader.Shape.Ymin.ToString("0.0000") + "," + fileReader.Shape.Ymax.ToString("0.0000");
+            textBoxZRange.Text = fileReader.Shape.Zmin.ToString("0.0000") + "," + fileReader.Shape.Zmax.ToString("0.0000");
         }
 
         private void buttonOpen_Click(object sender, RoutedEventArgs e)
@@ -102,13 +90,10 @@ namespace Wpf3DPrint
         {
             if (!fileReader.HasFile)
                 return;
-            Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape);
+            Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, textBoxSliceThick.Text);
             if (dlSlice.ShowDialog() == false)
                 return;
-            buttonSlice.IsEnabled = false;
-            textBoxSlice.Visibility = Visibility.Visible;
             fileReader.sliceShape((Control)this, onAfterSlice, new SceneThread.onFunction(onSlice));
-            sliderSlice.Maximum = fileReader.Shape.sliceCnt - 1;
         }
 
         private void onSlice(object args)
@@ -116,7 +101,7 @@ namespace Wpf3DPrint
             ArrayList argList = (ArrayList)args;
             Shape shape = (Shape)argList[0];
             int currentSlice = (int)argList[1];
-            textBoxSlice.Text = "总层数：" + shape.sliceCnt + " 当前层数：" + currentSlice;
+            labelStatus.Content = "总层数：" + ((int)((shape.Zmax - shape.Zmin) / shape.sliceThick)) + " 当前层数：" + currentSlice;
         }
 
         private void onAfterSlice(object args)
@@ -126,8 +111,6 @@ namespace Wpf3DPrint
 
         private void afterSlice(object args)
         {
-            buttonSlice.IsEnabled = true;
-            textBoxSlice.Visibility = Visibility.Hidden;
         }
 
         private void GridScene_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -181,11 +164,6 @@ namespace Wpf3DPrint
             sliceScene.clearWindow();
         }
 
-        private void sliderSlice_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            sliceScene.drawSlice((int)sliderSlice.Value);
-        }
-
         private void buttonOpenSlice_Click(object sender, RoutedEventArgs e)
         {
             if (fileReader.HasFile)
@@ -214,10 +192,17 @@ namespace Wpf3DPrint
         private void afterOpenSlice(object workResult)
         {
             int count = fileReader.afterOpenSlice(workResult);
+            fileReader.displaySlice();
             sliceScene.slice(fileReader.Shape.stepSlice, count);
-            sliderSlice.Maximum = count - 1;
             afterOpenFile();
-            sliceScene.drawSlice((int)sliderSlice.Value);
+            ArrayList list = new ArrayList();
+            for (int i = 0; i < count; i++)
+            {
+                list.Add(i + 1);
+            }
+            comboBoxSliceList.ItemsSource = list;
+            comboBoxSliceNumber.SelectedItem = 1;
+            sliceScene.drawSlice((int)comboBoxSliceNumber.SelectedItem - 1);
         }
 
         private void buttonQuit_Click(object sender, RoutedEventArgs e)
@@ -227,7 +212,8 @@ namespace Wpf3DPrint
 
         private void PanelSlice_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
-            sliceScene.drawSlice((int)sliderSlice.Value);
+            if (comboBoxSliceNumber.SelectedItem != null)
+                sliceScene.drawSlice((int)comboBoxSliceNumber.SelectedItem - 1);
         }
 
         private void PanelSlice_Resize(object sender, EventArgs e)
@@ -243,6 +229,13 @@ namespace Wpf3DPrint
             {
                 child.RowDefinitions[0].Height = new GridLength(0);
             }
+        }
+
+        private void comboBoxSliceNumber_SelectionChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            int index = (int)comboBoxSliceNumber.SelectedItem - 1;
+            sliceScene.drawSlice(index);
+            fileReader.selectSlice(index);
         }
     }
 }

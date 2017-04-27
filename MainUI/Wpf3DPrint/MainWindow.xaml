@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition/>
+            <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Ribbon x:Name="ribbonMenu" Grid.Row="0" Loaded="ribbonMenu_Loaded">
             <Ribbon.HelpPaneContent>
@@ -37,63 +38,60 @@
             <RibbonTab Header="观察">
                 <RibbonGroup Header="三维视图">
                     <RibbonCheckBox Label="实体半透明" IsChecked="True"></RibbonCheckBox>
+                    <RibbonCheckBox Label="显示包围线框" IsChecked="False"></RibbonCheckBox>
+                    <RibbonTextBox x:Name="textBoxXRange" Label="X范围"></RibbonTextBox>
+                    <RibbonTextBox x:Name="textBoxYRange" Label="Y范围"></RibbonTextBox>
+                    <RibbonTextBox x:Name="textBoxZRange" Label="Z范围"></RibbonTextBox>
                 </RibbonGroup>
                 <RibbonGroup Header="二维视图">
+                    <RibbonComboBox Label="查看切片" IsEditable="False">
+                        <RibbonGallery x:Name="comboBoxSliceNumber" MaxColumnCount="1" SelectedValuePath="Content" SelectionChanged="comboBoxSliceNumber_SelectionChanged">
+                            <RibbonGalleryCategory x:Name="comboBoxSliceList"></RibbonGalleryCategory>
+                        </RibbonGallery>
+                    </RibbonComboBox>
                 </RibbonGroup>
             </RibbonTab>
             <RibbonTab Header="编辑">
                 <RibbonGroup Header="切片">
                     <RibbonButton Label="切片" LargeImageSource="images/Slice.ico" Click="buttonSlice_Click"></RibbonButton>
                     <RibbonCheckBox Label="在定位面处切片" x:Name="checkBoxSliceInPlane" IsChecked="True"></RibbonCheckBox>
+                    <RibbonTextBox x:Name="textBoxSliceThick" Label="层厚" Text="1"></RibbonTextBox>
                 </RibbonGroup>
-                <RibbonGroup Header="操作">
-                    
+                <RibbonGroup Header="旋转操作">
+                    <RibbonButton Label="旋转" LargeImageSource="images/Rotate.png"></RibbonButton>
+                    <RibbonCheckBox Label="逆时针旋转" IsChecked="True"></RibbonCheckBox>
+                    <RibbonComboBox Label="旋转轴" IsEditable="False">
+                        <RibbonGallery SelectedValue="X轴" SelectedValuePath="Content" MaxColumnCount="1">
+                            <RibbonGalleryCategory>
+                                <RibbonGalleryItem Content="X轴"></RibbonGalleryItem>
+                                <RibbonGalleryItem Content="Y轴"></RibbonGalleryItem>
+                                <RibbonGalleryItem Content="Z轴"></RibbonGalleryItem>
+                            </RibbonGalleryCategory>
+                        </RibbonGallery>
+                    </RibbonComboBox>
                 </RibbonGroup>
             </RibbonTab>
             <RibbonTab Header="工具"></RibbonTab>
             <RibbonTab Header="机器"></RibbonTab>
         </Ribbon>
         <Grid Grid.Row="1">
-            <ToolBar x:Name="toolBar" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="230" Margin="0,24,0,0">
-                <Button x:Name="buttonSelectMode" Content="选择" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSelectMode_Click"/>
-                <Button x:Name="buttonWatchMode" Content="观察" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonWatchMode_Click" Background="LightSkyBlue"/>
-                <Button x:Name="buttonSlice" Content="切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Background="Transparent" Click="buttonSlice_Click"/>
-            </ToolBar>
-            <ToolBar x:Name="toolBar_Copy" Margin="230,24,0,0" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="805">
-                <Button x:Name="buttonOpen" Content="打开实体..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpen_Click"/>
-                <Button x:Name="buttonSave" Content="保存切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonSave_Click"/>
-                <Button x:Name="buttonOpenSlice" Content="打开切片..." HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonOpenSlice_Click"/>
-                <Button x:Name="buttonClose" Content="关闭" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="64" Click="buttonClose_Click"/>
-            </ToolBar>
-            <Grid x:Name="GridView" Margin="0,48,0,0">
+            <Grid x:Name="GridView" Margin="0,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="50*"/>
                 </Grid.ColumnDefinitions>
-                <Grid x:Name="GridScene" Grid.Column="0" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave">
-                    <TextBox x:Name="textBoxSlice" HorizontalAlignment="Left" Height="22" Margin="286,0,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="229" IsEnabled="False" Visibility="Hidden"/>
-                </Grid>
+                <Grid x:Name="GridScene" Grid.Column="0" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave"></Grid>
                 <GridSplitter Width="5" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
                 <Grid x:Name="GridSlice" Grid.Column="2" Background="White">
-                    <WindowsFormsHost Margin="0,0,0,35" Panel.ZIndex="-1">
-                        <WinForms:Panel x:Name="PanelSlice" BackColor="Black" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
+                    <WindowsFormsHost Margin="0,0,0,0" Panel.ZIndex="-1">
+                        <WinForms:Panel x:Name="PanelSlice" BackColor="White" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
                     </WindowsFormsHost>
-                    <Slider x:Name="sliderSlice" Margin="2,0,0,3" VerticalAlignment="Bottom" SmallChange="0" ValueChanged="sliderSlice_ValueChanged" TickPlacement="BottomRight" Value="-1" IsSnapToTickEnabled="True" Height="32" RenderTransformOrigin="0.5,0.5">
-                        <Slider.RenderTransform>
-                            <TransformGroup>
-                                <ScaleTransform ScaleY="-1"/>
-                                <SkewTransform/>
-                                <RotateTransform/>
-                                <TranslateTransform/>
-                            </TransformGroup>
-                        </Slider.RenderTransform>
-                    </Slider>
                 </Grid>
             </Grid>
-            <Grid x:Name="GridOnReading" Height="82" Margin="320,224,321,0" VerticalAlignment="Top" Background="White" Visibility="Hidden">
-                <Label x:Name="labelOnReading" Content="Label" Margin="10,32,10,0" VerticalAlignment="Top" Panel.ZIndex="9999"/>
-            </Grid>
+        </Grid>
+        <Grid Grid.Row="2" x:Name="GridStatus" Background="White">
+            <Label x:Name="labelStatus" Content="状态"/>
         </Grid>
     </Grid>
 </Window>

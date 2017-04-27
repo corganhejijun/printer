@@ -60,8 +60,8 @@ int SliceDevice::CreateD2DResource() {
 
 void SliceDevice::resetScene() {
     m_curveWith = 1;
-    m_manuStepX = 10;
-    m_manuStepY = 5;
+    m_manuStepX = 1;
+    m_manuStepY = 1;
     m_sceneScale = -1;
     m_sceneMargin = 0.1f;
     m_precise = 1.0f;

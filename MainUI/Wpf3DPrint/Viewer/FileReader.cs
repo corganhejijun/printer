@@ -107,22 +107,24 @@ namespace Wpf3DPrint.Viewer
             SceneThread.onFunction onslice = (SceneThread.onFunction)list[1];
             foreach (Shape shape in shapeList)
             {
-                for (int i = 0; i < shape.sliceCnt; i++)
+                double height = shape.Zmin;
+                int i = 0;
+                for (i = 0; height < shape.Zmax - 0.000001; i++)
                 {
-                    double height = shape.Zmin + (double)i / shape.sliceCnt * (shape.Zmax - shape.Zmin);
+                    height = shape.Zmin + (double)i * shape.sliceThick;
                     IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, height);
                     shape.sliceList.Add(slice);
                     onGetSlice(slice, shape, i, control, onslice);
                 }
+                int sliceCnt = i;
                 int count = 0;
                 IntPtr containers = Cpp2Managed.getLocatPlane(shape.shape, 0, ref count);
-                for (int i = 0; i < count; i++)
+                for (i = 0; i < count; i++)
                 {
                     IntPtr slice = Cpp2Managed.getShapeContainer(containers, i);
                     shape.sliceList.Add(slice);
-                    onGetSlice(slice, shape, shape.sliceCnt + i, control, onslice);
+                    onGetSlice(slice, shape, sliceCnt + i, control, onslice);
                 }
-                shape.sliceCnt += count;
             }
             return null;
         }
@@ -157,10 +159,23 @@ namespace Wpf3DPrint.Viewer
             shapeList.Add(shape);
             for (int i = 0; i < shape.count; i++)
             {
-                shape.sliceCnt = shape.count;
                 shape.sliceList.Add(Cpp2Managed.getSliceFromShape(shape.shape, i));
             }
             return shape.count;
+        }
+
+        public void displaySlice()
+        {
+            foreach(IntPtr slice in Shape.sliceList)
+            {
+                scene.Proxy.displaySlice(slice);
+            }
+            scene.Proxy.ZoomAllView();
+        }
+
+        public void selectSlice(int i)
+        {
+            scene.Proxy.selectSlice((IntPtr)(Shape.sliceList[i]));
         }
 
         public void releaseShape()

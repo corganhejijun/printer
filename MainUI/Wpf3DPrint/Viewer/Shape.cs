@@ -9,7 +9,7 @@ namespace Wpf3DPrint.Viewer
         public IntPtr stepSlice;
         public int count;   // shape 指向的 shape container 内包含的 shape 数
         public double Xmin, Xmax, Ymin, Ymax, Zmin, Zmax;
-        public int sliceCnt;
+        public double sliceThick;
         public ArrayList sliceList;
         public Shape(IntPtr shape, int count)
         {
@@ -17,7 +17,7 @@ namespace Wpf3DPrint.Viewer
             this.shape = shape;
             this.count = count;
             Xmin = Xmax = Ymin = Ymax = Zmin = Zmax = 0;
-            sliceCnt = 10;
+            sliceThick = 1;
             sliceList = new ArrayList();
         }
     }
