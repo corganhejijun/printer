@@ -127,6 +127,7 @@ namespace Wpf3DPrint
             string fileName = saveSlice();
             if (fileName.Length == 0)
                 return;
+            fileReader.releaseShape();
             openSlice(fileName);
         }
 
@@ -179,6 +180,7 @@ namespace Wpf3DPrint
             fileReader.releaseShape();
             sliceScene.closeSlice();
             sliceScene.clearWindow();
+            TreeView_Slice.Items.Clear();
             set3DView();
         }
 

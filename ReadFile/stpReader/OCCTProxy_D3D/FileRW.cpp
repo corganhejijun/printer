@@ -60,6 +60,9 @@
 #include <Geom_BSplineCurve.hxx>
 #include <TColStd_Array1OfReal.hxx>
 #include <TColgp_Array1OfPnt.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
+#include <ShapeAnalysis_FreeBounds.hxx>
+#include <BRep_Builder.hxx>
 
 #include <iostream>
 #include <fstream>
@@ -351,6 +354,21 @@ EXPORT void deleteSlice(void* pt)
         delete container;
 }
 
+Handle_TopTools_HSequenceOfShape getWires(TopoDS_Shape shape) {
+    Handle(TopTools_HSequenceOfShape) Edges = new TopTools_HSequenceOfShape();
+    TopoDS_Shape wireShape = shape;
+    BRepBuilderAPI_MakeWire mkWire;
+    for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
+        for (TopExp_Explorer edgeExp(anIt.Value(), TopAbs_EDGE); edgeExp.More(); edgeExp.Next()) {
+            TopoDS_Edge edge = TopoDS::Edge(edgeExp.Current());
+            Edges->Append(edge);
+        }
+    }
+    Handle(TopTools_HSequenceOfShape) Wires = new TopTools_HSequenceOfShape();
+    ShapeAnalysis_FreeBounds::ConnectEdgesToWires(Edges, Precision::Confusion(), Standard_False, Wires);
+    return Wires;
+}
+
 EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
 {
     ShapeContainer* shape = ShapeContainer::getContainer(pt, index);
@@ -369,7 +387,8 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
     TopoDS_Shape sectionShape = section.Shape();
     if (sectionShape.IsNull())
         return NULL;
-    ShapeContainer* container = new ShapeContainer(sectionShape);
+    Handle_TopTools_HSequenceOfShape Wires = getWires(sectionShape);
+    ShapeContainer* container = new ShapeContainer(Wires);
     return container;
 }
 
@@ -386,7 +405,8 @@ EXPORT ShapeContainer** getLocatPlane(void** pt, int index, int* count) {
         BRepBndLib::Add(currentFace, C);
         C.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
         if (Zmax - Zmin < 0.0001) {
-            containers[counter++] = new ShapeContainer(currentFace);
+            Handle_TopTools_HSequenceOfShape wires = getWires(currentFace);
+            containers[counter++] = new ShapeContainer(wires);
         }
     }
     ShapeContainer** result = new ShapeContainer*[counter];
@@ -406,8 +426,22 @@ EXPORT bool exportStep(char* fileName, ShapeContainer** slices, int length) {
     STEPControl_StepModelType aType = STEPControl_AsIs;
     STEPControl_Writer        aWriter;
     for (int i = 0; i < length; i++){
-        if (aWriter.Transfer(slices[i]->Shape, aType) != IFSelect_RetDone)
-            return false;
+        if (slices[i]->type == ShapeContainer::Entity) {
+            if (aWriter.Transfer(slices[i]->Shape, aType) != IFSelect_RetDone)
+                return false;
+        } else if (slices[i]->type == ShapeContainer::Slice) {
+            int length = slices[i]->shapeSequence->Length();
+            if (length == 0)
+                continue;
+            TopoDS_Compound aCompound;
+            BRep_Builder aBuilder;
+            aBuilder.MakeCompound(aCompound);
+            for (int j = 1; j <= length; j++) {
+                aBuilder.Add(aCompound, slices[i]->shapeSequence->Value(j));
+            }
+            if (aWriter.Transfer(aCompound, aType) != IFSelect_RetDone)
+                return false;
+        }
     }
     return aWriter.Write(fileName) == IFSelect_RetDone;
 }
