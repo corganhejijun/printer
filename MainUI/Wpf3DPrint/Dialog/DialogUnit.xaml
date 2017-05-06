@@ -1,0 +1,24 @@
+﻿<Window x:Class="Wpf3DPrint.Dialog.DialogUnit"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
+        mc:Ignorable="d"
+        Title="请设置单位" Height="300" Width="300" ShowInTaskbar="False" Topmost="True" ResizeMode="NoResize">
+    <Grid>
+        <Label x:Name="label" Content="单位：" HorizontalAlignment="Left" Margin="36,33,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="82,33,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="2">
+            <ComboBoxItem Content="米"/>
+            <ComboBoxItem Content="厘米"/>
+            <ComboBoxItem Content="毫米"/>
+        </ComboBox>
+        <Label x:Name="label1" Content="比例：" HorizontalAlignment="Left" Margin="30,76,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="81,78,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="button" Content="确定" HorizontalAlignment="Left" Margin="200,241,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="button_Click"/>
+        <Label x:Name="labelX" Content="Label" HorizontalAlignment="Left" Margin="42,122,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="labelY" Content="Label" HorizontalAlignment="Left" Margin="42,152,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="labelZ" Content="Label" HorizontalAlignment="Left" Margin="42,182,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>

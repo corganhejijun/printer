@@ -10,10 +10,46 @@
     <Grid x:Name="GridMain">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition/>
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
-        <Ribbon x:Name="ribbonMenu" Grid.Row="0" Loaded="ribbonMenu_Loaded">
+        <Menu DockPanel.Dock="Top" Grid.Row="0" FontSize="15" Height="25">
+            <MenuItem Header="文件" HorizontalAlignment="Right" Width="38">
+                <MenuItem x:Name="menuOpenFile" Header="打开..." Click="buttonOpen_Click"></MenuItem>
+                <MenuItem x:Name="menuOpenSlice" Header="打开切片..." Click="buttonOpenSlice_Click"></MenuItem>
+                <MenuItem x:Name="menuSaveSlice" Header="切片另存为..." Click="buttonSave_Click"></MenuItem>
+                <MenuItem x:Name="menuCloseFile" Header="关闭" Click="buttonClose_Click"></MenuItem>
+                <MenuItem x:Name="menuQuit" Header="退出" Click="buttonQuit_Click"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="编辑">
+                <MenuItem Header="切片">
+                    <MenuItem x:Name="menuSlice" Header="切片..." Click="buttonSlice_Click"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="对齐">
+                    <MenuItem Header="几何中心对齐"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="旋转..."></MenuItem>
+                <MenuItem Header="移动..."></MenuItem>
+            </MenuItem>
+            <MenuItem Header="工具">
+                <MenuItem Header="工艺参数设置..."></MenuItem>
+                <MenuItem Header="图形处理..."></MenuItem>
+                <MenuItem Header="路径规划..."></MenuItem>
+                <MenuItem Header="仿真..."></MenuItem>
+                <MenuItem Header="加工..."></MenuItem>
+            </MenuItem>
+            <MenuItem Header="机器">
+                <MenuItem Header="基本信息"></MenuItem>
+                <MenuItem Header="调试..."></MenuItem>
+                <MenuItem Header="运动参数..."></MenuItem>
+                <MenuItem Header="功能参数..."></MenuItem>
+            </MenuItem>
+            <MenuItem Header="帮助">
+                <MenuItem Header="关于..."></MenuItem>
+            </MenuItem>
+        </Menu>
+        <Ribbon x:Name="ribbonMenu" Grid.Row="1" Loaded="ribbonMenu_Loaded" Visibility="Collapsed">
             <Ribbon.HelpPaneContent>
                 <RibbonButton SmallImageSource="images/Help.ico"></RibbonButton>
             </Ribbon.HelpPaneContent>
@@ -27,6 +63,11 @@
                 <RibbonGroup Header="打开文件" LargeImageSource="images/Open.ico">
                     <RibbonButton Label="打开实体"  LargeImageSource="images/Open.ico" Click="buttonOpen_Click"></RibbonButton>
                     <RibbonButton Label="打开切片" LargeImageSource="images/OpenSlice.ico" Click="buttonOpenSlice_Click"></RibbonButton>
+                </RibbonGroup>
+                <RibbonGroup Header="切片">
+                    <RibbonButton Label="切片" LargeImageSource="images/Slice.ico" Click="buttonSlice_Click"></RibbonButton>
+                    <RibbonCheckBox Label="在定位面处切片" x:Name="checkBoxSliceInPlane" IsChecked="True"></RibbonCheckBox>
+                    <RibbonTextBox x:Name="textBoxSliceThick" Label="层厚" Text="1"></RibbonTextBox>
                 </RibbonGroup>
                 <RibbonGroup Header="保存文件">
                     <RibbonButton Label="保存切片" LargeImageSource="images/SaveSlice.ico" Click="buttonSave_Click"></RibbonButton>
@@ -52,11 +93,6 @@
                 </RibbonGroup>
             </RibbonTab>
             <RibbonTab Header="编辑">
-                <RibbonGroup Header="切片">
-                    <RibbonButton Label="切片" LargeImageSource="images/Slice.ico" Click="buttonSlice_Click"></RibbonButton>
-                    <RibbonCheckBox Label="在定位面处切片" x:Name="checkBoxSliceInPlane" IsChecked="True"></RibbonCheckBox>
-                    <RibbonTextBox x:Name="textBoxSliceThick" Label="层厚" Text="1"></RibbonTextBox>
-                </RibbonGroup>
                 <RibbonGroup Header="旋转操作">
                     <RibbonButton Label="旋转" LargeImageSource="images/Rotate.png"></RibbonButton>
                     <RibbonCheckBox Label="逆时针旋转" IsChecked="True"></RibbonCheckBox>
@@ -70,27 +106,40 @@
                         </RibbonGallery>
                     </RibbonComboBox>
                 </RibbonGroup>
+                <RibbonGroup Header="重建">
+                    <RibbonButton x:Name="buttonRebuild" Label="重建" LargeImageSource="images/rebuild.png" Click="buttonRebuild_Click"></RibbonButton>
+                </RibbonGroup>
             </RibbonTab>
             <RibbonTab Header="工具"></RibbonTab>
             <RibbonTab Header="机器"></RibbonTab>
         </Ribbon>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid x:Name="GridView" Margin="0,0,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition x:Name="columnTree" Width="0*"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition x:Name="column3D" Width="100*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition x:Name="column2D" Width="0*"/>
                 </Grid.ColumnDefinitions>
-                <Grid x:Name="GridScene" Grid.Column="0" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave"></Grid>
-                <GridSplitter Width="5" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
-                <Grid x:Name="GridSlice" Grid.Column="2" Background="White">
+                <Grid Grid.Column="0">
+                    <TreeView x:Name="TreeView_Slice">
+                        <TreeView.Resources>
+                            <ResourceDictionary Source="Themes/TreeView.xaml"></ResourceDictionary>
+                        </TreeView.Resources>
+                    </TreeView>
+                </Grid>
+                <GridSplitter Width="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
+                <Grid x:Name="GridScene" Grid.Column="2" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave"></Grid>
+                <GridSplitter Width="3" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
+                <Grid x:Name="GridSlice" Grid.Column="4" Background="White">
                     <WindowsFormsHost Margin="0,0,0,0" Panel.ZIndex="-1">
                         <WinForms:Panel x:Name="PanelSlice" BackColor="White" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
                     </WindowsFormsHost>
                 </Grid>
             </Grid>
         </Grid>
-        <Grid Grid.Row="2" x:Name="GridStatus" Background="White">
+        <Grid Grid.Row="3" x:Name="GridStatus" Background="White">
             <Label x:Name="labelStatus" Content="状态"/>
         </Grid>
     </Grid>

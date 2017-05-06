@@ -9,6 +9,7 @@ namespace Wpf3DPrint.Viewer
     {
         Scene scene;
         ArrayList shapeList;
+        string fileName;
         public FileReader(Scene scene)
         {
             this.scene = scene;
@@ -31,12 +32,21 @@ namespace Wpf3DPrint.Viewer
             }
         }
 
+        public string FileName
+        {
+            get
+            {
+                return fileName;
+            }
+        }
+
         public bool openStep(string fileName, SceneThread.afterFunction afterOpenStep, bool isSlice)
         {
             ArrayList list = new ArrayList();
             list.Add(fileName);
             list.Add(isSlice);
             scene.D3DThread.addWork(openStepWork, list, afterOpenStep);
+            this.fileName = fileName;
             return true;
         }
 
@@ -175,7 +185,12 @@ namespace Wpf3DPrint.Viewer
 
         public void selectSlice(int i)
         {
-            scene.Proxy.selectSlice((IntPtr)(Shape.sliceList[i]));
+            scene.Proxy.displaySlice((IntPtr)(Shape.sliceList[i]));
+        }
+
+        public void rebuildSlice(int i)
+        {
+            scene.Proxy.strechSlice((IntPtr)(Shape.sliceList[i]), Shape.sliceThick);
         }
 
         public void releaseShape()

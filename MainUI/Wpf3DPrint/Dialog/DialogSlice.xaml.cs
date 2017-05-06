@@ -29,13 +29,13 @@ namespace Wpf3DPrint.Dialog
             try
             {
                 thickness = double.Parse(thick);
-                labelThickness.Content = "层厚：" + thick;
+                textBoxThick.Text = thick;
                 int cnt = (int)((shape.Zmax - shape.Zmin) / thickness);
                 labelCnt.Content = "预计层数：" + cnt;
             }
             catch
             {
-                labelThickness.Content = "层厚数值错误";
+                textBoxThick.Text = "层厚数值错误";
                 buttonOK.IsEnabled = false;
             }
         }
@@ -43,11 +43,21 @@ namespace Wpf3DPrint.Dialog
         private void buttonOK_Click(object sender, RoutedEventArgs e)
         {
             try {
+                thickness = double.Parse(textBoxThick.Text);
+                int cnt = (int)((shape.Zmax - shape.Zmin) / thickness);
+                labelCnt.Content = "预计层数：" + cnt;
+                if (cnt < 2)
+                {
+                    throw new Exception();
+                }
                 shape.sliceThick = thickness;
                 this.DialogResult = true;
             }
             catch
-            { }
+            {
+                e.Handled = false;
+                textBoxThick.Text = "层厚值错误";
+            }
         }
     }
 }

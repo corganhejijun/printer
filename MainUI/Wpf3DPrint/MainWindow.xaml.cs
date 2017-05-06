@@ -61,6 +61,7 @@ namespace Wpf3DPrint
                 return;
             }
             onOpeningFile(openFile.FileName);
+            set3DView();
         }
 
         private void afterOpenStep(object args)
@@ -72,28 +73,40 @@ namespace Wpf3DPrint
         {
             fileReader.displayStep(workResult);
             fileReader.afterOpenFile();
+            Dialog.DialogUnit unit = new Dialog.DialogUnit(fileReader.Shape);
+            unit.ShowDialog();
             afterOpenFile();
         }
 
         private void buttonSave_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFile = new SaveFileDialog();
-            saveFile.FileName = "model";
-            saveFile.DefaultExt = "stp";
-            saveFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step";
-            if (false == saveFile.ShowDialog())
-                return;
-            fileReader.saveSlice(saveFile.FileName);
+            saveSlice();
         }
 
         private void buttonSlice_Click(object sender, RoutedEventArgs e)
         {
             if (!fileReader.HasFile)
+            {
+                MessageBox.Show("未打开3D文件");
                 return;
+            }
             Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, textBoxSliceThick.Text);
             if (dlSlice.ShowDialog() == false)
                 return;
+            textBoxSliceThick.Text = fileReader.Shape.sliceThick.ToString();
             fileReader.sliceShape((Control)this, onAfterSlice, new SceneThread.onFunction(onSlice));
+        }
+
+        private string saveSlice()
+        {
+            SaveFileDialog saveFile = new SaveFileDialog();
+            saveFile.FileName = "model";
+            saveFile.DefaultExt = "slc";
+            saveFile.Filter = "Slice file (*.slc)|*.slc";
+            if (false == saveFile.ShowDialog())
+                return "";
+            fileReader.saveSlice(saveFile.FileName);
+            return saveFile.FileName;
         }
 
         private void onSlice(object args)
@@ -111,6 +124,10 @@ namespace Wpf3DPrint
 
         private void afterSlice(object args)
         {
+            string fileName = saveSlice();
+            if (fileName.Length == 0)
+                return;
+            openSlice(fileName);
         }
 
         private void GridScene_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -162,6 +179,7 @@ namespace Wpf3DPrint
             fileReader.releaseShape();
             sliceScene.closeSlice();
             sliceScene.clearWindow();
+            set3DView();
         }
 
         private void buttonOpenSlice_Click(object sender, RoutedEventArgs e)
@@ -172,16 +190,21 @@ namespace Wpf3DPrint
                 return;
             }
             OpenFileDialog openFile = new OpenFileDialog();
-            openFile.DefaultExt = ".stp";
-            openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step";
+            openFile.DefaultExt = ".slc";
+            openFile.Filter = "Slice file (*.slc)|*.slc";
             if (openFile.ShowDialog() == false)
                 return;
-            if (!fileReader.openStep(openFile.FileName, afterOpen, true))
+            openSlice(openFile.FileName);
+        }
+
+        private void openSlice(string fileName)
+        {
+            if (!fileReader.openStep(fileName, afterOpen, true))
             {
                 MessageBox.Show("Open file Failed!");
                 return;
             }
-            onOpeningFile(openFile.FileName);
+            onOpeningFile(fileName);
         }
 
         private void afterOpen(object args)
@@ -203,6 +226,43 @@ namespace Wpf3DPrint
             comboBoxSliceList.ItemsSource = list;
             comboBoxSliceNumber.SelectedItem = 1;
             sliceScene.drawSlice((int)comboBoxSliceNumber.SelectedItem - 1);
+            setSliceView();
+            TreeViewItem root = new TreeViewItem();
+            root.Header = fileReader.FileName.Substring(fileReader.FileName.LastIndexOf('\\') + 1);
+            root.ItemsSource = list;
+            TreeView_Slice.SelectedItemChanged += TreeView_Slice_SelectedItemChanged;
+            root.IsExpanded = true;
+            TreeView_Slice.Items.Add(root);
+            /*root = (TreeViewItem)TreeView_Slice.Items[0];
+            TreeViewItem first = (TreeViewItem)root.Items[0];
+            first.IsSelected = true;
+            */
+        }
+
+        private void TreeView_Slice_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            try {
+                int value = (int)e.NewValue;
+                selectSlice(value - 1);
+            }
+            catch
+            {
+                return;
+            }
+        }
+
+        private void set3DView()
+        {
+            column3D.Width = new GridLength(100, GridUnitType.Star);
+            column2D.Width = new GridLength(0, GridUnitType.Star);
+            columnTree.Width = new GridLength(0, GridUnitType.Star);
+        }
+
+        private void setSliceView()
+        {
+            column3D.Width = new GridLength(40, GridUnitType.Star);
+            column2D.Width = new GridLength(50, GridUnitType.Star);
+            columnTree.Width = new GridLength(10, GridUnitType.Star);
         }
 
         private void buttonQuit_Click(object sender, RoutedEventArgs e)
@@ -224,18 +284,35 @@ namespace Wpf3DPrint
 
         private void ribbonMenu_Loaded(object sender, RoutedEventArgs e)
         {
-            Grid child = VisualTreeHelper.GetChild((DependencyObject)sender, 0) as Grid;
-            if (child != null)
+            try {
+                Grid child = VisualTreeHelper.GetChild((DependencyObject)sender, 0) as Grid;
+                if (child != null)
+                {
+                    child.RowDefinitions[0].Height = new GridLength(0);
+                }
+            }
+            catch
             {
-                child.RowDefinitions[0].Height = new GridLength(0);
+                return;
             }
         }
 
         private void comboBoxSliceNumber_SelectionChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             int index = (int)comboBoxSliceNumber.SelectedItem - 1;
+            selectSlice(index);
+        }
+
+        private void selectSlice(int index)
+        {
             sliceScene.drawSlice(index);
             fileReader.selectSlice(index);
+            //fileReader.rebuildSlice(index);
+        }
+
+        private void buttonRebuild_Click(object sender, RoutedEventArgs e)
+        {
+            fileReader.rebuildSlice(0);
         }
     }
 }

@@ -17,7 +17,7 @@
 #define _Standard_Size_HeaderFile
 
 // msv 26.05.2009: add HashCode and IsEqual functions
-
+#ifdef _WIN64
 // ------------------------------------------------------------------
 // Hascode : Computes a hashcoding value for a given value
 // ------------------------------------------------------------------
@@ -41,5 +41,6 @@ inline Standard_Boolean IsEqual(const Standard_Size One,
 {
   return One == Two;
 }
+#endif
 
 #endif
