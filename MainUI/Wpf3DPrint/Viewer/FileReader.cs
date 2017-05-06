@@ -185,7 +185,7 @@ namespace Wpf3DPrint.Viewer
 
         public void selectSlice(int i)
         {
-            scene.Proxy.displaySlice((IntPtr)(Shape.sliceList[i]));
+            scene.Proxy.selectSlice((IntPtr)(Shape.sliceList[i]));
         }
 
         public void rebuildSlice(int i)

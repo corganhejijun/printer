@@ -775,6 +775,8 @@ public:
 
     bool displaySlice(System::IntPtr pt)
     {
+        if (pt == IntPtr::Zero)
+            return false;
         ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
         if (shape->type == ShapeContainer::Entity) {
             Handle(AIS_Shape) aisShape = new AIS_Shape(shape->Shape);
@@ -788,6 +790,16 @@ public:
                 myAISContext()->Display(aisShape, Standard_True);
                 myAISContext()->SetSelected(aisShape);
             }
+        }
+        return true;
+    }
+
+    bool selectSlice(System::IntPtr pt) {
+        ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
+        Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = shape->shapeSequence;
+        for (int i = 1; i <= aHSequenceOfShape->Length(); i++) {
+            Handle(AIS_Shape) aisShape = new AIS_Shape(aHSequenceOfShape->Value(i));
+            myAISContext()->SetSelected(aisShape);
         }
         return true;
     }
