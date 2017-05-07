@@ -272,6 +272,7 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice,
     ofstream file("log.txt");
     Slice** ss = (Slice**)slice;
     *ss = new Slice[aNbRoot];
+    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
     for (Standard_Integer aRootIter = 1; aRootIter <= aNbRoot; ++aRootIter)
     {
         aReader.TransferRoot(aRootIter);
@@ -279,36 +280,20 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice,
         if (aNbShap > 0)
         {
             Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
-            //for (int aShapeIter = 1; aShapeIter <= aNbShap; ++aShapeIter)
-            {
-                TopoDS_Shape shape = aReader.Shape(aNbShap);
-                if (isSlice) {
-                    file << "begin shape" << endl;
-                    Slice* sss = &(*ss)[(*cnt)];
-                    sss->data = sss->next = sss->prev = NULL;
-                    sss->type = EdgeType::unknown;
-                    showType(shape, file, sss);
-                    file << "end shape" << endl;
-                    /*
-                    for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
-                        TopoDS_Shape aChild = anIt.Value();
-                        for (TopoDS_Iterator childIt(aChild); childIt.More(); childIt.Next()) {
-                            const TopoDS_Shape childChild = childIt.Value();
-                            printf("child type is %d", childChild.ShapeType());
-                            TopoDS_Vertex vertex = TopoDS::Vertex(childChild);
-                            gp_Pnt pt = BRep_Tool::Pnt(vertex);
-                            printf(" (%f, %f, %f)\n", pt.X(), pt.Y(), pt.Z());
-                        }
-                        Standard_Real first = 0, last = 0;
-                        Handle_Geom_Curve theCurve = BRep_Tool::Curve(TopoDS::Edge(aChild), first, last);
-                        BRepAdaptor_Curve adpCurve = BRepAdaptor_Curve(TopoDS::Edge(aChild));
-                        printf("type is %d, %d, (%f, %f)\n", aChild.ShapeType(), adpCurve.GetType(), first, last);
-                    }
-                    */
-                }
-                aHSequenceOfShape->Append(shape);
+            TopoDS_Shape shape = aReader.Shape(aNbShap);
+            if (isSlice) {
+                file << "begin shape" << endl;
+                Slice* sss = &(*ss)[(*cnt)];
+                sss->data = sss->next = sss->prev = NULL;
+                sss->type = EdgeType::unknown;
+                Bnd_Box B;
+                BRepBndLib::Add(shape, B);
+                B.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
+                showType(shape, file, sss);
+                file << "end shape" << endl;
             }
-            ShapeContainer* sc = new ShapeContainer(aHSequenceOfShape);
+            aHSequenceOfShape->Append(shape);
+            ShapeContainer* sc = new ShapeContainer(aHSequenceOfShape, Zmin);
             *(shapes + (*cnt)*sizeof(void*)) = sc;
             (*cnt)++;
         }
@@ -321,8 +306,10 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice,
     return true;
 }
 
-EXPORT void* getSliceFromShape(void** shapes, int index) {
-    return *(shapes + index*sizeof(void*));
+EXPORT void* getSliceFromShape(void** shapes, int index, double* height) {
+    ShapeContainer* container = *((ShapeContainer**)shapes + index*sizeof(void*));
+    *height = container->height;
+    return container;
 }
 
 EXPORT bool deleteShape(void** pt, int count)
@@ -330,11 +317,12 @@ EXPORT bool deleteShape(void** pt, int count)
     for (int i = 0; i < count; i++)
     {
         ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
-        if (shape->type == ShapeContainer::Slice) {
+        if (shape != NULL && shape->type == ShapeContainer::Slice) {
             shape->shapeSequence->Clear();
             shape->shapeSequence->Delete();
         }
         delete shape;
+        *(pt + i * sizeof(void*)) = NULL;
     }
     return true;
 }
@@ -406,19 +394,22 @@ EXPORT ShapeContainer** getLocatPlane(void** pt, int index, int* count) {
         C.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
         if (Zmax - Zmin < 0.0001) {
             Handle_TopTools_HSequenceOfShape wires = getWires(currentFace);
-            containers[counter++] = new ShapeContainer(wires);
+            containers[counter++] = new ShapeContainer(wires, Zmin);
         }
     }
+    *count = counter;
+    if (counter == 0)
+        return NULL;
     ShapeContainer** result = new ShapeContainer*[counter];
     for (int i = 0; i < counter; i++) {
         result[i] = containers[i];
     }
-    *count = counter;
     return result;
 }
 
-EXPORT ShapeContainer* getShapeContainer(void** pt, int index) {
+EXPORT ShapeContainer* getShapeContainer(void** pt, int index, double* height) {
     ShapeContainer** containers = (ShapeContainer**)pt;
+    *height = containers[index]->height;
     return containers[index];
 }
 

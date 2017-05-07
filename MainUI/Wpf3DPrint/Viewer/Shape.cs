@@ -11,6 +11,24 @@ namespace Wpf3DPrint.Viewer
         public double Xmin, Xmax, Ymin, Ymax, Zmin, Zmax;
         public double sliceThick;
         public ArrayList sliceList;
+
+        public class SliceCompare : IComparer {
+            public int Compare(object x, object y)
+            {
+                return Comparer.Default.Compare(((Slice)x).height, ((Slice)y).height);
+            }
+        }
+
+        public class Slice
+        {
+            public IntPtr slice;
+            public double height;
+            public Slice(IntPtr s, double h)
+            {
+                slice = s;
+                height = h;
+            }
+        }
         public Shape(IntPtr shape, int count)
         {
             stepSlice = IntPtr.Zero;
@@ -19,6 +37,11 @@ namespace Wpf3DPrint.Viewer
             Xmin = Xmax = Ymin = Ymax = Zmin = Zmax = 0;
             sliceThick = 1;
             sliceList = new ArrayList();
+        }
+        public void sortSliceList()
+        {
+            sliceList.Sort(new SliceCompare());
+            sliceList.Reverse();
         }
     }
 }

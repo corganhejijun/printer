@@ -94,9 +94,9 @@ namespace Wpf3DPrint.Viewer
             Shape shape = (Shape)shapeList[0];
             IntPtr[] slices = new IntPtr[shape.sliceList.Count];
             int i = 0;
-            foreach (IntPtr slice in shape.sliceList)
+            foreach (Shape.Slice slice in shape.sliceList)
             {
-                slices[i++] = slice;
+                slices[i++] = slice.slice;
             }
             Cpp2Managed.exportStep(Marshal.StringToHGlobalAnsi(path), slices, shape.sliceList.Count);
         }
@@ -123,7 +123,7 @@ namespace Wpf3DPrint.Viewer
                 {
                     height = shape.Zmin + (double)i * shape.sliceThick;
                     IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, height);
-                    shape.sliceList.Add(slice);
+                    shape.sliceList.Add(new Shape.Slice(slice, height));
                     onGetSlice(slice, shape, i, control, onslice);
                 }
                 int sliceCnt = i;
@@ -131,10 +131,23 @@ namespace Wpf3DPrint.Viewer
                 IntPtr containers = Cpp2Managed.getLocatPlane(shape.shape, 0, ref count);
                 for (i = 0; i < count; i++)
                 {
-                    IntPtr slice = Cpp2Managed.getShapeContainer(containers, i);
-                    shape.sliceList.Add(slice);
+                    IntPtr slice = Cpp2Managed.getShapeContainer(containers, i, ref height);
+                    bool skip = false;
+                    foreach (Shape.Slice s in shape.sliceList)
+                    {
+                        // 高度重复的跳过
+                        if (Math.Abs(s.height - height) < 0.0001)
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+                    if (skip)
+                        continue;
+                    shape.sliceList.Add(new Shape.Slice(slice, height));
                     onGetSlice(slice, shape, sliceCnt + i, control, onslice);
                 }
+                shape.sortSliceList();
             }
             return null;
         }
@@ -157,6 +170,11 @@ namespace Wpf3DPrint.Viewer
             return true;
         }
 
+        public void sceneZoom(int delta)
+        {
+            scene.Proxy.Zoom(0, 0, delta / 8, 0);
+        }
+
         public int afterOpenSlice(object workResult)
         {
             ArrayList list = (ArrayList)workResult;
@@ -169,37 +187,39 @@ namespace Wpf3DPrint.Viewer
             shapeList.Add(shape);
             for (int i = 0; i < shape.count; i++)
             {
-                shape.sliceList.Add(Cpp2Managed.getSliceFromShape(shape.shape, i));
+                double height = 0;
+                IntPtr slice = Cpp2Managed.getSliceFromShape(shape.shape, i, ref height);
+                shape.sliceList.Add(new Shape.Slice(slice, height));
             }
             return shape.count;
         }
 
         public void displaySlice()
         {
-            foreach(IntPtr slice in Shape.sliceList)
+            foreach(Shape.Slice slice in Shape.sliceList)
             {
-                scene.Proxy.displaySlice(slice);
+                scene.Proxy.displaySlice(slice.slice);
             }
             scene.Proxy.ZoomAllView();
         }
 
         public void selectSlice(int i)
         {
-            scene.Proxy.selectSlice((IntPtr)(Shape.sliceList[i]));
+            scene.Proxy.selectSlice(((Shape.Slice)(Shape.sliceList[i])).slice);
         }
 
         public void rebuildSlice(int i)
         {
-            scene.Proxy.strechSlice((IntPtr)(Shape.sliceList[i]), Shape.sliceThick);
+            scene.Proxy.strechSlice(((Shape.Slice)(Shape.sliceList[i])).slice, Shape.sliceThick);
         }
 
         public void releaseShape()
         {
             foreach (Shape shape in shapeList)
             {
-                foreach (IntPtr slice in shape.sliceList)
+                foreach (Shape.Slice slice in shape.sliceList)
                 {
-                    Cpp2Managed.deleteSlice(slice);
+                    Cpp2Managed.deleteSlice(slice.slice);
                 }
                 Cpp2Managed.deleteShape(shape.shape, shape.count);
                 Marshal.FreeHGlobal(shape.shape);

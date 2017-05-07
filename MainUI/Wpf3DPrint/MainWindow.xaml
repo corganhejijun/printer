@@ -130,7 +130,7 @@
                     </TreeView>
                 </Grid>
                 <GridSplitter Width="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
-                <Grid x:Name="GridScene" Grid.Column="2" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave"></Grid>
+                <Grid x:Name="GridScene" Grid.Column="2" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel"></Grid>
                 <GridSplitter Width="3" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
                 <Grid x:Name="GridSlice" Grid.Column="4" Background="White">
                     <WindowsFormsHost Margin="0,0,0,0" Panel.ZIndex="-1">

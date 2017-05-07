@@ -25,13 +25,13 @@ namespace Wpf3DPrint.Viewer
         public static extern IntPtr getLocatPlane(IntPtr pt, int index, ref int count);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr getShapeContainer(IntPtr pt, int index);
+        public static extern IntPtr getShapeContainer(IntPtr pt, int index, ref double height);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void deleteSlice(IntPtr pt);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr getSliceFromShape(IntPtr pt, int index);
+        public static extern IntPtr getSliceFromShape(IntPtr pt, int index, ref double height);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool exportStep(IntPtr fileName, IntPtr[] slices, int length);

@@ -61,9 +61,11 @@ public:
         Entity, Slice
     };
     ShapeType type;
-    ShapeContainer(const Handle(TopTools_HSequenceOfShape) shape){
+    double height;
+    ShapeContainer(const Handle(TopTools_HSequenceOfShape) shape, double z = 0){
         type = ShapeType::Slice;
         shapeSequence = shape;
+        height = z;
     }
     ShapeContainer(const TopoDS_Shape& shape) : Shape(shape){
         type = ShapeType::Entity;

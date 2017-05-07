@@ -309,12 +309,19 @@ namespace Wpf3DPrint
         {
             sliceScene.drawSlice(index);
             fileReader.selectSlice(index);
-            //fileReader.rebuildSlice(index);
         }
 
         private void buttonRebuild_Click(object sender, RoutedEventArgs e)
         {
             fileReader.rebuildSlice(0);
+        }
+
+        private void GridScene_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            if (Math.Abs(e.Delta) > 8)
+            {
+                fileReader.sceneZoom(e.Delta);
+            }
         }
     }
 }
