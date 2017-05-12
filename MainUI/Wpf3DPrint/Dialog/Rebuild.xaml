@@ -1,0 +1,14 @@
+﻿<Window x:Class="Wpf3DPrint.Dialog.Rebuild"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
+        mc:Ignorable="d"
+        Title="重建" Height="300" Width="300" ResizeMode="NoResize">
+    <Grid>
+        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="198,233,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
+        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="109,233,0,0" VerticalAlignment="Top" Width="75" IsDefault="True"/>
+
+    </Grid>
+</Window>

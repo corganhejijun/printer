@@ -807,7 +807,6 @@ public:
     bool strechSlice(System::IntPtr pt, double thickness) {
         ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
         Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = shape->shapeSequence;
-        myAISContext()->RemoveAll();
         for (int i = 1; i <= aHSequenceOfShape->Length(); i++) {
             Handle(TopTools_HSequenceOfShape) Edges = new TopTools_HSequenceOfShape();
             TopoDS_Shape wireShape = aHSequenceOfShape->Value(i);

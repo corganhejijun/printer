@@ -13,8 +13,6 @@
             <ComboBoxItem Content="厘米"/>
             <ComboBoxItem Content="毫米"/>
         </ComboBox>
-        <Label x:Name="label1" Content="比例：" HorizontalAlignment="Left" Margin="30,76,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="81,78,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120"/>
         <Button x:Name="button" Content="确定" HorizontalAlignment="Left" Margin="200,241,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="button_Click"/>
         <Label x:Name="labelX" Content="Label" HorizontalAlignment="Left" Margin="42,122,0,0" VerticalAlignment="Top"/>
         <Label x:Name="labelY" Content="Label" HorizontalAlignment="Left" Margin="42,152,0,0" VerticalAlignment="Top"/>

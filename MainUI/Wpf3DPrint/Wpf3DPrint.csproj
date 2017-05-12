@@ -46,7 +46,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Build\x64\Release\</OutputPath>
+    <OutputPath>..\..\Build\Win32\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -120,11 +120,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialog\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\DialogSlice.xaml.cs">
       <DependentUpon>DialogSlice.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialog\DialogUnit.xaml.cs">
       <DependentUpon>DialogUnit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Move.xaml.cs">
+      <DependentUpon>Move.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Rebuild.xaml.cs">
+      <DependentUpon>Rebuild.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Rotate.xaml.cs">
+      <DependentUpon>Rotate.xaml</DependentUpon>
     </Compile>
     <Compile Include="Themes\IndentConverter.cs" />
     <Compile Include="Themes\TreeViewItemExt.cs" />
@@ -135,11 +147,27 @@
     <Compile Include="Viewer\Scene2D.cs" />
     <Compile Include="Viewer\SceneThread.cs" />
     <Compile Include="Viewer\Shape.cs" />
+    <Page Include="Dialog\About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialog\DialogSlice.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\DialogUnit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\Move.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\Rebuild.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\Rotate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

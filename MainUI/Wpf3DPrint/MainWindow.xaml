@@ -25,12 +25,13 @@
             <MenuItem Header="编辑">
                 <MenuItem Header="切片">
                     <MenuItem x:Name="menuSlice" Header="切片..." Click="buttonSlice_Click"></MenuItem>
+                    <MenuItem x:Name="menuRebuild" Header="重建..." Click="buttonRebuild_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="对齐">
                     <MenuItem Header="几何中心对齐"></MenuItem>
                 </MenuItem>
-                <MenuItem Header="旋转..."></MenuItem>
-                <MenuItem Header="移动..."></MenuItem>
+                <MenuItem x:Name="menuRotate" Header="旋转..." Click="menuRotate_Click"></MenuItem>
+                <MenuItem x:Name="menuMove" Header="移动..." Click="menuMove_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="工具">
                 <MenuItem Header="工艺参数设置..."></MenuItem>
@@ -46,7 +47,7 @@
                 <MenuItem Header="功能参数..."></MenuItem>
             </MenuItem>
             <MenuItem Header="帮助">
-                <MenuItem Header="关于..."></MenuItem>
+                <MenuItem x:Name="menuAbout" Header="关于..."></MenuItem>
             </MenuItem>
         </Menu>
         <Ribbon x:Name="ribbonMenu" Grid.Row="1" Loaded="ribbonMenu_Loaded" Visibility="Collapsed">

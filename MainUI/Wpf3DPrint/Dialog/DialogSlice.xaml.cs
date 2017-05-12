@@ -25,7 +25,9 @@ namespace Wpf3DPrint.Dialog
         {
             this.shape = shape;
             InitializeComponent();
-            labelMaxMinInfo.Content = "Z向范围：" + shape.Zmin.ToString("F") + "~" + shape.Zmax.ToString("F");
+            labelMaxMinInfo.Content = "Z向高度: " + (shape.Zmax - shape.Zmin).ToString("0.00") + ";范围：" + shape.Zmin.ToString("F") + "~" + shape.Zmax.ToString("F") + '\n'
+                + "X向高度:" + (shape.Xmax - shape.Xmin).ToString("0.00") + ";范围：" + shape.Xmin.ToString("F") + "~" + shape.Xmax.ToString("F") + '\n'
+                + "Y向高度:" + (shape.Ymax - shape.Ymin).ToString("0.00") + ";范围：" + shape.Ymin.ToString("F") + "~" + shape.Ymax.ToString("F");
             try
             {
                 thickness = double.Parse(thick);
@@ -45,6 +47,7 @@ namespace Wpf3DPrint.Dialog
             try {
                 thickness = double.Parse(textBoxThick.Text);
                 int cnt = (int)((shape.Zmax - shape.Zmin) / thickness);
+                float ratio = float.Parse(textBoxRatio.Text);
                 labelCnt.Content = "预计层数：" + cnt;
                 if (cnt < 2)
                 {
@@ -56,7 +59,21 @@ namespace Wpf3DPrint.Dialog
             catch
             {
                 e.Handled = false;
-                textBoxThick.Text = "层厚值错误";
+                textBoxThick.Text = "输入值错误";
+            }
+        }
+
+        private void textBoxThick_LostFocus(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                thickness = double.Parse(textBoxThick.Text);
+                int cnt = (int)((shape.Zmax - shape.Zmin) / thickness);
+                labelCnt.Content = "预计层数：" + cnt;
+            }
+            catch
+            {
+                textBoxThick.Text = "输入值错误";
             }
         }
     }

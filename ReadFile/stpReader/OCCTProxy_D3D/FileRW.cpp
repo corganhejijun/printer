@@ -298,6 +298,7 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice,
             (*cnt)++;
         }
     }
+    aReader.ClearShapes();
     file.close();
     if ((*cnt) == 1) {
         ShapeContainer* shape = ShapeContainer::getContainer(shapes, 0);

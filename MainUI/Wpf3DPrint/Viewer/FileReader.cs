@@ -208,9 +208,13 @@ namespace Wpf3DPrint.Viewer
             scene.Proxy.selectSlice(((Shape.Slice)(Shape.sliceList[i])).slice);
         }
 
-        public void rebuildSlice(int i)
+        public void rebuildSlice()
         {
-            scene.Proxy.strechSlice(((Shape.Slice)(Shape.sliceList[i])).slice, Shape.sliceThick);
+            scene.Proxy.removeObjects();
+            foreach (Shape.Slice slice in Shape.sliceList)
+            {
+                scene.Proxy.strechSlice(slice.slice, Shape.sliceThick);
+            }
         }
 
         public void releaseShape()

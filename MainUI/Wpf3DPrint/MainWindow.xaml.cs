@@ -313,7 +313,10 @@ namespace Wpf3DPrint
 
         private void buttonRebuild_Click(object sender, RoutedEventArgs e)
         {
-            fileReader.rebuildSlice(0);
+            Dialog.Rebuild rebuild = new Dialog.Rebuild();
+            if (rebuild.ShowDialog() == false)
+                return;
+            fileReader.rebuildSlice();
         }
 
         private void GridScene_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
@@ -322,6 +325,28 @@ namespace Wpf3DPrint
             {
                 fileReader.sceneZoom(e.Delta);
             }
+        }
+
+        private void menuRotate_Click(object sender, RoutedEventArgs e)
+        {
+            Dialog.Rotate rotate = new Dialog.Rotate();
+            if (rotate.ShowDialog() == false)
+            {
+                return;
+            }
+        }
+
+        private void menuMove_Click(object sender, RoutedEventArgs e)
+        {
+            Dialog.Move move = new Dialog.Move();
+            if (move.ShowDialog() == false)
+                return;
+        }
+
+        private void menuAbout_Click(object sender, RoutedEventArgs e)
+        {
+            Dialog.About about = new Dialog.About();
+            about.ShowDialog();
         }
     }
 }
