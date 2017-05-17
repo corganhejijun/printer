@@ -1,0 +1,17 @@
+﻿<Window x:Class="Wpf3DPrint.Dialog.EntityProp"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
+        mc:Ignorable="d"
+        Title="实体属性" Height="375" Width="562" ResizeMode="NoResize">
+    <Grid>
+        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="437,305,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
+        <Label x:Name="label" Content="实体范围" HorizontalAlignment="Left" Margin="21,19,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="labelX" Content="Label" HorizontalAlignment="Left" Margin="50,49,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="labelY" Content="Label" HorizontalAlignment="Left" Margin="50,79,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="labelZ" Content="Label" HorizontalAlignment="Left" Margin="50,109,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>

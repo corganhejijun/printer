@@ -129,8 +129,14 @@
     <Compile Include="Dialog\DialogUnit.xaml.cs">
       <DependentUpon>DialogUnit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\EntityProp.xaml.cs">
+      <DependentUpon>EntityProp.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\Move.xaml.cs">
       <DependentUpon>Move.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Param2D.xaml.cs">
+      <DependentUpon>Param2D.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialog\Rebuild.xaml.cs">
       <DependentUpon>Rebuild.xaml</DependentUpon>
@@ -159,7 +165,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialog\EntityProp.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialog\Move.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\Param2D.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

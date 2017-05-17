@@ -69,12 +69,14 @@ namespace Wpf3DPrint
             this.Dispatcher.Invoke(new SceneThread.afterFunction(displayStep), System.Windows.Threading.DispatcherPriority.Normal, new object[] { args });
         }
 
+        string unit;
         private void displayStep(object workResult)
         {
             fileReader.displayStep(workResult);
             fileReader.afterOpenFile();
             Dialog.DialogUnit unit = new Dialog.DialogUnit(fileReader.Shape);
             unit.ShowDialog();
+            this.unit = unit.Unit;
             afterOpenFile();
         }
 
@@ -347,6 +349,25 @@ namespace Wpf3DPrint
         {
             Dialog.About about = new Dialog.About();
             about.ShowDialog();
+        }
+
+        private void menuEntityProp_Click(object sender, RoutedEventArgs e)
+        {
+            Dialog.EntityProp entity = new Dialog.EntityProp(fileReader.Shape, unit);
+            if (entity.ShowDialog() == false)
+                return;
+        }
+
+        private void menuEntityEdit_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void menu2DProc_Click(object sender, RoutedEventArgs e)
+        {
+            Dialog.Param2D d2 = new Dialog.Param2D();
+            if (d2.ShowDialog() == false)
+                return;
         }
     }
 }
