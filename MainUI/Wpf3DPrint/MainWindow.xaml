@@ -15,7 +15,7 @@
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Menu DockPanel.Dock="Top" Grid.Row="0" FontSize="15" Height="25">
-            <MenuItem Header="文件" HorizontalAlignment="Right" Width="38">
+            <MenuItem Header="文件" HorizontalAlignment="Right" Width="48">
                 <MenuItem Header="新建"></MenuItem>
                 <MenuItem x:Name="menuOpenFile" Header="打开..." Click="buttonOpen_Click"></MenuItem>
                 <MenuItem x:Name="menuOpenSlice" Header="打开切片..." Click="buttonOpenSlice_Click"></MenuItem>
@@ -26,7 +26,7 @@
                 <MenuItem x:Name="menuCloseFile" Header="关闭" Click="buttonClose_Click"></MenuItem>
                 <MenuItem x:Name="menuQuit" Header="退出" Click="buttonQuit_Click"></MenuItem>
             </MenuItem>
-            <MenuItem Header="编辑">
+            <MenuItem Header="编辑" Width="48">
                 <MenuItem Header="撤销"></MenuItem>
                 <MenuItem Header="重复"></MenuItem>
                 <MenuItem Header="复制"></MenuItem>
@@ -38,17 +38,17 @@
                 <MenuItem x:Name="menuRotate" Header="旋转..." Click="menuRotate_Click"></MenuItem>
                 <MenuItem x:Name="menuMove" Header="移动..." Click="menuMove_Click"></MenuItem>
             </MenuItem>
-            <MenuItem Header="图形">
+            <MenuItem Header="图形" Width="48">
                 <MenuItem x:Name="menuEntityProp" Header="实体属性..." Click="menuEntityProp_Click"></MenuItem>
                 <MenuItem x:Name="menuTransform" Header="图形变换..." Click="menuRotate_Click"></MenuItem>
                 <MenuItem x:Name="menuEntityEdit" Header="图形编辑..." Click="menuMove_Click"></MenuItem>
             </MenuItem>
-            <MenuItem Header="分层">
+            <MenuItem Header="分层" Width="48">
                 <MenuItem x:Name="menuSlice" Header="3D分层..." Click="buttonSlice_Click"></MenuItem>
                 <MenuItem x:Name="menuRebuild" Header="3D重建..." Click="buttonRebuild_Click"></MenuItem>
                 <MenuItem x:Name="menu2DProc" Header="2D处理..." Click="menu2DProc_Click"></MenuItem>
             </MenuItem>
-            <MenuItem Header="视图">
+            <MenuItem Header="视图" Width="48">
                 <MenuItem Header="显示设置"></MenuItem>
                 <MenuItem Header="重置坐标"></MenuItem>
                 <MenuItem Header="层叠"></MenuItem>
@@ -57,8 +57,8 @@
                 <MenuItem Header="排列"></MenuItem>
                 <MenuItem Header="显示"></MenuItem>
             </MenuItem>
-            <MenuItem Header="窗口"></MenuItem>
-            <MenuItem Header="帮助">
+            <MenuItem Header="窗口" Width="48"></MenuItem>
+            <MenuItem Header="帮助" Width="48">
                 <MenuItem x:Name="menuAbout" Header="关于..." Click="menuAbout_Click"></MenuItem>
             </MenuItem>
         </Menu>

@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Win32;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Wpf3DPrint.Dialog
 {
@@ -55,6 +44,15 @@ namespace Wpf3DPrint.Dialog
                 MessageBox.Show("请输入合法内容");
                 e.Handled = false;
             }
+        }
+
+        private void buttonAdd_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            if (dialog.ShowDialog() == false)
+                return;
+            string path = dialog.FileName;
+            labelAdd.Content = path;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Controls;
 
 namespace Wpf3DPrint.Viewer
@@ -50,6 +51,16 @@ namespace Wpf3DPrint.Viewer
             return true;
         }
 
+        public static IntPtr NativeUtf8FromString(string managedString)
+        {
+            int len = Encoding.UTF8.GetByteCount(managedString);
+            byte[] buffer = new byte[len + 1];
+            Encoding.UTF8.GetBytes(managedString, 0, managedString.Length, buffer, 0);
+            IntPtr nativeUtf8 = Marshal.AllocHGlobal(buffer.Length);
+            Marshal.Copy(buffer, 0, nativeUtf8, buffer.Length);
+            return nativeUtf8;
+        }
+
         private object openStepWork(object args)
         {
             ArrayList list = (ArrayList)args;
@@ -58,7 +69,9 @@ namespace Wpf3DPrint.Viewer
             int count = 500;
             IntPtr shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)) * count);
             IntPtr slice = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)));
-            bool result = Cpp2Managed.ImportStep(Marshal.StringToHGlobalAnsi(fileName), ref count, shapePt, isSlice, slice);
+            IntPtr fileNameSpace = NativeUtf8FromString(fileName);
+            bool result = Cpp2Managed.ImportStep(fileNameSpace, ref count, shapePt, isSlice, slice);
+            Marshal.FreeHGlobal(fileNameSpace);
             list.Clear();
             list.Add(result);
             Shape shape = new Shape(shapePt, count);
@@ -89,7 +102,7 @@ namespace Wpf3DPrint.Viewer
             return true;
         }
 
-        public unsafe void saveSlice(string path)
+        public void saveSlice(string path)
         {
             Shape shape = (Shape)shapeList[0];
             IntPtr[] slices = new IntPtr[shape.sliceList.Count];
@@ -98,7 +111,9 @@ namespace Wpf3DPrint.Viewer
             {
                 slices[i++] = slice.slice;
             }
-            Cpp2Managed.exportStep(Marshal.StringToHGlobalAnsi(path), slices, shape.sliceList.Count);
+            IntPtr fileName = NativeUtf8FromString(path);
+            Cpp2Managed.exportStep(fileName, slices, shape.sliceList.Count);
+            Marshal.FreeHGlobal(fileName);
         }
 
         public void sliceShape(Control control, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)

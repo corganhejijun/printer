@@ -27,15 +27,33 @@ namespace Wpf3DPrint.Dialog
         private void buttonOK_Click(object sender, RoutedEventArgs e)
         {
             try {
-                float x = float.Parse(textBoxX.Text);
-                float y = float.Parse(textBoxY.Text);
-                float z = float.Parse(textBoxZ.Text);
+                testInput();
                 this.DialogResult = true;
             }
             catch
             {
                 e.Handled = false;
                 MessageBox.Show("请输入合法数字");
+            }
+        }
+
+        void testInput()
+        {
+            float x = float.Parse(textBoxX.Text);
+            float y = float.Parse(textBoxY.Text);
+            float z = float.Parse(textBoxZ.Text);
+        }
+
+        private void buttonPreview_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                testInput();
+            }
+            catch
+            {
+                MessageBox.Show("请输入合法数字");
+                return;
             }
         }
     }

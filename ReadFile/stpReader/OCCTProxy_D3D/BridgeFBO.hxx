@@ -56,22 +56,20 @@ private:
 public class ShapeContainer
 {
 public:
-    enum ShapeType
-    {
-        Entity, Slice
-    };
-    ShapeType type;
     double height;
     ShapeContainer(const Handle(TopTools_HSequenceOfShape) shape, double z = 0){
-        type = ShapeType::Slice;
         shapeSequence = shape;
         height = z;
     }
-    ShapeContainer(const TopoDS_Shape& shape) : Shape(shape){
-        type = ShapeType::Entity;
+
+    ~ShapeContainer() {
     }
-    TopoDS_Shape Shape;
+
     Handle(TopTools_HSequenceOfShape) shapeSequence;
+
+    TopoDS_Shape getShape(int index) {
+        return shapeSequence->Value(index);
+    }
 
     static ShapeContainer* getContainer(void** pt, int index)
     {

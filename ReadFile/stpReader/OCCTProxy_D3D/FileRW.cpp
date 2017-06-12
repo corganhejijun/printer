@@ -300,10 +300,6 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice,
     }
     aReader.ClearShapes();
     file.close();
-    if ((*cnt) == 1) {
-        ShapeContainer* shape = ShapeContainer::getContainer(shapes, 0);
-        shape->Shape = shape->shapeSequence->Value(1);
-    }
     return true;
 }
 
@@ -318,10 +314,12 @@ EXPORT bool deleteShape(void** pt, int count)
     for (int i = 0; i < count; i++)
     {
         ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
-        if (shape != NULL && shape->type == ShapeContainer::Slice) {
+        /*
+        if (shape != NULL) {
             shape->shapeSequence->Clear();
             shape->shapeSequence->Delete();
         }
+        */
         delete shape;
         *(pt + i * sizeof(void*)) = NULL;
     }
@@ -332,15 +330,14 @@ EXPORT void getShapeBoundary(void** pt, int index, double* Zmin, double* Zmax, d
 {
     ShapeContainer* shape = ShapeContainer::getContainer(pt, index);
     Bnd_Box B;
-    BRepBndLib::Add(shape->Shape, B);
+    BRepBndLib::Add(shape->getShape(1), B);
     B.Get(*Xmin, *Ymin, *Zmin, *Xmax, *Ymax, *Zmax);
 }
 
 EXPORT void deleteSlice(void* pt)
 {
     ShapeContainer* container = (ShapeContainer*)pt;
-    if (container->type == ShapeContainer::Entity)
-        delete container;
+    delete container;
 }
 
 Handle_TopTools_HSequenceOfShape getWires(TopoDS_Shape shape) {
@@ -363,7 +360,7 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
     ShapeContainer* shape = ShapeContainer::getContainer(pt, index);
     // 生成水平面，进行逐层切割
     gp_Pln originPlane = gp_Pln(0, 0, 1, -height);
-    TopoDS_Shape face = shape->Shape;
+    TopoDS_Shape face = shape->getShape(1);
     double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
     Bnd_Box C;
     BRepBndLib::Add(face, C);
@@ -372,7 +369,7 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
         // 水平面，不存在交点
         return NULL;
     }
-    BRepAlgo_Section section(shape->Shape, originPlane, Standard_True);
+    BRepAlgo_Section section(shape->getShape(1), originPlane, Standard_True);
     TopoDS_Shape sectionShape = section.Shape();
     if (sectionShape.IsNull())
         return NULL;
@@ -388,7 +385,7 @@ EXPORT ShapeContainer** getLocatPlane(void** pt, int index, int* count) {
     TopExp_Explorer explorer;
     double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
     int counter = 0;
-    for (explorer.Init(shape->Shape, TopAbs_FACE); explorer.More(); explorer.Next()) {
+    for (explorer.Init(shape->getShape(1), TopAbs_FACE); explorer.More(); explorer.Next()) {
         TopoDS_Shape currentFace = explorer.Current();
         Bnd_Box C;
         BRepBndLib::Add(currentFace, C);
@@ -417,23 +414,18 @@ EXPORT ShapeContainer* getShapeContainer(void** pt, int index, double* height) {
 EXPORT bool exportStep(char* fileName, ShapeContainer** slices, int length) {
     STEPControl_StepModelType aType = STEPControl_AsIs;
     STEPControl_Writer        aWriter;
-    for (int i = 0; i < length; i++){
-        if (slices[i]->type == ShapeContainer::Entity) {
-            if (aWriter.Transfer(slices[i]->Shape, aType) != IFSelect_RetDone)
-                return false;
-        } else if (slices[i]->type == ShapeContainer::Slice) {
-            int length = slices[i]->shapeSequence->Length();
-            if (length == 0)
-                continue;
-            TopoDS_Compound aCompound;
-            BRep_Builder aBuilder;
-            aBuilder.MakeCompound(aCompound);
-            for (int j = 1; j <= length; j++) {
-                aBuilder.Add(aCompound, slices[i]->shapeSequence->Value(j));
-            }
-            if (aWriter.Transfer(aCompound, aType) != IFSelect_RetDone)
-                return false;
+    for (int i = 0; i < length; i++) {
+        int length = slices[i]->shapeSequence->Length();
+        if (length == 0)
+            continue;
+        TopoDS_Compound aCompound;
+        BRep_Builder aBuilder;
+        aBuilder.MakeCompound(aCompound);
+        for (int j = 1; j <= length; j++) {
+            aBuilder.Add(aCompound, slices[i]->shapeSequence->Value(j));
         }
+        if (aWriter.Transfer(aCompound, aType) != IFSelect_RetDone)
+            return false;
     }
     return aWriter.Write(fileName) == IFSelect_RetDone;
 }

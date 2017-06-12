@@ -764,7 +764,7 @@ public:
     bool displayShape(System::IntPtr pt, int index, double transparency)
     {
         ShapeContainer* shape = ShapeContainer::getContainer((void**)pt.ToPointer(), index);
-        Handle(AIS_Shape) aisShape = new AIS_Shape(shape->Shape);
+        Handle(AIS_Shape) aisShape = new AIS_Shape(shape->getShape(1));
         if (transparency < 0 || transparency >= 1)
             aisShape->SetTransparency();
         else
@@ -778,18 +778,11 @@ public:
         if (pt == IntPtr::Zero)
             return false;
         ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
-        if (shape->type == ShapeContainer::Entity) {
-            Handle(AIS_Shape) aisShape = new AIS_Shape(shape->Shape);
+        Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = shape->shapeSequence;
+        for (int i = 1; i <= aHSequenceOfShape->Length(); i++) {
+            Handle(AIS_Shape) aisShape = new AIS_Shape(aHSequenceOfShape->Value(i));
             myAISContext()->Display(aisShape, Standard_True);
             myAISContext()->SetSelected(aisShape);
-        }
-        else if (shape->type == ShapeContainer::Slice) {
-            Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = shape->shapeSequence;
-            for (int i = 1; i <= aHSequenceOfShape->Length(); i++) {
-                Handle(AIS_Shape) aisShape = new AIS_Shape(aHSequenceOfShape->Value(i));
-                myAISContext()->Display(aisShape, Standard_True);
-                myAISContext()->SetSelected(aisShape);
-            }
         }
         return true;
     }

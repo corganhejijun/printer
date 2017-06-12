@@ -21,7 +21,7 @@ namespace Wpf3DPrint.Dialog
     {
         Viewer.Shape shape;
         double thickness;
-        public DialogSlice(Viewer.Shape shape, string thick)
+        public DialogSlice(Viewer.Shape shape, string thick, string unit)
         {
             this.shape = shape;
             InitializeComponent();
@@ -30,6 +30,7 @@ namespace Wpf3DPrint.Dialog
                 + "Y向高度:" + (shape.Ymax - shape.Ymin).ToString("0.00") + ";范围：" + shape.Ymin.ToString("F") + "~" + shape.Ymax.ToString("F");
             try
             {
+                labelCurrentUnit.Content = "当前单位：" + unit;
                 thickness = double.Parse(thick);
                 textBoxThick.Text = thick;
                 int cnt = (int)((shape.Zmax - shape.Zmin) / thickness);

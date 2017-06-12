@@ -92,7 +92,7 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, textBoxSliceThick.Text);
+            Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, textBoxSliceThick.Text, unit);
             if (dlSlice.ShowDialog() == false)
                 return;
             textBoxSliceThick.Text = fileReader.Shape.sliceThick.ToString();
