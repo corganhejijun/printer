@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Timers;
 using System.Windows.Controls;
 
 namespace Wpf3DPrint.Viewer
@@ -223,13 +224,32 @@ namespace Wpf3DPrint.Viewer
             scene.Proxy.selectSlice(((Shape.Slice)(Shape.sliceList[i])).slice);
         }
 
+        Timer rebuildTimer;
+        int rebuildIndex;
         public void rebuildSlice()
         {
+            if (rebuildTimer == null)
+                rebuildTimer = new Timer();
+            rebuildTimer.Enabled = true;
+            rebuildTimer.Interval = 100;
+            rebuildTimer.Elapsed += new ElapsedEventHandler(RebuildTimer_Elapsed);
             scene.Proxy.removeObjects();
-            foreach (Shape.Slice slice in Shape.sliceList)
+            rebuildIndex = Shape.sliceList.Count;
+            rebuildTimer.Start();
+        }
+
+        private void RebuildTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (rebuildIndex == 0)
             {
-                scene.Proxy.strechSlice(slice.slice, Shape.sliceThick);
+                rebuildTimer.Stop();
+                rebuildTimer.Close();
+                rebuildTimer = null;
+                return;
             }
+            Shape.Slice slice = (Shape.Slice)Shape.sliceList[rebuildIndex - 1];
+            scene.Proxy.strechSlice(slice.slice, Shape.sliceThick);
+            rebuildIndex--;
         }
 
         public void releaseShape()
