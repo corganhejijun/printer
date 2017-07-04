@@ -96,7 +96,7 @@ namespace Wpf3DPrint
             if (dlSlice.ShowDialog() == false)
                 return;
             textBoxSliceThick.Text = fileReader.Shape.sliceThick.ToString();
-            fileReader.sliceShape((Control)this, onAfterSlice, new SceneThread.onFunction(onSlice));
+            fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, onAfterSlice, new SceneThread.onFunction(onSlice));
         }
 
         private string saveSlice()
@@ -115,8 +115,7 @@ namespace Wpf3DPrint
         {
             ArrayList argList = (ArrayList)args;
             Shape shape = (Shape)argList[0];
-            int currentSlice = (int)argList[1];
-            labelStatus.Content = "总层数：" + ((int)((shape.Zmax - shape.Zmin) / shape.sliceThick)) + " 当前层数：" + currentSlice;
+            labelStatus.Content = "总层数：" + ((int)((shape.Zmax - shape.Zmin) / shape.sliceThick)) + " 当前层数：" + shape.sliceList.Count;
         }
 
         private void onAfterSlice(object args)

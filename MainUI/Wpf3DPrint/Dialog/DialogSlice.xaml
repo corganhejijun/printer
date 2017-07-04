@@ -12,8 +12,8 @@
         <Label x:Name="labelThickness" Content="分层厚度:" HorizontalAlignment="Left" Margin="10,205,0,0" VerticalAlignment="Top"/>
         <Label x:Name="labelCnt" Content="Label" HorizontalAlignment="Left" Margin="212,205,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="textBoxThick" HorizontalAlignment="Left" Height="23" Margin="76,207,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" LostFocus="textBoxThick_LostFocus"/>
-        <CheckBox x:Name="checkBox" Content="突变形体处理" HorizontalAlignment="Left" Margin="10,139,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <CheckBox x:Name="checkBox_Copy" Content="渐变形体处理" HorizontalAlignment="Left" Margin="107,139,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="checkBoxLocatePlane" Content="突变形体处理" HorizontalAlignment="Left" Margin="10,139,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="checkBoxGradient" Content="渐变形体处理" HorizontalAlignment="Left" Margin="107,139,0,0" VerticalAlignment="Top"/>
         <Label x:Name="labelThickness_Copy" Content="输出比例:" HorizontalAlignment="Left" Margin="10,170,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="textBoxRatio" HorizontalAlignment="Left" Height="23" Margin="76,174,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="54"/>
         <CheckBox x:Name="checkBox_Copy1" Content="模型最低点置零" HorizontalAlignment="Left" Margin="204,139,0,0" VerticalAlignment="Top" IsChecked="True"/>

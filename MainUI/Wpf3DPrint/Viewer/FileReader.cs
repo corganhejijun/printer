@@ -117,11 +117,13 @@ namespace Wpf3DPrint.Viewer
             Marshal.FreeHGlobal(fileName);
         }
 
-        public void sliceShape(Control control, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)
+        public void sliceShape(Control control, bool locatePlane, bool gradientShape, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)
         {
             ArrayList args = new ArrayList();
             args.Add(control);
             args.Add(onSlice);
+            args.Add(locatePlane);
+            args.Add(gradientShape);
             scene.D3DThread.addWork(sliceShapeWork, args, afterSlice);
         }
 
@@ -131,50 +133,60 @@ namespace Wpf3DPrint.Viewer
             ArrayList list = (ArrayList)args;
             Control control = (Control)list[0];
             SceneThread.onFunction onslice = (SceneThread.onFunction)list[1];
+            bool locatePlane = (bool)list[2];
+            bool gradientShape = (bool)list[3];
             foreach (Shape shape in shapeList)
             {
-                double height = shape.Zmin;
-                int i = 0;
-                for (i = 0; height < shape.Zmax - 0.000001; i++)
-                {
-                    height = shape.Zmin + (double)i * shape.sliceThick;
-                    IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, height);
-                    shape.sliceList.Add(new Shape.Slice(slice, height));
-                    onGetSlice(slice, shape, i, control, onslice);
-                }
-                int sliceCnt = i;
+                // 确定定位面，与定位面等高的切割线要特殊处理
                 int count = 0;
                 IntPtr containers = Cpp2Managed.getLocatPlane(shape.shape, 0, ref count);
-                for (i = 0; i < count; i++)
+                ArrayList locatePlaneList = new ArrayList();
+                for (int i = 0; i < count; i++)
                 {
-                    IntPtr slice = Cpp2Managed.getShapeContainer(containers, i, ref height);
+                    double locateHeight = 0;
+                    IntPtr slice = Cpp2Managed.getShapeContainer(containers, i, ref locateHeight);
+                    locatePlaneList.Add(new Shape.Slice(slice, locateHeight));
+                    if (locatePlane)
+                        shape.sliceList.Add(new Shape.Slice(slice, locateHeight));
+                    onGetSlice(slice, shape, control, onslice);
+                }
+
+                double height = shape.Zmin;
+                for (int i = 0; height < shape.Zmax; i++)
+                {
+                    height = shape.Zmin + (double)i * shape.sliceThick;
                     bool skip = false;
-                    foreach (Shape.Slice s in shape.sliceList)
+                    foreach (Shape.Slice s in locatePlaneList)
                     {
-                        // 高度重复的跳过
+                        // 与定位面高度重复的不能进行普通切割操作
                         if (Math.Abs(s.height - height) < 0.0001)
                         {
+                            // 如果之前未作为定位面加入slice list，则现在需要加入
+                            if (!locatePlane)
+                                shape.sliceList.Add(s);
                             skip = true;
                             break;
                         }
                     }
                     if (skip)
                         continue;
+                    IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, height);
+                    if (slice == IntPtr.Zero)
+                        continue;
                     shape.sliceList.Add(new Shape.Slice(slice, height));
-                    onGetSlice(slice, shape, sliceCnt + i, control, onslice);
+                    onGetSlice(slice, shape, control, onslice);
                 }
                 shape.sortSliceList();
             }
             return null;
         }
 
-        private void onGetSlice(IntPtr slice, Shape shape, int i, Control control, SceneThread.onFunction onSlice)
+        private void onGetSlice(IntPtr slice, Shape shape, Control control, SceneThread.onFunction onSlice)
         {
             if (slice != IntPtr.Zero)
             {
                 ArrayList onArgs = new ArrayList();
                 onArgs.Add(shape);
-                onArgs.Add(i);
                 control.Dispatcher.Invoke(new DisplayOneShape(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, onSlice, onArgs });
             }
         }

@@ -359,7 +359,6 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
 {
     ShapeContainer* shape = ShapeContainer::getContainer(pt, index);
     // 生成水平面，进行逐层切割
-    gp_Pln originPlane = gp_Pln(0, 0, 1, -height);
     TopoDS_Shape face = shape->getShape(1);
     double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
     Bnd_Box C;
@@ -369,6 +368,7 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
         // 水平面，不存在交点
         return NULL;
     }
+    gp_Pln originPlane = gp_Pln(0, 0, 1, -height);
     BRepAlgo_Section section(shape->getShape(1), originPlane, Standard_True);
     TopoDS_Shape sectionShape = section.Shape();
     if (sectionShape.IsNull())

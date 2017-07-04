@@ -10,6 +10,23 @@ namespace Wpf3DPrint.Dialog
     {
         Viewer.Shape shape;
         double thickness;
+
+        public bool locatePlane
+        {
+            get
+            {
+                return (bool)checkBoxLocatePlane.IsChecked;
+            }
+        }
+
+        public bool gradientShape
+        {
+            get
+            {
+                return (bool)checkBoxGradient.IsChecked;
+            }
+        }
+
         public DialogSlice(Viewer.Shape shape, string thick, string unit)
         {
             this.shape = shape;
