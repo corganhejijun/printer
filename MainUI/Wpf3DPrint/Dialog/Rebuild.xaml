@@ -5,23 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="3D重建" Height="300" Width="300" ResizeMode="NoResize">
+        Title="3D重建" Height="339" Width="314" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
     <Grid>
-        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="198,233,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
-        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="109,233,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
+        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="209,246,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
+        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="120,246,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
         <CheckBox x:Name="checkBox_Copy" Content="样条" HorizontalAlignment="Left" Margin="97,16,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="checkBox_Copy1" Content="椭圆" HorizontalAlignment="Left" Margin="154,16,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="checkBox_Copy2" Content="圆弧" HorizontalAlignment="Left" Margin="212,16,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label" Content="炸开曲线：" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label1" Content="生成多义线：" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label2" Content="最短直线：" HorizontalAlignment="Left" Margin="40,70,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="115,74,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Label x:Name="label2_Copy" Content="允差：" HorizontalAlignment="Left" Margin="40,98,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox_Copy" HorizontalAlignment="Left" Height="23" Margin="115,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Label x:Name="label1_Copy" Content="线段检查：" HorizontalAlignment="Left" Margin="10,128,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="checkBox_Copy3" Content="多于两点共有端点" HorizontalAlignment="Left" Margin="48,158,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="checkBox_Copy4" Content="原始封闭曲线自相交" HorizontalAlignment="Left" Margin="48,178,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.374,1.994"/>
-        <CheckBox x:Name="checkBox_Copy5" Content="生成区域(整体)" HorizontalAlignment="Left" Margin="13,198,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.374,1.994"/>
+        <GroupBox Header="生成多义线" Margin="0,40,0,172">
+            <Grid>
+                <Label x:Name="label2" Content="最短直线" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="85,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                <Label x:Name="label2_Copy" Content="允差" HorizontalAlignment="Left" Margin="34,40,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBox_Copy" HorizontalAlignment="Left" Height="23" Margin="85,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="线段检查" Margin="0,143,0,106">
+            <Grid>
+                <CheckBox x:Name="checkBox_Copy3" Content="多于两点共有端点" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <CheckBox x:Name="checkBox_Copy4" Content="原始封闭曲线自相交" HorizontalAlignment="Left" Margin="144,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.374,1.994"/>
+            </Grid>
+        </GroupBox>
+        <CheckBox x:Name="checkBox_Copy5" Content="生成区域(整体)" HorizontalAlignment="Left" Margin="10,221,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.374,1.994"/>
 
     </Grid>
 </Window>

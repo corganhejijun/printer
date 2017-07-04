@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="2D参数设置" Height="349.837" Width="439.739" ResizeMode="NoResize">
+        Title="2D参数设置" Height="349.837" Width="439.739" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
     <Grid>
         <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="326,282,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
         <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="224,282,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>

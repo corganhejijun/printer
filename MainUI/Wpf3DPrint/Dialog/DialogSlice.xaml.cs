@@ -1,16 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Wpf3DPrint.Dialog
 {
@@ -25,12 +14,14 @@ namespace Wpf3DPrint.Dialog
         {
             this.shape = shape;
             InitializeComponent();
-            labelMaxMinInfo.Content = "Z向高度: " + (shape.Zmax - shape.Zmin).ToString("0.00") + ";范围：" + shape.Zmin.ToString("F") + "~" + shape.Zmax.ToString("F") + '\n'
-                + "X向高度:" + (shape.Xmax - shape.Xmin).ToString("0.00") + ";范围：" + shape.Xmin.ToString("F") + "~" + shape.Xmax.ToString("F") + '\n'
-                + "Y向高度:" + (shape.Ymax - shape.Ymin).ToString("0.00") + ";范围：" + shape.Ymin.ToString("F") + "~" + shape.Ymax.ToString("F");
+            textBoxX.Text = (shape.Xmax - shape.Xmin).ToString("0.00") + " " + unit;
+            textBoxX2.Text = shape.Xmin.ToString("0.00") + "~" + shape.Xmax.ToString("0.00") + " " + unit;
+            textBoxY.Text = (shape.Ymax - shape.Ymin).ToString("0.00") + " " + unit;
+            textBoxY2.Text = shape.Ymin.ToString("0.00") + "~" + shape.Ymax.ToString("0.00") + " " + unit;
+            textBoxZ.Text = (shape.Zmax - shape.Zmin).ToString("0.00") + " " + unit;
+            textBoxZ2.Text = shape.Zmin.ToString("0.00") + "~" + shape.Zmax.ToString("0.00") + " " + unit;
             try
             {
-                labelCurrentUnit.Content = "当前单位：" + unit;
                 thickness = double.Parse(thick);
                 textBoxThick.Text = thick;
                 int cnt = (int)((shape.Zmax - shape.Zmin) / thickness);

@@ -5,13 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="实体属性" Height="375" Width="562" ResizeMode="NoResize">
+        Title="实体属性" Height="409.7" Width="431" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
     <Grid>
-        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="437,305,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
-        <Label x:Name="label" Content="实体范围" HorizontalAlignment="Left" Margin="21,19,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="labelX" Content="Label" HorizontalAlignment="Left" Margin="50,49,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="labelY" Content="Label" HorizontalAlignment="Left" Margin="50,79,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="labelZ" Content="Label" HorizontalAlignment="Left" Margin="50,109,0,0" VerticalAlignment="Top"/>
-
+        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="312,338,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
+        <GroupBox x:Name="groupBox" Header="X轴" Margin="10,15,10,0" VerticalAlignment="Top" Height="95">
+            <Grid>
+                <Label x:Name="labelX" Content="长度" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxX" HorizontalAlignment="Left" Height="23" Margin="61,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="labelX_Copy" Content="最大值" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxXMax" HorizontalAlignment="Left" Height="23" Margin="61,40,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="labelX_Copy1" Content="最小值" HorizontalAlignment="Left" Margin="196,40,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxXMin" HorizontalAlignment="Left" Height="23" Margin="247,42,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="groupBoxY" Header="Y轴" Margin="10,115,10,0" VerticalAlignment="Top" Height="86">
+            <Grid>
+                <Label x:Name="labelY" Content="宽度" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxY" HorizontalAlignment="Left" Height="23" Margin="62,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="labelY2" Content="最大值" HorizontalAlignment="Left" Margin="11,34,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxYMax" HorizontalAlignment="Left" Height="23" Margin="62,38,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="labelY2_Copy" Content="最小值" HorizontalAlignment="Left" Margin="195,34,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxYMin" HorizontalAlignment="Left" Height="23" Margin="246,38,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="groupBoxZ" Header="Z轴" Margin="10,206,10,0" VerticalAlignment="Top" Height="107">
+            <Grid>
+                <Label x:Name="labelZ" Content="高度" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxZ" HorizontalAlignment="Left" Height="23" Margin="63,12,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="labelZ2" Content="最大值" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxZMax" HorizontalAlignment="Left" Height="23" Margin="63,40,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="labelZZMin" Content="最小值" HorizontalAlignment="Left" Margin="197,36,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxZMin" HorizontalAlignment="Left" Height="23" Margin="250,40,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>

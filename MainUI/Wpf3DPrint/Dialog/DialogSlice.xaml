@@ -5,20 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="3D分层" Height="360.383" Width="359.826" ResizeMode="NoResize">
+        Title="3D分层" Height="357.383" Width="354.826" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
     <Grid>
         <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="156,283,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
         <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="251,283,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
-        <Label x:Name="labelMaxMinInfo" Content="Label" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="labelThickness" Content="分层厚度:" HorizontalAlignment="Left" Margin="17,180,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="labelCnt" Content="Label" HorizontalAlignment="Left" Margin="219,180,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBoxThick" HorizontalAlignment="Left" Height="23" Margin="83,182,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" LostFocus="textBoxThick_LostFocus"/>
-        <CheckBox x:Name="checkBox" Content="突变形体处理" HorizontalAlignment="Left" Margin="17,130,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <CheckBox x:Name="checkBox_Copy" Content="渐变形体处理" HorizontalAlignment="Left" Margin="154,130,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="labelThickness_Copy" Content="输出比例:" HorizontalAlignment="Left" Margin="153,97,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBoxRatio" HorizontalAlignment="Left" Height="23" Margin="219,101,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="54"/>
-        <CheckBox x:Name="checkBox_Copy1" Content="模型最低点置零" HorizontalAlignment="Left" Margin="17,150,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <Label x:Name="labelCurrentUnit" Content="Label" HorizontalAlignment="Left" Margin="17,89,0,0" VerticalAlignment="Top"/>
-
+        <Label x:Name="labelThickness" Content="分层厚度:" HorizontalAlignment="Left" Margin="10,205,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="labelCnt" Content="Label" HorizontalAlignment="Left" Margin="212,205,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="textBoxThick" HorizontalAlignment="Left" Height="23" Margin="76,207,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" LostFocus="textBoxThick_LostFocus"/>
+        <CheckBox x:Name="checkBox" Content="突变形体处理" HorizontalAlignment="Left" Margin="10,139,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="checkBox_Copy" Content="渐变形体处理" HorizontalAlignment="Left" Margin="107,139,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="labelThickness_Copy" Content="输出比例:" HorizontalAlignment="Left" Margin="10,170,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="textBoxRatio" HorizontalAlignment="Left" Height="23" Margin="76,174,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="54"/>
+        <CheckBox x:Name="checkBox_Copy1" Content="模型最低点置零" HorizontalAlignment="Left" Margin="204,139,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <GroupBox Header="实体属性" Height="121" VerticalAlignment="Top">
+            <Grid>
+                <Label x:Name="labelMaxMinInfo" Content="X轴长度" HorizontalAlignment="Left" Margin="10,6,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxX" HorizontalAlignment="Left" Height="23" Margin="69,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="70" IsEnabled="False"/>
+                <Label x:Name="labelMaxMinInfo_Copy" Content="X轴范围" HorizontalAlignment="Left" Margin="144,6,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxX2" HorizontalAlignment="Left" Height="23" Margin="203,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="labelMaxMinInfo_Copy1" Content="Y轴宽度" HorizontalAlignment="Left" Margin="10,34,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxY" HorizontalAlignment="Left" Height="23" Margin="69,38,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="70" IsEnabled="False"/>
+                <Label x:Name="labelMaxMinInfo_Copy2" Content="Y轴范围" HorizontalAlignment="Left" Margin="144,34,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxY2" HorizontalAlignment="Left" Height="23" Margin="203,38,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="labelMaxMinInfo_Copy3" Content="Z轴高度" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxZ" HorizontalAlignment="Left" Height="23" Margin="69,66,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="70" IsEnabled="False"/>
+                <Label x:Name="labelMaxMinInfo_Copy4" Content="Z轴范围" HorizontalAlignment="Left" Margin="144,62,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxZ2" HorizontalAlignment="Left" Height="23" Margin="203,66,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>

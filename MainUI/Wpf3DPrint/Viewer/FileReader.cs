@@ -256,11 +256,15 @@ namespace Wpf3DPrint.Viewer
         {
             foreach (Shape shape in shapeList)
             {
-                foreach (Shape.Slice slice in shape.sliceList)
+                if (shape.sliceList.Count > 0)
                 {
-                    Cpp2Managed.deleteSlice(slice.slice);
+                    foreach (Shape.Slice slice in shape.sliceList)
+                    {
+                        Cpp2Managed.deleteSlice(slice.slice);
+                    }
                 }
-                Cpp2Managed.deleteShape(shape.shape, shape.count);
+                else
+                    Cpp2Managed.deleteShape(shape.shape, shape.count);
                 Marshal.FreeHGlobal(shape.shape);
             }
             shapeList.Clear();

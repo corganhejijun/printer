@@ -315,6 +315,11 @@ namespace Wpf3DPrint
 
         private void buttonRebuild_Click(object sender, RoutedEventArgs e)
         {
+            if (!fileReader.HasFile)
+            {
+                MessageBox.Show("未打开3D文件");
+                return;
+            }
             Dialog.Rebuild rebuild = new Dialog.Rebuild();
             if (rebuild.ShowDialog() == false)
                 return;
@@ -353,6 +358,11 @@ namespace Wpf3DPrint
 
         private void menuEntityProp_Click(object sender, RoutedEventArgs e)
         {
+            if (!fileReader.HasFile)
+            {
+                MessageBox.Show("未打开3D文件");
+                return;
+            }
             Dialog.EntityProp entity = new Dialog.EntityProp(fileReader.Shape, unit);
             if (entity.ShowDialog() == false)
                 return;

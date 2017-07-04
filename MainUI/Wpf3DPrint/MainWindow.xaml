@@ -46,7 +46,6 @@
             <MenuItem Header="分层" Width="48">
                 <MenuItem x:Name="menuSlice" Header="3D分层..." Click="buttonSlice_Click"></MenuItem>
                 <MenuItem x:Name="menuRebuild" Header="3D重建..." Click="buttonRebuild_Click"></MenuItem>
-                <MenuItem x:Name="menu2DProc" Header="2D处理..." Click="menu2DProc_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="视图" Width="48">
                 <MenuItem Header="显示设置"></MenuItem>
