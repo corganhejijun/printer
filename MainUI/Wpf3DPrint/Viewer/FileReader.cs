@@ -99,7 +99,7 @@ namespace Wpf3DPrint.Viewer
         private bool displayShape(Shape shape)
         {
             scene.Proxy.SetDisplayMode(1);
-            scene.Proxy.displayShape(shape.shape, 0, 0.7);
+            scene.Proxy.displayShape(shape.shape, 0, 0);
             return true;
         }
 

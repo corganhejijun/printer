@@ -95,6 +95,7 @@ namespace Wpf3DPrint
             Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, textBoxSliceThick.Text, unit);
             if (dlSlice.ShowDialog() == false)
                 return;
+            setSlicingView();
             textBoxSliceThick.Text = fileReader.Shape.sliceThick.ToString();
             fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, onAfterSlice, new SceneThread.onFunction(onSlice));
         }
@@ -258,6 +259,13 @@ namespace Wpf3DPrint
         {
             column3D.Width = new GridLength(100, GridUnitType.Star);
             column2D.Width = new GridLength(0, GridUnitType.Star);
+            columnTree.Width = new GridLength(0, GridUnitType.Star);
+        }
+
+        private void setSlicingView()
+        {
+            column3D.Width = new GridLength(50, GridUnitType.Star);
+            column2D.Width = new GridLength(50, GridUnitType.Star);
             columnTree.Width = new GridLength(0, GridUnitType.Star);
         }
 

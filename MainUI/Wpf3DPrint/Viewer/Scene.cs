@@ -94,6 +94,7 @@ namespace Wpf3DPrint.Viewer
         {
             if (deviceInitFail || !d3DImage.IsFrontBufferAvailable || d3DColorSurface == IntPtr.Zero)
                 return;
+            occtProxy.SetBackgroundColor(255, 255, 255);
             d3DImage.Lock();
             {
                 occtProxy.RedrawView();
