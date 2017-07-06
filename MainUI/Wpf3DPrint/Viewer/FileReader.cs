@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Timers;
 using System.Windows.Controls;
 
@@ -10,11 +11,13 @@ namespace Wpf3DPrint.Viewer
     class FileReader
     {
         Scene scene;
+        Scene sliceScene;
         ArrayList shapeList;
         string fileName;
-        public FileReader(Scene scene)
+        public FileReader(Scene scene, Scene sliceScene)
         {
             this.scene = scene;
+            this.sliceScene = sliceScene;
             shapeList = new ArrayList();
         }
 
@@ -175,6 +178,7 @@ namespace Wpf3DPrint.Viewer
                         continue;
                     shape.sliceList.Add(new Shape.Slice(slice, height));
                     onGetSlice(slice, shape, control, onslice);
+                    Thread.Sleep(1000);
                 }
                 shape.sortSliceList();
             }
@@ -193,7 +197,7 @@ namespace Wpf3DPrint.Viewer
 
         private bool displaySlice(IntPtr slice, SceneThread.onFunction onSlice, ArrayList onArgs)
         {
-            scene.Proxy.displaySlice(slice);
+            sliceScene.Proxy.displaySlice(slice);
             onSlice(onArgs);
             return true;
         }
@@ -201,6 +205,7 @@ namespace Wpf3DPrint.Viewer
         public void sceneZoom(int delta)
         {
             scene.Proxy.Zoom(0, 0, delta / 8, 0);
+            sliceScene.Proxy.Zoom(0, 0, delta / 8, 0);
         }
 
         public int afterOpenSlice(object workResult)
@@ -226,26 +231,27 @@ namespace Wpf3DPrint.Viewer
         {
             foreach(Shape.Slice slice in Shape.sliceList)
             {
-                scene.Proxy.displaySlice(slice.slice);
+                sliceScene.Proxy.displaySlice(slice.slice);
             }
             scene.Proxy.ZoomAllView();
+            sliceScene.Proxy.ZoomAllView();
         }
 
         public void selectSlice(int i)
         {
-            scene.Proxy.selectSlice(((Shape.Slice)(Shape.sliceList[i])).slice);
+            sliceScene.Proxy.selectSlice(((Shape.Slice)(Shape.sliceList[i])).slice);
         }
 
-        Timer rebuildTimer;
+        System.Timers.Timer rebuildTimer;
         int rebuildIndex;
         public void rebuildSlice()
         {
             if (rebuildTimer == null)
-                rebuildTimer = new Timer();
+                rebuildTimer = new System.Timers.Timer();
             rebuildTimer.Enabled = true;
             rebuildTimer.Interval = 100;
             rebuildTimer.Elapsed += new ElapsedEventHandler(RebuildTimer_Elapsed);
-            scene.Proxy.removeObjects();
+            sliceScene.Proxy.removeObjects();
             rebuildIndex = Shape.sliceList.Count;
             rebuildTimer.Start();
         }
@@ -260,7 +266,7 @@ namespace Wpf3DPrint.Viewer
                 return;
             }
             Shape.Slice slice = (Shape.Slice)Shape.sliceList[rebuildIndex - 1];
-            scene.Proxy.strechSlice(slice.slice, Shape.sliceThick);
+            sliceScene.Proxy.strechSlice(slice.slice, Shape.sliceThick);
             rebuildIndex--;
         }
 
@@ -281,11 +287,13 @@ namespace Wpf3DPrint.Viewer
             }
             shapeList.Clear();
             scene.Proxy.removeObjects();
+            sliceScene.Proxy.removeObjects();
         }
 
         public void afterOpenFile()
         {
             scene.Proxy.ZoomAllView();
+            sliceScene.Proxy.ZoomAllView();
         }
     }
 }

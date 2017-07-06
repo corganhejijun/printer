@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -14,6 +15,7 @@ namespace Wpf3DPrint
     public partial class MainWindow : Window
     {
         private Scene scene;
+        private Scene slicingScene;
         private Scene2D sliceScene;
         private FileReader fileReader;
 
@@ -21,11 +23,15 @@ namespace Wpf3DPrint
         {
             InitializeComponent();
             scene = new Scene();
+            slicingScene = new Scene();
             sliceScene = new Scene2D(PanelSlice);
-            fileReader = new FileReader(scene);
+            fileReader = new FileReader(scene, slicingScene);
             ImageBrush brush = new ImageBrush(scene.Image);
+            ImageBrush slicingBrush = new ImageBrush(slicingScene.Image);
             brush.RelativeTransform = new ScaleTransform(1.0, -1.0, 0.5, 0.5);
+            slicingBrush.RelativeTransform = new ScaleTransform(1.0, -1.0, 0.5, 0.5);
             GridScene.Background = brush;
+            GridSlice3D.Background = slicingBrush;
         }
 
         private void onOpeningFile(string fileName)
@@ -117,6 +123,7 @@ namespace Wpf3DPrint
             ArrayList argList = (ArrayList)args;
             Shape shape = (Shape)argList[0];
             labelStatus.Content = "总层数：" + ((int)((shape.Zmax - shape.Zmin) / shape.sliceThick)) + " 当前层数：" + shape.sliceList.Count;
+            fileReader.afterOpenFile();
         }
 
         private void onAfterSlice(object args)
@@ -136,12 +143,14 @@ namespace Wpf3DPrint
         private void GridScene_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             scene.Resize(Convert.ToInt32(e.NewSize.Width), Convert.ToInt32(e.NewSize.Height));
+            slicingScene.Resize(Convert.ToInt32(e.NewSize.Width), Convert.ToInt32(e.NewSize.Height));
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
             fileReader.releaseShape();
             scene.Dispose();
+            slicingScene.Dispose();
             sliceScene.Dispose();
         }
 
@@ -155,6 +164,7 @@ namespace Wpf3DPrint
             beginRotate = true;
             Point p = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
             scene.Proxy.StartRotation((int)p.X, (int)p.Y);
+            slicingScene.Proxy.StartRotation((int)p.X, (int)p.Y);
         }
 
         private void GridScene_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -169,6 +179,8 @@ namespace Wpf3DPrint
                 Point p = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
                 scene.Proxy.Rotation((int)p.X, (int)p.Y);
                 scene.Proxy.RedrawView();
+                slicingScene.Proxy.Rotation((int)p.X, (int)p.Y);
+                slicingScene.Proxy.RedrawView();
             }
         }
 
@@ -267,6 +279,8 @@ namespace Wpf3DPrint
             column3D.Width = new GridLength(50, GridUnitType.Star);
             column2D.Width = new GridLength(50, GridUnitType.Star);
             columnTree.Width = new GridLength(0, GridUnitType.Star);
+            columnSlice2D.Width = new GridLength(0, GridUnitType.Star);
+            columnSlice3D.Width = new GridLength(100, GridUnitType.Star);
         }
 
         private void setSliceView()
@@ -274,6 +288,8 @@ namespace Wpf3DPrint
             column3D.Width = new GridLength(40, GridUnitType.Star);
             column2D.Width = new GridLength(50, GridUnitType.Star);
             columnTree.Width = new GridLength(10, GridUnitType.Star);
+            columnSlice2D.Width = new GridLength(100, GridUnitType.Star);
+            columnSlice3D.Width = new GridLength(0, GridUnitType.Star);
         }
 
         private void buttonQuit_Click(object sender, RoutedEventArgs e)
