@@ -79,7 +79,7 @@ namespace Wpf3DPrint
         private void displayStep(object workResult)
         {
             fileReader.displayStep(workResult);
-            fileReader.afterOpenFile();
+            fileReader.resetView();
             Dialog.DialogUnit unit = new Dialog.DialogUnit(fileReader.Shape);
             unit.ShowDialog();
             this.unit = unit.Unit;
@@ -122,8 +122,12 @@ namespace Wpf3DPrint
         {
             ArrayList argList = (ArrayList)args;
             Shape shape = (Shape)argList[0];
-            labelStatus.Content = "总层数：" + ((int)((shape.Zmax - shape.Zmin) / shape.sliceThick)) + " 当前层数：" + shape.sliceList.Count;
-            fileReader.afterOpenFile();
+            int total = (int)((shape.Zmax - shape.Zmin) / shape.sliceThick);
+            if (shape.countLocate)
+                total += shape.locateCount;
+            labelStatus.Content = "总层数：" + total + " 当前层数：" + shape.sliceList.Count;
+            if (shape.sliceList.Count == 1)
+                fileReader.resetView();
         }
 
         private void onAfterSlice(object args)
@@ -133,6 +137,7 @@ namespace Wpf3DPrint
 
         private void afterSlice(object args)
         {
+            fileReader.resetView();
             string fileName = saveSlice();
             if (fileName.Length == 0)
                 return;
@@ -401,6 +406,10 @@ namespace Wpf3DPrint
             Dialog.Param2D d2 = new Dialog.Param2D();
             if (d2.ShowDialog() == false)
                 return;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
         }
     }
 }

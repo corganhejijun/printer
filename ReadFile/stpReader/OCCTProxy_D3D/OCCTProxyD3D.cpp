@@ -246,6 +246,31 @@ public:
         }
     }
 
+    double getZoomScale()
+    {
+        if (!myView().IsNull())
+            return myView()->Scale();
+        return 1;
+    }
+
+    void setZoomScale(double scale)
+    {
+        if (!myView().IsNull())
+            myView()->SetScale(scale);
+    }
+
+    void getViewPoint(double& x, double& y, double& z) {
+        if (myView().IsNull())
+            return;
+        myView()->At(x, y, z);
+    }
+
+    void setViewPoint(double x, double y, double z) {
+        if (myView().IsNull())
+            return;
+        myView()->SetAt(x, y, z);
+    }
+
     /// <summary>
     ///Set Pan
     /// </summary>

@@ -43,6 +43,14 @@ namespace Wpf3DPrint.Viewer
             threadMutex.ReleaseMutex();
         }
 
+        static afterFunction afterRelease;
+
+        public void Dispose(afterFunction release)
+        {
+            stopThread = true;
+            afterRelease = release;
+        }
+
         public void addWork(function func, ArrayList args = null, afterFunction afterFunc = null)
         {
             ThreadFunction threadFunc = new ThreadFunction();
@@ -91,6 +99,8 @@ namespace Wpf3DPrint.Viewer
                 if (stopThread)
                 {
                     threadMutex.ReleaseMutex();
+                    if (afterRelease != null)
+                        afterRelease(null);
                     break;
                 }
                 busy = false;

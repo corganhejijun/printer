@@ -10,6 +10,8 @@ namespace Wpf3DPrint.Viewer
         public int count;   // shape 指向的 shape container 内包含的 shape 数
         public double Xmin, Xmax, Ymin, Ymax, Zmin, Zmax;
         public double sliceThick;
+        public int locateCount;
+        public bool countLocate;
         public ArrayList sliceList;
 
         public class SliceCompare : IComparer {
@@ -37,6 +39,7 @@ namespace Wpf3DPrint.Viewer
             Xmin = Xmax = Ymin = Ymax = Zmin = Zmax = 0;
             sliceThick = 1;
             sliceList = new ArrayList();
+            countLocate = true;
         }
         public void sortSliceList()
         {

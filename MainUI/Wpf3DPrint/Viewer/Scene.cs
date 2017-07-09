@@ -42,7 +42,7 @@ namespace Wpf3DPrint.Viewer
 
         public void Dispose()
         {
-            sceneThread.stop();
+            sceneThread.Dispose(null);
         }
 
         private void onFrontBufferChange(object sender, DependencyPropertyChangedEventArgs e)

@@ -143,6 +143,8 @@ namespace Wpf3DPrint.Viewer
                 // 确定定位面，与定位面等高的切割线要特殊处理
                 int count = 0;
                 IntPtr containers = Cpp2Managed.getLocatPlane(shape.shape, 0, ref count);
+                shape.locateCount = count;
+                shape.countLocate = locatePlane;
                 ArrayList locatePlaneList = new ArrayList();
                 for (int i = 0; i < count; i++)
                 {
@@ -178,7 +180,7 @@ namespace Wpf3DPrint.Viewer
                         continue;
                     shape.sliceList.Add(new Shape.Slice(slice, height));
                     onGetSlice(slice, shape, control, onslice);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
                 }
                 shape.sortSliceList();
             }
@@ -233,8 +235,6 @@ namespace Wpf3DPrint.Viewer
             {
                 sliceScene.Proxy.displaySlice(slice.slice);
             }
-            scene.Proxy.ZoomAllView();
-            sliceScene.Proxy.ZoomAllView();
         }
 
         public void selectSlice(int i)
@@ -272,6 +272,11 @@ namespace Wpf3DPrint.Viewer
 
         public void releaseShape()
         {
+            scene.D3DThread.Dispose(afterStop);
+        }
+
+        void afterStop(object obj)
+        {
             foreach (Shape shape in shapeList)
             {
                 if (shape.sliceList.Count > 0)
@@ -290,10 +295,17 @@ namespace Wpf3DPrint.Viewer
             sliceScene.Proxy.removeObjects();
         }
 
-        public void afterOpenFile()
+        public void resetView()
         {
             scene.Proxy.ZoomAllView();
-            sliceScene.Proxy.ZoomAllView();
+            double scale = scene.Proxy.getZoomScale();
+            sliceScene.Proxy.setZoomScale(scale);
+            double x = 0, y = 0, z = 0;
+            unsafe
+            {
+                scene.Proxy.getViewPoint(&x, &y, &z);
+            }
+            sliceScene.Proxy.setViewPoint(x, y, z);
         }
     }
 }
