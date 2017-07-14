@@ -130,7 +130,7 @@ namespace Wpf3DPrint.Viewer
             scene.D3DThread.addWork(sliceShapeWork, args, afterSlice);
         }
 
-        delegate bool DisplayOneShape(IntPtr shape, SceneThread.onFunction onSlice, ArrayList args);
+        delegate bool DisplayOneShape(IntPtr shape, double height, SceneThread.onFunction onSlice, ArrayList args);
         private object sliceShapeWork(object args)
         {
             ArrayList list = (ArrayList)args;
@@ -153,7 +153,7 @@ namespace Wpf3DPrint.Viewer
                     locatePlaneList.Add(new Shape.Slice(slice, locateHeight));
                     if (locatePlane)
                         shape.sliceList.Add(new Shape.Slice(slice, locateHeight));
-                    onGetSlice(slice, shape, control, onslice);
+                    onGetSlice(slice, locateHeight, shape, control, onslice);
                 }
 
                 double height = shape.Zmin;
@@ -179,7 +179,7 @@ namespace Wpf3DPrint.Viewer
                     if (slice == IntPtr.Zero)
                         continue;
                     shape.sliceList.Add(new Shape.Slice(slice, height));
-                    onGetSlice(slice, shape, control, onslice);
+                    onGetSlice(slice, height, shape, control, onslice);
                     Thread.Sleep(100);
                 }
                 shape.sortSliceList();
@@ -187,19 +187,21 @@ namespace Wpf3DPrint.Viewer
             return null;
         }
 
-        private void onGetSlice(IntPtr slice, Shape shape, Control control, SceneThread.onFunction onSlice)
+        private void onGetSlice(IntPtr slice, double height, Shape shape, Control control, SceneThread.onFunction onSlice)
         {
             if (slice != IntPtr.Zero)
             {
                 ArrayList onArgs = new ArrayList();
                 onArgs.Add(shape);
-                control.Dispatcher.Invoke(new DisplayOneShape(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, onSlice, onArgs });
+                control.Dispatcher.Invoke(new DisplayOneShape(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, height, onSlice, onArgs });
             }
         }
 
-        private bool displaySlice(IntPtr slice, SceneThread.onFunction onSlice, ArrayList onArgs)
+        private bool displaySlice(IntPtr slice, double height, SceneThread.onFunction onSlice, ArrayList onArgs)
         {
             sliceScene.Proxy.displaySlice(slice);
+            Shape shape = (Shape)onArgs[0];
+            scene.Proxy.displaySliceCut(shape.shape, height, 0);
             onSlice(onArgs);
             return true;
         }

@@ -60,6 +60,8 @@
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <ShapeAnalysis_FreeBounds.hxx>
 #include <BRepTools_WireExplorer.hxx>
+#include <BRepPrimAPI_MakeBox.hxx>
+#include <BRepAlgoAPI_Cut.hxx>
 
 /// <summary>
 /// Proxy class encapsulating calls to OCCT C++ classes within
@@ -813,6 +815,25 @@ public:
             myAISContext()->Display(aisShape, Standard_True);
             myAISContext()->SetSelected(aisShape);
         }
+        return true;
+    }
+
+    bool displaySliceCut(System::IntPtr pt, double height, int index) {
+        if (pt == IntPtr::Zero)
+            return false;
+        myAISContext()->RemoveAll();
+        ShapeContainer* container = ShapeContainer::getContainer((void**)pt.ToPointer(), index);
+        TopoDS_Shape shape = container->getShape(1);
+        double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
+        Bnd_Box C;
+        BRepBndLib::Add(shape, C);
+        C.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
+        gp_Pnt pt1 = gp_Pnt(Xmin, Ymin, Zmin);
+        gp_Pnt pt2 = gp_Pnt(Xmax, Ymax, height);
+        TopoDS_Shape box = BRepPrimAPI_MakeBox(pt1, pt2).Shape();
+        TopoDS_Shape cutResult = BRepAlgoAPI_Cut(shape, box);
+        Handle(AIS_Shape) aisShape = new AIS_Shape(cutResult);
+        myAISContext()->Display(aisShape);
         return true;
     }
 
