@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using System.Timers;
 using System.Windows.Controls;
 
 namespace Wpf3DPrint.Viewer
@@ -180,7 +178,7 @@ namespace Wpf3DPrint.Viewer
                         continue;
                     shape.sliceList.Add(new Shape.Slice(slice, height));
                     onGetSlice(slice, height, shape, control, onslice);
-                    Thread.Sleep(100);
+                    System.Threading.Thread.Sleep(100);
                 }
                 shape.sortSliceList();
             }
@@ -235,8 +233,9 @@ namespace Wpf3DPrint.Viewer
         {
             foreach(Shape.Slice slice in Shape.sliceList)
             {
-                sliceScene.Proxy.displaySlice(slice.slice);
+                scene.Proxy.displaySlice(slice.slice);
             }
+            resetView();
         }
 
         public void selectSlice(int i)
@@ -244,26 +243,25 @@ namespace Wpf3DPrint.Viewer
             sliceScene.Proxy.selectSlice(((Shape.Slice)(Shape.sliceList[i])).slice);
         }
 
-        System.Timers.Timer rebuildTimer;
+        System.Windows.Forms.Timer rebuildTimer;
         int rebuildIndex;
         public void rebuildSlice()
         {
             if (rebuildTimer == null)
-                rebuildTimer = new System.Timers.Timer();
-            rebuildTimer.Enabled = true;
+                rebuildTimer = new System.Windows.Forms.Timer();
+            rebuildTimer.Tick += RebuildTimer_Elapsed;
             rebuildTimer.Interval = 100;
-            rebuildTimer.Elapsed += new ElapsedEventHandler(RebuildTimer_Elapsed);
             sliceScene.Proxy.removeObjects();
             rebuildIndex = Shape.sliceList.Count;
             rebuildTimer.Start();
         }
 
-        private void RebuildTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void RebuildTimer_Elapsed(object sender, EventArgs e)
         {
             if (rebuildIndex == 0)
             {
                 rebuildTimer.Stop();
-                rebuildTimer.Close();
+                rebuildTimer.Dispose();
                 rebuildTimer = null;
                 return;
             }
@@ -274,10 +272,10 @@ namespace Wpf3DPrint.Viewer
 
         public void releaseShape()
         {
-            scene.D3DThread.Dispose(afterStop);
+            afterStop();
         }
 
-        void afterStop(object obj)
+        void afterStop()
         {
             foreach (Shape shape in shapeList)
             {

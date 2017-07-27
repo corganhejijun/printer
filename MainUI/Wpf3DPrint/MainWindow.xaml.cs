@@ -1,7 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -81,6 +80,7 @@ namespace Wpf3DPrint
             fileReader.displayStep(workResult);
             fileReader.resetView();
             Dialog.DialogUnit unit = new Dialog.DialogUnit(fileReader.Shape);
+            unit.Owner = this;
             unit.ShowDialog();
             this.unit = unit.Unit;
             afterOpenFile();
@@ -99,6 +99,7 @@ namespace Wpf3DPrint
                 return;
             }
             Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, textBoxSliceThick.Text, unit);
+            dlSlice.Owner = this;
             if (dlSlice.ShowDialog() == false)
                 return;
             setSlicingView();
@@ -349,8 +350,10 @@ namespace Wpf3DPrint
                 return;
             }
             Dialog.Rebuild rebuild = new Dialog.Rebuild();
+            rebuild.Owner = this;
             if (rebuild.ShowDialog() == false)
                 return;
+            setSlicingView();
             fileReader.rebuildSlice();
         }
 
@@ -365,6 +368,7 @@ namespace Wpf3DPrint
         private void menuRotate_Click(object sender, RoutedEventArgs e)
         {
             Dialog.Rotate rotate = new Dialog.Rotate();
+            rotate.Owner = this;
             if (rotate.ShowDialog() == false)
             {
                 return;
@@ -374,6 +378,7 @@ namespace Wpf3DPrint
         private void menuMove_Click(object sender, RoutedEventArgs e)
         {
             Dialog.Move move = new Dialog.Move();
+            move.Owner = this;
             if (move.ShowDialog() == false)
                 return;
         }
@@ -381,6 +386,7 @@ namespace Wpf3DPrint
         private void menuAbout_Click(object sender, RoutedEventArgs e)
         {
             Dialog.About about = new Dialog.About();
+            about.Owner = this;
             about.ShowDialog();
         }
 
@@ -392,6 +398,7 @@ namespace Wpf3DPrint
                 return;
             }
             Dialog.EntityProp entity = new Dialog.EntityProp(fileReader.Shape, unit);
+            entity.Owner = this;
             if (entity.ShowDialog() == false)
                 return;
         }
@@ -404,6 +411,7 @@ namespace Wpf3DPrint
         private void menu2DProc_Click(object sender, RoutedEventArgs e)
         {
             Dialog.Param2D d2 = new Dialog.Param2D();
+            d2.Owner = this;
             if (d2.ShowDialog() == false)
                 return;
         }

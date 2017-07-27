@@ -91,7 +91,7 @@ public:
 
         TCollection_ExtendedString a3DName("Visu3D");
         myViewer() = new V3d_Viewer(myGraphicDriver(), a3DName.ToExtString(), "", 1000.0,
-            V3d_XposYnegZneg, Quantity_NOC_GRAY30,
+            V3d_XposYnegZpos, Quantity_NOC_GRAY30,
             V3d_ZBUFFER, V3d_GOURAUD, V3d_WAIT,
             Standard_True, Standard_False);
 
