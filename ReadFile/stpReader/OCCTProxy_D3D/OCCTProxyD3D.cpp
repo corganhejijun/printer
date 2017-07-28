@@ -109,6 +109,14 @@ public:
         myView()->MustBeResized();
         myView()->ZBufferTriedronSetup(Quantity_NOC_RED, Quantity_NOC_GREEN, Quantity_NOC_BLUE1, 0.8, 0.05, 12);
         myView()->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_BLACK, 0.05, V3d_ZBUFFER);
+
+        gp_Pnt axPt(0, 0, 0);
+        gp_Dir axDir(0, 0, 1);
+        gp_Ax3 ax3(axPt, axDir);
+        myViewer()->SetPrivilegedPlane(ax3);
+        myViewer()->SetRectangularGridValues(0, 0, 3, 3, 0);
+        myViewer()->SetRectangularGridGraphicValues(50, 50, 0);
+        myViewer()->ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines);
         return true;
     }
 
