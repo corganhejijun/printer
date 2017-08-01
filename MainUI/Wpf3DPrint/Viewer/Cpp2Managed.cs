@@ -36,6 +36,9 @@ namespace Wpf3DPrint.Viewer
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool exportStep(IntPtr fileName, IntPtr[] slices, int length);
 
+        [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool rotateShape(IntPtr shape, IntPtr rotateResult, int count, double x, double y, double z);
+
         [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr create2D(IntPtr hWnd);
 

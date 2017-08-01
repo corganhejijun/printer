@@ -63,6 +63,8 @@
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <ShapeAnalysis_FreeBounds.hxx>
 #include <BRep_Builder.hxx>
+#include <gp_Trsf.hxx>
+#include <BRepBuilderAPI_Transform.hxx>
 
 #include <iostream>
 #include <fstream>
@@ -292,6 +294,8 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice,
                 showType(shape, file, sss);
                 file << "end shape" << endl;
             }
+            else
+                Zmin = 0;
             aHSequenceOfShape->Append(shape);
             ShapeContainer* sc = new ShapeContainer(aHSequenceOfShape, Zmin);
             *(shapes + (*cnt)*sizeof(void*)) = sc;
@@ -309,17 +313,35 @@ EXPORT void* getSliceFromShape(void** shapes, int index, double* height) {
     return container;
 }
 
+EXPORT bool rotateShape(void** pt, void** rotateResult, int count, double x, double y, double z) {
+    gp_Trsf xTrsf;
+    xTrsf.SetRotation(gp::OX(), x * M_PI / 180);
+    gp_Trsf yTrsf;
+    yTrsf.SetRotation(gp::OY(), y * M_PI / 180);
+    gp_Trsf zTrsf;
+    zTrsf.SetRotation(gp::OZ(), z * M_PI / 180);
+    for (int i = 0; i < count; i++)
+    {
+        ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
+        BRepBuilderAPI_Transform xform1(shape->getShape(1), xTrsf*yTrsf*zTrsf);
+        TopoDS_Shape transShape = xform1.Shape();
+        Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
+        aHSequenceOfShape->Append(transShape);
+        ShapeContainer* transContainer = new ShapeContainer(aHSequenceOfShape);
+        *(rotateResult + i * sizeof(void*)) = transContainer;
+    }
+    return true;
+}
+
 EXPORT bool deleteShape(void** pt, int count)
 {
     for (int i = 0; i < count; i++)
     {
         ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
-        /*
         if (shape != NULL) {
             shape->shapeSequence->Clear();
             shape->shapeSequence->Delete();
         }
-        */
         delete shape;
         *(pt + i * sizeof(void*)) = NULL;
     }

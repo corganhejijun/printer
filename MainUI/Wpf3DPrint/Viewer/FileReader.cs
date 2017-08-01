@@ -69,8 +69,8 @@ namespace Wpf3DPrint.Viewer
             string fileName = (string)list[0];
             bool isSlice = (bool)list[1];
             int count = 500;
-            IntPtr shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)) * count);
-            IntPtr slice = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)));
+            IntPtr shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * count);
+            IntPtr slice = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
             IntPtr fileNameSpace = NativeUtf8FromString(fileName);
             bool result = Cpp2Managed.ImportStep(fileNameSpace, ref count, shapePt, isSlice, slice);
             Marshal.FreeHGlobal(fileNameSpace);
@@ -288,6 +288,11 @@ namespace Wpf3DPrint.Viewer
                 }
                 else
                     Cpp2Managed.deleteShape(shape.shape, shape.count);
+                if (shape.rotate != IntPtr.Zero)
+                {
+                    Cpp2Managed.deleteShape(shape.rotate, shape.count);
+                    Marshal.FreeHGlobal(shape.rotate);
+                }
                 Marshal.FreeHGlobal(shape.shape);
             }
             shapeList.Clear();
@@ -306,6 +311,24 @@ namespace Wpf3DPrint.Viewer
                 scene.Proxy.getViewPoint(&x, &y, &z);
             }
             sliceScene.Proxy.setViewPoint(x, y, z);
+        }
+
+        public void rotateAllShape(double x, double y, double z)
+        {
+            scene.Proxy.removeObjects();
+            foreach (Shape shape in shapeList)
+            {
+                IntPtr rotate = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * shape.count);
+                Cpp2Managed.rotateShape(shape.shape, rotate, shape.count, x, y, z);
+                if (shape.rotate != IntPtr.Zero)
+                {
+                    Cpp2Managed.deleteShape(shape.rotate, shape.count);
+                    Marshal.FreeHGlobal(shape.rotate);
+                }
+                shape.rotate = rotate;
+                scene.Proxy.displayShape(shape.rotate, 0, 0);
+                scene.Proxy.ZoomAllView();
+            }
         }
     }
 }

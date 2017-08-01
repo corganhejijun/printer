@@ -24,6 +24,36 @@ namespace Wpf3DPrint.Dialog
             InitializeComponent();
         }
 
+        public double XAngle
+        {
+            get
+            {
+                if (checkBoxX.IsChecked ?? false)
+                    return float.Parse(textBoxX.Text);
+                return -float.Parse(textBoxX.Text);
+            }
+        }
+
+        public double YAngle
+        {
+            get
+            {
+                if (checkBoxY.IsChecked ?? false)
+                    return float.Parse(textBoxY.Text);
+                return -float.Parse(textBoxY.Text);
+            }
+        }
+
+        public double ZAngle
+        {
+            get
+            {
+                if (checkBoxZ.IsChecked ?? false)
+                    return float.Parse(textBoxZ.Text);
+                return -float.Parse(textBoxZ.Text);
+            }
+        }
+
         private void buttonOK_Click(object sender, RoutedEventArgs e)
         {
             try {

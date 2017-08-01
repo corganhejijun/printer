@@ -367,12 +367,14 @@ namespace Wpf3DPrint
 
         private void menuRotate_Click(object sender, RoutedEventArgs e)
         {
+            // TODO 切片之前的实体才能旋转，切片中和切片后不能旋转
             Dialog.Rotate rotate = new Dialog.Rotate();
             rotate.Owner = this;
             if (rotate.ShowDialog() == false)
             {
                 return;
             }
+            fileReader.rotateAllShape(rotate.XAngle, rotate.YAngle, rotate.ZAngle);
         }
 
         private void menuMove_Click(object sender, RoutedEventArgs e)
@@ -418,6 +420,11 @@ namespace Wpf3DPrint
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+        }
+
+        private void menuPan_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

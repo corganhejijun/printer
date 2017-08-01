@@ -13,6 +13,7 @@ namespace Wpf3DPrint.Viewer
         public int locateCount;
         public bool countLocate;
         public ArrayList sliceList;
+        public IntPtr rotate;
 
         public class SliceCompare : IComparer {
             public int Compare(object x, object y)
@@ -40,6 +41,7 @@ namespace Wpf3DPrint.Viewer
             sliceThick = 1;
             sliceList = new ArrayList();
             countLocate = true;
+            rotate = IntPtr.Zero;
         }
         public void sortSliceList()
         {
