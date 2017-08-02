@@ -288,16 +288,21 @@ namespace Wpf3DPrint.Viewer
                 }
                 else
                     Cpp2Managed.deleteShape(shape.shape, shape.count);
-                if (shape.rotate != IntPtr.Zero)
-                {
-                    Cpp2Managed.deleteShape(shape.rotate, shape.count);
-                    Marshal.FreeHGlobal(shape.rotate);
-                }
+                releaseTransform(shape);
                 Marshal.FreeHGlobal(shape.shape);
             }
             shapeList.Clear();
             scene.Proxy.removeObjects();
             sliceScene.Proxy.removeObjects();
+        }
+
+        void releaseTransform(Shape shape)
+        {
+            if (shape.transform != IntPtr.Zero)
+            {
+                Cpp2Managed.deleteShape(shape.transform, shape.count);
+                Marshal.FreeHGlobal(shape.transform);
+            }
         }
 
         public void resetView()
@@ -320,13 +325,23 @@ namespace Wpf3DPrint.Viewer
             {
                 IntPtr rotate = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * shape.count);
                 Cpp2Managed.rotateShape(shape.shape, rotate, shape.count, x, y, z);
-                if (shape.rotate != IntPtr.Zero)
-                {
-                    Cpp2Managed.deleteShape(shape.rotate, shape.count);
-                    Marshal.FreeHGlobal(shape.rotate);
-                }
-                shape.rotate = rotate;
-                scene.Proxy.displayShape(shape.rotate, 0, 0);
+                releaseTransform(shape);
+                shape.transform = rotate;
+                scene.Proxy.displayShape(shape.transform, 0, 0);
+                scene.Proxy.ZoomAllView();
+            }
+        }
+
+        public void moveAllShape(double x, double y, double z)
+        {
+            scene.Proxy.removeObjects();
+            foreach(Shape shape in shapeList)
+            {
+                IntPtr move = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * shape.count);
+                Cpp2Managed.moveShape(shape.shape, move, shape.count, x, y, z);
+                releaseTransform(shape);
+                shape.transform = move;
+                scene.Proxy.displayShape(shape.transform, 0, 0);
                 scene.Proxy.ZoomAllView();
             }
         }

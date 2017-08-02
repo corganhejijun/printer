@@ -1,0 +1,24 @@
+﻿<Window x:Class="Wpf3DPrint.Dialog.Pan"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
+        mc:Ignorable="d"
+        Title="移动" Height="272.571" Width="303.429" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Icon="/Wpf3DPrint;component/images/CloseFile.ico">
+    <Grid>
+        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="185,191,0,0" VerticalAlignment="Top" Width="75" IsCancel="True" Height="19"/>
+        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="87,191,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click" Height="19"/>
+        <Label x:Name="label" Content="X轴" HorizontalAlignment="Left" Margin="28,20,0,0" VerticalAlignment="Top" Height="25" Width="54"/>
+        <TextBox x:Name="textBoxX" HorizontalAlignment="Left" Height="23" Margin="87,22,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="66"/>
+        <Label x:Name="label_Copy" Content="Y轴" HorizontalAlignment="Left" Margin="28,48,0,0" VerticalAlignment="Top" Height="25" Width="53"/>
+        <TextBox x:Name="textBoxY" HorizontalAlignment="Left" Height="23" Margin="87,50,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="66"/>
+        <Label x:Name="label_Copy1" Content="Z轴" HorizontalAlignment="Left" Margin="28,76,0,0" VerticalAlignment="Top" Height="25" Width="53"/>
+        <TextBox x:Name="textBoxZ" HorizontalAlignment="Left" Height="23" Margin="87,80,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="66"/>
+        <Label x:Name="labelX" Content="" HorizontalAlignment="Left" Margin="158,22,0,0" VerticalAlignment="Top" Height="25" Width="51"/>
+        <Label x:Name="labelY" Content="" HorizontalAlignment="Left" Margin="158,50,0,0" VerticalAlignment="Top" Height="25" Width="51"/>
+        <Label x:Name="labelZ" Content="" HorizontalAlignment="Left" Margin="158,78,0,0" VerticalAlignment="Top" Height="25" Width="51"/>
+        <Button x:Name="buttonPreview" Content="预览" HorizontalAlignment="Left" Margin="185,128,0,0" VerticalAlignment="Top" Width="75" Click="buttonPreview_Click"/>
+
+    </Grid>
+</Window>

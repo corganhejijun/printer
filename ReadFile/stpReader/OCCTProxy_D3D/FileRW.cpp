@@ -320,8 +320,7 @@ EXPORT bool rotateShape(void** pt, void** rotateResult, int count, double x, dou
     yTrsf.SetRotation(gp::OY(), y * M_PI / 180);
     gp_Trsf zTrsf;
     zTrsf.SetRotation(gp::OZ(), z * M_PI / 180);
-    for (int i = 0; i < count; i++)
-    {
+    for (int i = 0; i < count; i++) {
         ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
         BRepBuilderAPI_Transform xform1(shape->getShape(1), xTrsf*yTrsf*zTrsf);
         TopoDS_Shape transShape = xform1.Shape();
@@ -329,6 +328,21 @@ EXPORT bool rotateShape(void** pt, void** rotateResult, int count, double x, dou
         aHSequenceOfShape->Append(transShape);
         ShapeContainer* transContainer = new ShapeContainer(aHSequenceOfShape);
         *(rotateResult + i * sizeof(void*)) = transContainer;
+    }
+    return true;
+}
+
+EXPORT bool moveShape(void** pt, void** moveResult, int count, double x, double y, double z) {
+    gp_Trsf trsf;
+    trsf.SetTranslation(gp_Vec(x, y, z));
+    for (int i = 0; i < count; i++) {
+        ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
+        BRepBuilderAPI_Transform xform(shape->getShape(1), trsf);
+        TopoDS_Shape transShape = xform.Shape();
+        Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
+        aHSequenceOfShape->Append(transShape);
+        ShapeContainer* transContainer = new ShapeContainer(aHSequenceOfShape);
+        *(moveResult + i * sizeof(void*)) = transContainer;
     }
     return true;
 }

@@ -367,6 +367,11 @@ namespace Wpf3DPrint
 
         private void menuRotate_Click(object sender, RoutedEventArgs e)
         {
+            if (!fileReader.HasFile)
+            {
+                MessageBox.Show("未打开3D文件");
+                return;
+            }
             // TODO 切片之前的实体才能旋转，切片中和切片后不能旋转
             Dialog.Rotate rotate = new Dialog.Rotate();
             rotate.Owner = this;
@@ -424,7 +429,16 @@ namespace Wpf3DPrint
 
         private void menuPan_Click(object sender, RoutedEventArgs e)
         {
-
+            if (!fileReader.HasFile)
+            {
+                MessageBox.Show("未打开3D文件");
+                return;
+            }
+            Dialog.Pan pan = new Dialog.Pan(unit);
+            pan.Owner = this;
+            if (pan.ShowDialog() == false)
+                return;
+            fileReader.moveAllShape(pan.X, pan.Y, pan.Z);
         }
     }
 }
