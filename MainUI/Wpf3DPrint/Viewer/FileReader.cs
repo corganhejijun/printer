@@ -286,6 +286,7 @@ namespace Wpf3DPrint.Viewer
         {
             foreach (Shape shape in shapeList)
             {
+                releaseTransform(shape);
                 if (shape.sliceList.Count > 0)
                 {
                     foreach (Shape.Slice slice in shape.sliceList)
@@ -295,7 +296,6 @@ namespace Wpf3DPrint.Viewer
                 }
                 else
                     Cpp2Managed.deleteShape(shape.shape, shape.count);
-                releaseTransform(shape);
                 Marshal.FreeHGlobal(shape.shape);
             }
             shapeList.Clear();
@@ -322,6 +322,11 @@ namespace Wpf3DPrint.Viewer
             shape.shape = shape.transform;
             shape.transform = IntPtr.Zero;
             Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
+            displayAfterTransform(shape);
+        }
+
+        public void displayAfterTransform(Shape shape)
+        {
             scene.Proxy.removeObjects();
             scene.Proxy.displayShape(shape.shape, 0, 0);
             scene.Proxy.ZoomAllView();

@@ -381,6 +381,7 @@ namespace Wpf3DPrint
             if (rotate.ShowDialog() == false)
             {
                 fileReader.releaseTransform(fileReader.Shape);
+                fileReader.displayAfterTransform(fileReader.Shape);
                 return;
             }
             fileReader.applyTransform(fileReader.Shape);
@@ -449,6 +450,7 @@ namespace Wpf3DPrint
             if (pan.ShowDialog() == false)
             {
                 fileReader.releaseTransform(fileReader.Shape);
+                fileReader.displayAfterTransform(fileReader.Shape);
                 return;
             }
             fileReader.applyTransform(fileReader.Shape);
@@ -459,7 +461,7 @@ namespace Wpf3DPrint
             fileReader.moveAllShape(x, y, z);
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void buttonSaveAs_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFile = new SaveFileDialog();
             saveFile.FileName = "model";
