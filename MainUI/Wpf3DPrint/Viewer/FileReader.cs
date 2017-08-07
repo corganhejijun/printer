@@ -118,6 +118,12 @@ namespace Wpf3DPrint.Viewer
             Marshal.FreeHGlobal(fileName);
         }
 
+        public void saveStep(string path, Shape shape)
+        {
+            IntPtr fileName = NativeUtf8FromString(path);
+            Cpp2Managed.exportTransformStep(fileName, shape.shape, 1);
+        }
+
         public void sliceShape(Control control, bool locatePlane, bool gradientShape, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)
         {
             ArrayList args = new ArrayList();
@@ -155,8 +161,9 @@ namespace Wpf3DPrint.Viewer
                 }
 
                 double height = shape.Zmin;
-                for (int i = 0; height < shape.Zmax; i++)
+                for (int i = 1; height < shape.Zmax; i++)
                 {
+                    // 从1开始，跳过0高度切割
                     height = shape.Zmin + (double)i * shape.sliceThick;
                     bool skip = false;
                     foreach (Shape.Slice s in locatePlaneList)
@@ -296,13 +303,28 @@ namespace Wpf3DPrint.Viewer
             sliceScene.Proxy.removeObjects();
         }
 
-        void releaseTransform(Shape shape)
+        public void releaseTransform(Shape shape)
         {
             if (shape.transform != IntPtr.Zero)
             {
                 Cpp2Managed.deleteShape(shape.transform, shape.count);
                 Marshal.FreeHGlobal(shape.transform);
+                shape.transform = IntPtr.Zero;
             }
+        }
+
+        public void applyTransform(Shape shape)
+        {
+            if (shape.transform == IntPtr.Zero)
+                return;
+            Cpp2Managed.deleteShape(shape.shape, shape.count);
+            Marshal.FreeHGlobal(shape.shape);
+            shape.shape = shape.transform;
+            shape.transform = IntPtr.Zero;
+            Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
+            scene.Proxy.removeObjects();
+            scene.Proxy.displayShape(shape.shape, 0, 0);
+            scene.Proxy.ZoomAllView();
         }
 
         public void resetView()

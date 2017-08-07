@@ -320,13 +320,17 @@ EXPORT bool rotateShape(void** pt, void** rotateResult, int count, double x, dou
     yTrsf.SetRotation(gp::OY(), y * M_PI / 180);
     gp_Trsf zTrsf;
     zTrsf.SetRotation(gp::OZ(), z * M_PI / 180);
+    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
     for (int i = 0; i < count; i++) {
         ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
         BRepBuilderAPI_Transform xform1(shape->getShape(1), xTrsf*yTrsf*zTrsf);
         TopoDS_Shape transShape = xform1.Shape();
         Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
         aHSequenceOfShape->Append(transShape);
-        ShapeContainer* transContainer = new ShapeContainer(aHSequenceOfShape);
+        Bnd_Box B;
+        BRepBndLib::Add(transShape, B);
+        B.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
+        ShapeContainer* transContainer = new ShapeContainer(aHSequenceOfShape, Zmin);
         *(rotateResult + i * sizeof(void*)) = transContainer;
     }
     return true;
@@ -335,13 +339,17 @@ EXPORT bool rotateShape(void** pt, void** rotateResult, int count, double x, dou
 EXPORT bool moveShape(void** pt, void** moveResult, int count, double x, double y, double z) {
     gp_Trsf trsf;
     trsf.SetTranslation(gp_Vec(x, y, z));
+    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
     for (int i = 0; i < count; i++) {
         ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
         BRepBuilderAPI_Transform xform(shape->getShape(1), trsf);
         TopoDS_Shape transShape = xform.Shape();
         Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
         aHSequenceOfShape->Append(transShape);
-        ShapeContainer* transContainer = new ShapeContainer(aHSequenceOfShape);
+        Bnd_Box B;
+        BRepBndLib::Add(transShape, B);
+        B.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
+        ShapeContainer* transContainer = new ShapeContainer(aHSequenceOfShape, Zmin);
         *(moveResult + i * sizeof(void*)) = transContainer;
     }
     return true;
@@ -464,4 +472,8 @@ EXPORT bool exportStep(char* fileName, ShapeContainer** slices, int length) {
             return false;
     }
     return aWriter.Write(fileName) == IFSelect_RetDone;
+}
+
+EXPORT bool exportTransformStep(char* fileName, ShapeContainer** slices, int length) {
+    return exportStep(fileName, slices, length);
 }

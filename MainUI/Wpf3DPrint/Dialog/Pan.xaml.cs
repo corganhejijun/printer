@@ -7,8 +7,10 @@ namespace Wpf3DPrint.Dialog
     /// </summary>
     public partial class Pan : Window
     {
-        public Pan(string unit)
+        MainWindow.TransformPreview preview;
+        public Pan(string unit, MainWindow.TransformPreview preview)
         {
+            this.preview = preview;
             InitializeComponent();
             labelX.Content = unit;
             labelY.Content = unit;
@@ -52,6 +54,7 @@ namespace Wpf3DPrint.Dialog
             {
                 testInput();
                 this.DialogResult = true;
+                preview(X, Y, Z);
             }
             catch
             {
@@ -62,7 +65,16 @@ namespace Wpf3DPrint.Dialog
 
         private void buttonPreview_Click(object sender, RoutedEventArgs e)
         {
-
+            try
+            {
+                testInput();
+                preview(X, Y, Z);
+            }
+            catch
+            {
+                MessageBox.Show("请输入合法数字");
+                return;
+            }
         }
     }
 }

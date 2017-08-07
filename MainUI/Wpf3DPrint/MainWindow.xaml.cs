@@ -365,6 +365,8 @@ namespace Wpf3DPrint
             }
         }
 
+        public delegate void TransformPreview(double x, double y, double z);
+
         private void menuRotate_Click(object sender, RoutedEventArgs e)
         {
             if (!fileReader.HasFile)
@@ -373,13 +375,20 @@ namespace Wpf3DPrint
                 return;
             }
             // TODO 切片之前的实体才能旋转，切片中和切片后不能旋转
-            Dialog.Rotate rotate = new Dialog.Rotate();
+            TransformPreview preview = new TransformPreview(rotatePreview);
+            Dialog.Rotate rotate = new Dialog.Rotate(preview);
             rotate.Owner = this;
             if (rotate.ShowDialog() == false)
             {
+                fileReader.releaseTransform(fileReader.Shape);
                 return;
             }
-            fileReader.rotateAllShape(rotate.XAngle, rotate.YAngle, rotate.ZAngle);
+            fileReader.applyTransform(fileReader.Shape);
+        }
+
+        void rotatePreview(double xAngle, double yAngle, double zAngle)
+        {
+            fileReader.rotateAllShape(xAngle, yAngle, zAngle);
         }
 
         private void menuMove_Click(object sender, RoutedEventArgs e)
@@ -434,11 +443,31 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            Dialog.Pan pan = new Dialog.Pan(unit);
+            TransformPreview preview = new TransformPreview(panPreview);
+            Dialog.Pan pan = new Dialog.Pan(unit, preview);
             pan.Owner = this;
             if (pan.ShowDialog() == false)
+            {
+                fileReader.releaseTransform(fileReader.Shape);
                 return;
-            fileReader.moveAllShape(pan.X, pan.Y, pan.Z);
+            }
+            fileReader.applyTransform(fileReader.Shape);
+        }
+
+        void panPreview(double x, double y, double z)
+        {
+            fileReader.moveAllShape(x, y, z);
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFile = new SaveFileDialog();
+            saveFile.FileName = "model";
+            saveFile.DefaultExt = "step";
+            saveFile.Filter = "Step file (*.step)|*.step";
+            if (false == saveFile.ShowDialog())
+                return ;
+            fileReader.saveStep(saveFile.FileName, fileReader.Shape);
         }
     }
 }

@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace Wpf3DPrint.Dialog
 {
@@ -19,8 +7,10 @@ namespace Wpf3DPrint.Dialog
     /// </summary>
     public partial class Rotate : Window
     {
-        public Rotate()
+        MainWindow.TransformPreview preview;
+        public Rotate(MainWindow.TransformPreview preview)
         {
+            this.preview = preview;
             InitializeComponent();
         }
 
@@ -59,6 +49,7 @@ namespace Wpf3DPrint.Dialog
             try {
                 testInput();
                 this.DialogResult = true;
+                preview(XAngle, YAngle, ZAngle);
             }
             catch
             {
@@ -79,6 +70,7 @@ namespace Wpf3DPrint.Dialog
             try
             {
                 testInput();
+                preview(XAngle, YAngle, ZAngle);
             }
             catch
             {
