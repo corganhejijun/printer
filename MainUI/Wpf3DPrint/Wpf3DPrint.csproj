@@ -132,8 +132,8 @@
     <Compile Include="Dialog\EntityProp.xaml.cs">
       <DependentUpon>EntityProp.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialog\Move.xaml.cs">
-      <DependentUpon>Move.xaml</DependentUpon>
+    <Compile Include="Dialog\EntityEdit.xaml.cs">
+      <DependentUpon>EntityEdit.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialog\Pan.xaml.cs">
       <DependentUpon>Pan.xaml</DependentUpon>
@@ -172,7 +172,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialog\Move.xaml">
+    <Page Include="Dialog\EntityEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

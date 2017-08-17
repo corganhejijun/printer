@@ -53,6 +53,15 @@ namespace Wpf3DPrint.Viewer
             return true;
         }
 
+        public bool importMoreStep(string fileName, SceneThread.afterFunction afterImport)
+        {
+            ArrayList list = new ArrayList();
+            list.Add(fileName);
+            list.Add(false);
+            scene.D3DThread.addWork(openStepWork, list, afterImport);
+            return true;
+        }
+
         public static IntPtr NativeUtf8FromString(string managedString)
         {
             int len = Encoding.UTF8.GetByteCount(managedString);
@@ -92,8 +101,8 @@ namespace Wpf3DPrint.Viewer
                 return result;
             }
             Shape shape = (Shape)list[1];
-            shapeList.Add(shape);
             Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
+            shapeList.Add(shape);
             return displayShape(shape);
         }
 

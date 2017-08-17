@@ -40,12 +40,15 @@ namespace Wpf3DPrint
 
         private void afterOpenFile()
         {
+            /*
             labelStatus.Content = "X:[" + fileReader.Shape.Xmin.ToString("0.000") + "," + fileReader.Shape.Xmax.ToString("0.000")
                 + "]; Y:[" + fileReader.Shape.Ymin.ToString("0.000") + "," + fileReader.Shape.Ymax.ToString("0.000")
                 + "]; Z:[" + fileReader.Shape.Zmin.ToString("0.000") + "," + fileReader.Shape.Zmax.ToString("0.000") + "]";
             textBoxXRange.Text = fileReader.Shape.Xmin.ToString("0.0000") + "," + fileReader.Shape.Xmax.ToString("0.0000");
             textBoxYRange.Text = fileReader.Shape.Ymin.ToString("0.0000") + "," + fileReader.Shape.Ymax.ToString("0.0000");
             textBoxZRange.Text = fileReader.Shape.Zmin.ToString("0.0000") + "," + fileReader.Shape.Zmax.ToString("0.0000");
+            */
+            labelStatus.Content = "";
         }
 
         private void buttonOpen_Click(object sender, RoutedEventArgs e)
@@ -74,6 +77,11 @@ namespace Wpf3DPrint
             this.Dispatcher.Invoke(new SceneThread.afterFunction(displayStep), System.Windows.Threading.DispatcherPriority.Normal, new object[] { args });
         }
 
+        private void afterImportMoreStep(object args)
+        {
+            this.Dispatcher.Invoke(new SceneThread.afterFunction(displayImportMoreStep), System.Windows.Threading.DispatcherPriority.Normal, new object[] { args });
+        }
+
         string unit;
         private void displayStep(object workResult)
         {
@@ -83,6 +91,13 @@ namespace Wpf3DPrint
             unit.Owner = this;
             unit.ShowDialog();
             this.unit = unit.Unit;
+            afterOpenFile();
+        }
+
+        private void displayImportMoreStep(object workResult)
+        {
+            fileReader.displayStep(workResult);
+            fileReader.resetView();
             afterOpenFile();
         }
 
@@ -392,12 +407,24 @@ namespace Wpf3DPrint
             fileReader.rotateAllShape(xAngle, yAngle, zAngle);
         }
 
-        private void menuMove_Click(object sender, RoutedEventArgs e)
+        private void menuEntityEdit_Click(object sender, RoutedEventArgs e)
         {
-            Dialog.Move move = new Dialog.Move();
-            move.Owner = this;
-            if (move.ShowDialog() == false)
+            if (!fileReader.HasFile)
+            {
+                MessageBox.Show("未打开3D文件");
                 return;
+            }
+            Dialog.EntityEdit edit = new Dialog.EntityEdit();
+            edit.Owner = this;
+            if (edit.ShowDialog() == false)
+                return;
+            if (!fileReader.importMoreStep(edit.FileName, afterImportMoreStep))
+            {
+                MessageBox.Show("Open file Failed!");
+                return;
+            }
+            onOpeningFile(edit.FileName);
+            set3DView();
         }
 
         private void menuAbout_Click(object sender, RoutedEventArgs e)
@@ -418,11 +445,6 @@ namespace Wpf3DPrint
             entity.Owner = this;
             if (entity.ShowDialog() == false)
                 return;
-        }
-
-        private void menuEntityEdit_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void menu2DProc_Click(object sender, RoutedEventArgs e)

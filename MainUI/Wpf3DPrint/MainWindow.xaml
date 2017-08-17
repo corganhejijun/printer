@@ -18,7 +18,6 @@
             <MenuItem Header="文件" HorizontalAlignment="Right" Width="48">
                 <MenuItem Header="新建"></MenuItem>
                 <MenuItem x:Name="menuOpenFile" Header="打开..." Click="buttonOpen_Click"></MenuItem>
-                <MenuItem Header="导入实体..."></MenuItem>
                 <MenuItem x:Name="menuSaveAs" Header="保存实体..." Click="buttonSaveAs_Click"></MenuItem>
                 <MenuItem x:Name="menuOpenSlice" Header="导入切片..." Click="buttonOpenSlice_Click"></MenuItem>
                 <MenuItem x:Name="menuSaveSlice" Header="导出切片..." Click="buttonSave_Click"></MenuItem>
@@ -41,7 +40,7 @@
                     <MenuItem Header="旋转..." x:Name="menuRotate" Click="menuRotate_Click"></MenuItem>
                     <MenuItem Header="平移..." x:Name="menuPan" Click="menuPan_Click"></MenuItem>
                 </MenuItem>
-                <MenuItem x:Name="menuEntityEdit" Header="图形编辑..." Click="menuMove_Click"></MenuItem>
+                <MenuItem x:Name="menuEntityEdit" Header="图形编辑..." Click="menuEntityEdit_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="分层" Width="48">
                 <MenuItem x:Name="menuSlice" Header="3D分层..." Click="buttonSlice_Click"></MenuItem>
