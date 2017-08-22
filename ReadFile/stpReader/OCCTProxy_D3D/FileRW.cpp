@@ -65,6 +65,7 @@
 #include <BRep_Builder.hxx>
 #include <gp_Trsf.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
+#include <BRepAlgoAPI_Fuse.hxx>
 
 #include <iostream>
 #include <fstream>
@@ -357,14 +358,22 @@ EXPORT bool moveShape(void** pt, void** moveResult, int count, double x, double 
 
 EXPORT bool deleteShape(void** pt, int count)
 {
+    printf("ok0\n");
     for (int i = 0; i < count; i++)
     {
+        printf(" i = %d\n", i);
         ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
+        printf("ok1\n");
         if (shape != NULL) {
+            printf("ok2\n");
             shape->shapeSequence->Clear();
-            shape->shapeSequence->Delete();
+            printf("ok3\n");
+            // 这里不要delete 否则析构函数会再次delete，造成崩溃
+            //shape->shapeSequence->Delete();
         }
+        printf("ok4\n");
         delete shape;
+        printf("ok5\n");
         *(pt + i * sizeof(void*)) = NULL;
     }
     return true;
@@ -420,6 +429,22 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
     Handle_TopTools_HSequenceOfShape Wires = getWires(sectionShape);
     ShapeContainer* container = new ShapeContainer(Wires);
     return container;
+}
+
+EXPORT void combineShapes(void** pt, void** pt1, void** pt2) {
+    ShapeContainer* container1 = ShapeContainer::getContainer(pt1, 0);
+    ShapeContainer* container2 = ShapeContainer::getContainer(pt2, 0);
+    TopoDS_Shape shape1 = container1->getShape(1);
+    TopoDS_Shape shape2 = container2->getShape(1);
+    TopoDS_Shape shape = BRepAlgoAPI_Fuse(shape1, shape2);
+    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
+    Bnd_Box B;
+    BRepBndLib::Add(shape, B);
+    B.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
+    Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
+    aHSequenceOfShape->Append(shape);
+    ShapeContainer* container = new ShapeContainer(aHSequenceOfShape, Zmin);
+    *pt = container;
 }
 
 EXPORT ShapeContainer** getLocatPlane(void** pt, int index, int* count) {

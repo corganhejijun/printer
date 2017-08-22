@@ -62,9 +62,6 @@ public:
         height = z;
     }
 
-    ~ShapeContainer() {
-    }
-
     Handle(TopTools_HSequenceOfShape) shapeSequence;
 
     TopoDS_Shape getShape(int index) {

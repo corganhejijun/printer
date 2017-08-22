@@ -18,6 +18,8 @@ namespace Wpf3DPrint
         private Scene2D sliceScene;
         private FileReader fileReader;
 
+        Dialog.EntityEdit dlgEntityEdit;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -31,6 +33,7 @@ namespace Wpf3DPrint
             slicingBrush.RelativeTransform = new ScaleTransform(1.0, -1.0, 0.5, 0.5);
             GridScene.Background = brush;
             GridSlice3D.Background = slicingBrush;
+            dlgEntityEdit = null;
         }
 
         private void onOpeningFile(string fileName)
@@ -85,7 +88,7 @@ namespace Wpf3DPrint
         string unit;
         private void displayStep(object workResult)
         {
-            fileReader.displayStep(workResult);
+            fileReader.displayStep(workResult, false);
             fileReader.resetView();
             Dialog.DialogUnit unit = new Dialog.DialogUnit(fileReader.Shape);
             unit.Owner = this;
@@ -96,7 +99,7 @@ namespace Wpf3DPrint
 
         private void displayImportMoreStep(object workResult)
         {
-            fileReader.displayStep(workResult);
+            fileReader.displayStep(workResult, dlgEntityEdit.Combine);
             fileReader.resetView();
             afterOpenFile();
         }
@@ -414,16 +417,18 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            Dialog.EntityEdit edit = new Dialog.EntityEdit();
-            edit.Owner = this;
-            if (edit.ShowDialog() == false)
+            if (dlgEntityEdit != null)
+                dlgEntityEdit = null;
+            dlgEntityEdit = new Dialog.EntityEdit();
+            dlgEntityEdit.Owner = this;
+            if (dlgEntityEdit.ShowDialog() == false)
                 return;
-            if (!fileReader.importMoreStep(edit.FileName, afterImportMoreStep))
+            if (!fileReader.importMoreStep(dlgEntityEdit.FileName, afterImportMoreStep))
             {
                 MessageBox.Show("Open file Failed!");
                 return;
             }
-            onOpeningFile(edit.FileName);
+            onOpeningFile(dlgEntityEdit.FileName);
             set3DView();
         }
 

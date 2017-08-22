@@ -92,7 +92,7 @@ namespace Wpf3DPrint.Viewer
             return list;
         }
 
-        public bool displayStep(object workResult)
+        public bool displayStep(object workResult, bool combine)
         {
             ArrayList list = (ArrayList)workResult;
             bool result = (bool)list[0];
@@ -101,8 +101,16 @@ namespace Wpf3DPrint.Viewer
                 return result;
             }
             Shape shape = (Shape)list[1];
-            Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
-            shapeList.Add(shape);
+            if (combine)
+            {
+                combineShapes(shape);
+                shape = Shape;
+            }
+            else
+            {
+                Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
+                shapeList.Add(shape);
+            }
             return displayShape(shape);
         }
 
@@ -380,6 +388,18 @@ namespace Wpf3DPrint.Viewer
                 scene.Proxy.displayShape(shape.transform, 0, 0);
                 scene.Proxy.ZoomAllView();
             }
+        }
+
+        private void combineShapes(Shape newShape)
+        {
+            IntPtr shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
+            Cpp2Managed.combineShapes(shapePt, Shape.shape, newShape.shape);
+            Shape shape = new Shape(shapePt, 1);
+            Cpp2Managed.deleteShape(Shape.shape, Shape.count);
+            Cpp2Managed.deleteShape(newShape.shape, newShape.count);
+            Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
+            shapeList.Clear();
+            shapeList.Add(shape);
         }
     }
 }

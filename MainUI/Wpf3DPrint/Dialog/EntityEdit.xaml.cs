@@ -101,5 +101,9 @@ namespace Wpf3DPrint.Dialog
             string path = dialog.FileName;
             labelAdd.Content = path;
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+        }
     }
 }

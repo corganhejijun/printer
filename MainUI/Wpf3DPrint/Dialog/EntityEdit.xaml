@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="图形编辑" Height="398.103" Width="382.212" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
+        Title="图形编辑" Height="398.103" Width="382.212" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
     <Grid>
         <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="231,321,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
         <Button x:Name="buttonOk" Content="确定" HorizontalAlignment="Left" Margin="143,321,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOk_Click"/>
         <CheckBox x:Name="checkBoxCenter" Content="以平面图形中心(X/Y)为原点" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <CheckBox x:Name="checkBoxCombine" Content="合并图形" HorizontalAlignment="Left" Margin="18,214,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="checkBoxCombine" Content="合并图形" HorizontalAlignment="Left" Margin="18,214,0,0" VerticalAlignment="Top" IsChecked="True"/>
         <GroupBox x:Name="groupBox" Header="平移(正数正向平移，负数反向平移)" HorizontalAlignment="Left" Margin="11,90,0,0" VerticalAlignment="Top" Height="119" Width="274">
             <Grid>
                 <Label x:Name="label" Content="X轴平移" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
