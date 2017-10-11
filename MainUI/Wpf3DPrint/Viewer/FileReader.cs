@@ -174,7 +174,7 @@ namespace Wpf3DPrint.Viewer
                     locatePlaneList.Add(new Shape.Slice(slice, locateHeight));
                     if (locatePlane)
                         shape.sliceList.Add(new Shape.Slice(slice, locateHeight));
-                    onGetSlice(slice, locateHeight, shape, control, onslice);
+                    //onGetSlice(slice, locateHeight, shape, control, onslice);
                 }
 
                 double height = shape.Zmin;
@@ -193,6 +193,11 @@ namespace Wpf3DPrint.Viewer
                                 shape.sliceList.Add(s);
                             skip = true;
                             break;
+                        }
+                        // 显示对应高度的定位面切割线
+                        if (s.height < height && s.height > height - shape.sliceThick)
+                        {
+                            onGetSlice(s.slice, s.height, shape, control, onslice);
                         }
                     }
                     if (skip)

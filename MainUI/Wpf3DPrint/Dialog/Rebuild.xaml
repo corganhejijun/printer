@@ -11,7 +11,6 @@
         <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="120,246,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
         <CheckBox x:Name="checkBox_Copy" Content="样条" HorizontalAlignment="Left" Margin="97,16,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="checkBox_Copy1" Content="椭圆" HorizontalAlignment="Left" Margin="154,16,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="checkBox_Copy2" Content="圆弧" HorizontalAlignment="Left" Margin="212,16,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label" Content="炸开曲线：" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <GroupBox Header="生成多义线" Margin="0,40,0,172">
             <Grid>

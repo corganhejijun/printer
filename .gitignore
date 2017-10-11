@@ -8,3 +8,5 @@ ipch
 Thumbs.db
 *.opensdf
 Release_x86
+*.lib
+*.dxf
