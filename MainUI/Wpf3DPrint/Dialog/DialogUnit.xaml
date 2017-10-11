@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="请设置单位" Height="320.577" Width="317.328" ShowInTaskbar="False" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="请设置单位" Height="189.599" Width="244.053" ShowInTaskbar="False" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <Label x:Name="label" Content="单位：" HorizontalAlignment="Left" Margin="36,33,0,0" VerticalAlignment="Top"/>
         <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="82,33,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="2">
@@ -13,7 +13,7 @@
             <ComboBoxItem Content="厘米"/>
             <ComboBoxItem Content="毫米"/>
         </ComboBox>
-        <Button x:Name="button" Content="确定" HorizontalAlignment="Left" Margin="200,241,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="button_Click"/>
+        <Button x:Name="button" Content="确定" HorizontalAlignment="Left" Margin="127,96,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="button_Click"/>
         <Label x:Name="labelX" Content="Label" HorizontalAlignment="Left" Margin="42,122,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
         <Label x:Name="labelY" Content="Label" HorizontalAlignment="Left" Margin="42,152,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
         <Label x:Name="labelZ" Content="Label" HorizontalAlignment="Left" Margin="42,182,0,0" VerticalAlignment="Top" Visibility="Hidden"/>

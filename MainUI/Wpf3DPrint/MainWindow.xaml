@@ -60,6 +60,18 @@
                 <MenuItem x:Name="menuAbout" Header="关于..." Click="menuAbout_Click"></MenuItem>
             </MenuItem>
         </Menu>
+        <DockPanel Grid.Row="1">
+            <ToolBarTray DockPanel.Dock="Top">
+                <ToolBar>
+                    <Button Command="Open" ToolTip="打开实体">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="images/Open.ico" Width="16"></Image>
+                            <TextBlock Margin="5,0,0,0">打开</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
+        </DockPanel>
         <Ribbon x:Name="ribbonMenu" Grid.Row="1" Loaded="ribbonMenu_Loaded" Visibility="Collapsed">
             <Ribbon.HelpPaneContent>
                 <RibbonButton SmallImageSource="images/Help.ico"></RibbonButton>
@@ -127,37 +139,51 @@
         <Grid Grid.Row="2">
             <Grid x:Name="GridView" Margin="0,0,0,0">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="32"></ColumnDefinition>
                     <ColumnDefinition x:Name="columnTree" Width="0*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition x:Name="column3D" Width="100*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition x:Name="column2D" Width="0*"/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0">
+                <DockPanel Grid.Column="0">
+                    <ToolBarTray DockPanel.Dock="Left">
+                        <ToolBar>
+                            <Button x:Name="Pan">
+                                <Image Source="images/move.png" Width="32"></Image>
+                            </Button>
+                        </ToolBar>
+                    </ToolBarTray>
+                </DockPanel>
+                <Grid Grid.Column="1">
                     <TreeView x:Name="TreeView_Slice">
                         <TreeView.Resources>
                             <ResourceDictionary Source="Themes/TreeView.xaml"></ResourceDictionary>
                         </TreeView.Resources>
                     </TreeView>
                 </Grid>
-                <GridSplitter Width="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
-                <Grid x:Name="GridScene" Grid.Column="2" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel"></Grid>
-                <GridSplitter Width="3" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
-                <Grid x:Name="GridSlice" Grid.Column="4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition x:Name="columnSlice2D" Width="0*"/>
-                        <ColumnDefinition x:Name="columnSlice3D" Width="100*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid x:Name="GridSlice2D" Background="White" Grid.Column="0">
-                        <WindowsFormsHost Margin="0,0,0,0" Panel.ZIndex="-1">
-                            <WinForms:Panel x:Name="PanelSlice" BackColor="White" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
-                        </WindowsFormsHost>
+                <GridSplitter x:Name="treeViewSplitter" Width="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
+                <Border BorderBrush="Black" BorderThickness="1" Grid.Column="3">
+                    <Grid x:Name="GridScene" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel"></Grid>
+                </Border>
+                <GridSplitter x:Name="sliceSplitter" Width="0" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
+                <Border Grid.Column="5" BorderBrush="Black" BorderThickness="1">
+                    <Grid x:Name="GridSlice">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="columnSlice2D" Width="0*"/>
+                            <ColumnDefinition x:Name="columnSlice3D" Width="100*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid x:Name="GridSlice2D" Background="White" Grid.Column="0">
+                            <WindowsFormsHost Margin="0,0,0,0" Panel.ZIndex="-1">
+                                <WinForms:Panel x:Name="PanelSlice" BackColor="White" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
+                            </WindowsFormsHost>
+                        </Grid>
+                        <Grid x:Name="GridSlice3D" Grid.Column="1" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel"></Grid>
                     </Grid>
-                    <Grid x:Name="GridSlice3D" Grid.Column="1" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel"></Grid>
-                </Grid>
+                </Border>
             </Grid>
         </Grid>
-        <Grid Grid.Row="3" x:Name="GridStatus" Background="White">
+        <Grid Grid.Row="3" x:Name="GridStatus" Background="#FFEEEEEE">
             <Label x:Name="labelStatus" Content="状态"/>
         </Grid>
     </Grid>

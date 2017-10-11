@@ -296,6 +296,8 @@ namespace Wpf3DPrint
             column3D.Width = new GridLength(100, GridUnitType.Star);
             column2D.Width = new GridLength(0, GridUnitType.Star);
             columnTree.Width = new GridLength(0, GridUnitType.Star);
+            treeViewSplitter.Width = 0;
+            sliceSplitter.Width = 0;
         }
 
         private void setSlicingView()
@@ -305,6 +307,7 @@ namespace Wpf3DPrint
             columnTree.Width = new GridLength(0, GridUnitType.Star);
             columnSlice2D.Width = new GridLength(0, GridUnitType.Star);
             columnSlice3D.Width = new GridLength(100, GridUnitType.Star);
+            sliceSplitter.Width = 5;
         }
 
         private void setSliceView()
@@ -314,6 +317,8 @@ namespace Wpf3DPrint
             columnTree.Width = new GridLength(10, GridUnitType.Star);
             columnSlice2D.Width = new GridLength(100, GridUnitType.Star);
             columnSlice3D.Width = new GridLength(0, GridUnitType.Star);
+            sliceSplitter.Width = 5;
+            treeViewSplitter.Width = 5;
         }
 
         private void buttonQuit_Click(object sender, RoutedEventArgs e)
