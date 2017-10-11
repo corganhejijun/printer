@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Wpf3DPrint.Viewer;
 
@@ -179,8 +180,10 @@ namespace Wpf3DPrint
         }
 
         bool beginRotate = false;
+        Point mouseOrigin;
         private void GridScene_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            mouseOrigin = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
             if (beginRotate)
             {
                 return;
@@ -200,11 +203,19 @@ namespace Wpf3DPrint
         {
             if (beginRotate)
             {
+                float ratio = 1;
                 Point p = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
-                scene.Proxy.Rotation((int)p.X, (int)p.Y);
+                if ((bool)ButtonRoll.IsChecked)
+                    scene.Proxy.Rotation((int)p.X, (int)p.Y);
+                if ((bool)ButtonPan.IsChecked)
+                    scene.Proxy.Pan(-(int)((mouseOrigin.X - p.X)/ratio), (int)((mouseOrigin.Y - p.Y)/ratio));
                 scene.Proxy.RedrawView();
-                slicingScene.Proxy.Rotation((int)p.X, (int)p.Y);
+                if ((bool)ButtonRoll.IsChecked)
+                    slicingScene.Proxy.Rotation((int)p.X, (int)p.Y);
+                if ((bool)ButtonPan.IsChecked)
+                    slicingScene.Proxy.Pan(-(int)((mouseOrigin.X - p.X)/ratio), (int)((mouseOrigin.Y - p.Y)/ratio));
                 slicingScene.Proxy.RedrawView();
+                mouseOrigin = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
             }
         }
 
@@ -502,6 +513,33 @@ namespace Wpf3DPrint
             if (false == saveFile.ShowDialog())
                 return ;
             fileReader.saveStep(saveFile.FileName, fileReader.Shape);
+        }
+
+        private void ButtonRoll_Click(object sender, RoutedEventArgs e)
+        {
+            if ((bool)ButtonPan.IsChecked)
+                ButtonPan.IsChecked = false;
+            ButtonRoll.IsChecked = true;
+        }
+
+        private void ButtonPan_Click(object sender, RoutedEventArgs e)
+        {
+            if ((bool)ButtonRoll.IsChecked)
+                ButtonRoll.IsChecked = false;
+            ButtonPan.IsChecked = true;
+
+        }
+
+        private void ButtonPan_Checked(object sender, RoutedEventArgs e)
+        {
+            if (GridScene != null && (bool)ButtonPan.IsChecked)
+                GridScene.Cursor = Cursors.Hand;
+        }
+
+        private void ButtonRoll_Checked(object sender, RoutedEventArgs e)
+        {
+            if (GridScene != null && (bool)ButtonRoll.IsChecked)
+                GridScene.Cursor = Cursors.Arrow;
         }
     }
 }

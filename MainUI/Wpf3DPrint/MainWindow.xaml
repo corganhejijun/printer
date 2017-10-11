@@ -63,10 +63,34 @@
         <DockPanel Grid.Row="1">
             <ToolBarTray DockPanel.Dock="Top">
                 <ToolBar>
-                    <Button Command="Open" ToolTip="打开实体">
+                    <Button ToolTip="打开实体" x:Name="ButtonOpen" Click="buttonOpen_Click">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="images/Open.ico" Width="16"></Image>
                             <TextBlock Margin="5,0,0,0">打开</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button ToolTip="导入切片" x:Name="ButtonImport" Click="buttonOpenSlice_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="images/Import.png" Width="16"></Image>
+                            <TextBlock Margin="5,0,0,0">导入切片</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button ToolTip="旋转" x:Name="ButtonRotate" Click="menuRotate_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="images/Rotate.png" Width="16"></Image>
+                            <TextBlock Margin="5,0,0,0">旋转</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button ToolTip="平移" x:Name="ButtonMove" Click="menuPan_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="images/Move.png" Width="16"></Image>
+                            <TextBlock Margin="5,0,0,0">平移</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button ToolTip="关闭当前文件" x:Name="ButtonClose" Click="buttonClose_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="images/Close.png" Width="16"></Image>
+                            <TextBlock Margin="5,0,0,0">关闭</TextBlock>
                         </StackPanel>
                     </Button>
                 </ToolBar>
@@ -147,11 +171,14 @@
                     <ColumnDefinition x:Name="column2D" Width="0*"/>
                 </Grid.ColumnDefinitions>
                 <DockPanel Grid.Column="0">
-                    <ToolBarTray DockPanel.Dock="Left">
+                    <ToolBarTray DockPanel.Dock="Left" Orientation="Vertical" Width="32">
                         <ToolBar>
-                            <Button x:Name="Pan">
-                                <Image Source="images/move.png" Width="32"></Image>
-                            </Button>
+                            <ToggleButton x:Name="ButtonPan" ToolTip="平移" Click="ButtonPan_Click" Checked="ButtonPan_Checked">
+                                <Image Source="images/Move.png" Width="24"></Image>
+                            </ToggleButton>
+                            <ToggleButton x:Name="ButtonRoll" ToolTip="旋转" IsChecked="True" Click="ButtonRoll_Click" Checked="ButtonRoll_Checked">
+                                <Image Source="images/Roll.png" Width="24"></Image>
+                            </ToggleButton>
                         </ToolBar>
                     </ToolBarTray>
                 </DockPanel>
