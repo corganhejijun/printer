@@ -78,5 +78,67 @@ namespace Wpf3DPrint.Dialog
                 return;
             }
         }
+
+        private void buttonRotate1_Click(object sender, RoutedEventArgs e)
+        {
+            textBoxY.Text = "90";
+            checkBoxY.IsChecked = true;
+            textBoxX.Text = "0";
+            textBoxZ.Text = "0";
+        }
+
+        private void buttonRotate2_Click(object sender, RoutedEventArgs e)
+        {
+            textBoxY.Text = "90";
+            checkBoxY.IsChecked = false;
+            textBoxX.Text = "0";
+            textBoxZ.Text = "0";
+        }
+
+        private void buttonRotate3_Click(object sender, RoutedEventArgs e)
+        {
+            textBoxX.Text = "90";
+            checkBoxX.IsChecked = true;
+            textBoxY.Text = "0";
+            textBoxZ.Text = "0";
+        }
+
+        private void buttonRotate4_Click(object sender, RoutedEventArgs e)
+        {
+            textBoxX.Text = "90";
+            checkBoxX.IsChecked = false;
+            textBoxY.Text = "0";
+            textBoxZ.Text = "0";
+        }
+
+        private void buttonRotate5_Click(object sender, RoutedEventArgs e)
+        {
+            textBoxZ.Text = "90";
+            checkBoxZ.IsChecked = true;
+            textBoxY.Text = "0";
+            textBoxX.Text = "0";
+        }
+
+        private void buttonRotate6_Click(object sender, RoutedEventArgs e)
+        {
+            textBoxZ.Text = "90";
+            checkBoxZ.IsChecked = false;
+            textBoxY.Text = "0";
+            textBoxX.Text = "0";
+        }
+
+        private void buttonRotate7_Click(object sender, RoutedEventArgs e)
+        {
+            textBoxZ.Text = "180";
+            textBoxY.Text = "0";
+            textBoxX.Text = "0";
+        }
+
+        private void buttonRotate8_Click(object sender, RoutedEventArgs e)
+        {
+            textBoxY.Text = "180";
+            textBoxX.Text = "0";
+            textBoxZ.Text = "0";
+        }
     }
 }

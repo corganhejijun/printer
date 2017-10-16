@@ -358,22 +358,15 @@ EXPORT bool moveShape(void** pt, void** moveResult, int count, double x, double 
 
 EXPORT bool deleteShape(void** pt, int count)
 {
-    printf("ok0\n");
     for (int i = 0; i < count; i++)
     {
-        printf(" i = %d\n", i);
         ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
-        printf("ok1\n");
         if (shape != NULL) {
-            printf("ok2\n");
             shape->shapeSequence->Clear();
-            printf("ok3\n");
             // 这里不要delete 否则析构函数会再次delete，造成崩溃
             //shape->shapeSequence->Delete();
         }
-        printf("ok4\n");
         delete shape;
-        printf("ok5\n");
         *(pt + i * sizeof(void*)) = NULL;
     }
     return true;

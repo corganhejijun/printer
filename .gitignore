@@ -10,3 +10,4 @@ Thumbs.db
 Release_x86
 *.lib
 *.dxf
+*.exp

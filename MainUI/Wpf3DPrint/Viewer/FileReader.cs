@@ -406,5 +406,33 @@ namespace Wpf3DPrint.Viewer
             shapeList.Clear();
             shapeList.Add(shape);
         }
+
+        public void base0AllShapes()
+        {
+            double Zmin = 0;
+            foreach (Shape shape in shapeList)
+            {
+                if (Zmin > shape.Zmin)
+                    Zmin = shape.Zmin;
+            }
+            if (Zmin < 0.0001 && Zmin > -0.0001)
+                return;
+            foreach (Shape shape in shapeList)
+            {
+                IntPtr move = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * shape.count);
+                Cpp2Managed.moveShape(shape.shape, move, shape.count, 0, 0, -Zmin);
+                Cpp2Managed.deleteShape(shape.shape, shape.count);
+                Marshal.FreeHGlobal(shape.shape);
+                shape.shape = move;
+                shape.Zmin = shape.Zmin - Zmin;
+                shape.Zmax = shape.Zmax - Zmin;
+            }
+            scene.Proxy.removeObjects();
+            scene.Proxy.ZoomAllView();
+            foreach (Shape shape in shapeList)
+            {
+                scene.Proxy.displayShape(shape.shape, 0, 0);
+            }
+        }
     }
 }

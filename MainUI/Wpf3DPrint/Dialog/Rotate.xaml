@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="旋转" Height="263.843" Width="292.183" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
+        Title="旋转" Height="402.843" Width="410.183" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
     <Grid Margin="0,0,-6,3">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="167,181,0,0" VerticalAlignment="Top" Width="75" IsCancel="True" Height="19"/>
-        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="69,181,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click" Height="19"/>
+        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="285,316,0,0" VerticalAlignment="Top" Width="75" IsCancel="True" Height="19"/>
+        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="187,316,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click" Height="19"/>
         <Label x:Name="label" Content="X轴旋转" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="25" Width="54"/>
         <TextBox x:Name="textBoxX" HorizontalAlignment="Left" Height="23" Margin="69,12,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="66"/>
         <Label x:Name="label_Copy" Content="Y轴旋转" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top" Height="25" Width="53"/>
@@ -25,7 +25,33 @@
         <Label x:Name="label_Copy2" Content="度" HorizontalAlignment="Left" Margin="140,12,0,0" VerticalAlignment="Top" Height="25" Width="22"/>
         <Label x:Name="label_Copy3" Content="度" HorizontalAlignment="Left" Margin="140,40,0,0" VerticalAlignment="Top" Height="25" Width="22"/>
         <Label x:Name="label_Copy4" Content="度" HorizontalAlignment="Left" Margin="140,68,0,0" VerticalAlignment="Top" Height="25" Width="22"/>
-        <Button x:Name="buttonPreview" Content="预览" HorizontalAlignment="Left" Margin="167,118,0,0" VerticalAlignment="Top" Width="75" Click="buttonPreview_Click"/>
-
+        <Button x:Name="buttonPreview" Content="预览" HorizontalAlignment="Left" Margin="285,253,0,0" VerticalAlignment="Top" Width="75" Click="buttonPreview_Click"/>
+        <Button x:Name="buttonRotate1" ToolTip="绕Y轴逆时针旋转90度" HorizontalAlignment="Left" Margin="10,116,0,0" VerticalAlignment="Top" Width="40" Height="41" Background="White" Click="buttonRotate1_Click">
+            <Image Source="/images/Rotate1.png"></Image>
+        </Button>
+        <Button x:Name="buttonRotate2" ToolTip="绕Y轴顺时针旋转90度" HorizontalAlignment="Left" Margin="70,116,0,0" VerticalAlignment="Top" Width="40" Height="41" Background="White" Click="buttonRotate2_Click">
+            <Image Source="/images/Rotate2.png"></Image>
+        </Button>
+        <Button x:Name="buttonRotate3" ToolTip="绕X轴逆时针旋转90度" HorizontalAlignment="Left" Margin="130,116,0,0" VerticalAlignment="Top" Width="40" Height="41" Background="White" Click="buttonRotate3_Click">
+            <Image Source="/images/Rotate3.png"></Image>
+        </Button>
+        <Button x:Name="buttonRotate4" ToolTip="绕X轴顺时针旋转90度" HorizontalAlignment="Left" Margin="190,116,0,0" VerticalAlignment="Top" Width="40" Height="41" Background="White" Click="buttonRotate4_Click">
+            <Image Source="/images/Rotate4.png"></Image>
+        </Button>
+        <Button x:Name="buttonRotate5" ToolTip="绕Z轴逆时针旋转90度" HorizontalAlignment="Left" Margin="250,116,0,0" VerticalAlignment="Top" Width="40" Height="41" Background="White" Click="buttonRotate5_Click">
+            <Image Source="/images/Rotate5.png"></Image>
+        </Button>
+        <Button x:Name="buttonRotate6" ToolTip="绕Z轴顺时针旋转90度" HorizontalAlignment="Left" Margin="310,116,0,0" VerticalAlignment="Top" Width="40" Height="41" Background="White" Click="buttonRotate6_Click">
+            <Image Source="/images/Rotate6.png"></Image>
+        </Button>
+        <Button x:Name="buttonRotate7" ToolTip="绕Y轴逆时针旋转90度" HorizontalAlignment="Left" Margin="10,176,0,0" VerticalAlignment="Top" Width="40" Height="41" Background="White" Click="buttonRotate7_Click">
+            <Image Source="/images/Rotate7.png"></Image>
+        </Button>
+        <Button x:Name="buttonRotate8" ToolTip="绕Z轴旋转180度" HorizontalAlignment="Left" Margin="10,176,0,0" VerticalAlignment="Top" Width="40" Height="41" Background="White" Click="buttonRotate7_Click">
+            <Image Source="/images/Rotate7.png"></Image>
+        </Button>
+        <Button x:Name="buttonRotate9" ToolTip="绕Y轴旋转180度" HorizontalAlignment="Left" Margin="70,176,0,0" VerticalAlignment="Top" Width="40" Height="41" Background="White" Click="buttonRotate8_Click">
+            <Image Source="/images/Rotate8.png"></Image>
+        </Button>
     </Grid>
 </Window>

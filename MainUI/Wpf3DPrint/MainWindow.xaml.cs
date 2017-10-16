@@ -541,5 +541,15 @@ namespace Wpf3DPrint
             if (GridScene != null && (bool)ButtonRoll.IsChecked)
                 GridScene.Cursor = Cursors.Arrow;
         }
+
+        private void menuBase0_Click(object sender, RoutedEventArgs e)
+        {
+            if (!fileReader.HasFile)
+            {
+                MessageBox.Show("未打开3D文件");
+                return;
+            }
+            fileReader.base0AllShapes();
+        }
     }
 }
