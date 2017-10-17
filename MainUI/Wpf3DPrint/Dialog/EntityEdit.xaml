@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="图形编辑" Height="398.103" Width="382.212" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
+        Title="图形编辑" Height="443.103" Width="382.212" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
     <Grid>
-        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="231,321,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
-        <Button x:Name="buttonOk" Content="确定" HorizontalAlignment="Left" Margin="143,321,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOk_Click"/>
-        <CheckBox x:Name="checkBoxCenter" Content="以平面图形中心(X/Y)为原点" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <CheckBox x:Name="checkBoxCombine" Content="合并图形" HorizontalAlignment="Left" Margin="18,214,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <GroupBox x:Name="groupBox" Header="平移(正数正向平移，负数反向平移)" HorizontalAlignment="Left" Margin="11,90,0,0" VerticalAlignment="Top" Height="119" Width="274">
+        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="234,346,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
+        <Button x:Name="buttonOk" Content="下一步" HorizontalAlignment="Left" Margin="146,346,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOk_Click"/>
+        <CheckBox x:Name="checkBoxCenter" Content="以平面图形中心(X/Y)为原点" HorizontalAlignment="Left" Margin="13,140,0,0" VerticalAlignment="Top" IsChecked="True" IsEnabled="False"/>
+        <CheckBox x:Name="checkBoxCombine" Content="合并图形" HorizontalAlignment="Left" Margin="21,239,0,0" VerticalAlignment="Top" IsEnabled="False" IsChecked="True"/>
+        <GroupBox x:Name="groupBox" Header="平移(正数正向平移，负数反向平移)" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="119" Width="274">
             <Grid>
                 <Label x:Name="label" Content="X轴平移" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 <Label x:Name="label2" Content="Y轴平移" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top"/>
@@ -21,18 +21,19 @@
                 <TextBox x:Name="textBoxZ" HorizontalAlignment="Left" Height="23" Margin="69,68,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="84"/>
             </Grid>
         </GroupBox>
-        <CheckBox x:Name="checkBoxCombine_Copy" Content="炸开图形(非解除合并)" HorizontalAlignment="Left" Margin="112,214,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label1" Content="图形排样" HorizontalAlignment="Left" Margin="11,237,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="checkBoxAuto" Content="自动" HorizontalAlignment="Left" Margin="74,243,0,0" VerticalAlignment="Top" IsChecked="True" Checked="checkBoxAuto_Checked"/>
-        <CheckBox x:Name="checkBoxMenual" Content="手动" HorizontalAlignment="Left" Margin="135,243,0,0" VerticalAlignment="Top" Checked="checkBoxMenual_Checked"/>
-        <Label x:Name="label1_Copy" Content="图形边界处理(分区域中连续交界)" HorizontalAlignment="Left" Margin="11,267,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="210,271,0,0" VerticalAlignment="Top" Width="88" SelectedIndex="0" RenderTransformOrigin="0.511,0.444">
+        <CheckBox x:Name="checkBoxUncombine" Content="炸开图形" HorizontalAlignment="Left" Margin="115,239,0,0" VerticalAlignment="Top" IsEnabled="False"/>
+        <Label x:Name="label1" Content="图形排样" HorizontalAlignment="Left" Margin="14,262,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="checkBoxAuto" Content="自动" HorizontalAlignment="Left" Margin="77,268,0,0" VerticalAlignment="Top" IsChecked="True" Checked="checkBoxAuto_Checked" IsEnabled="False"/>
+        <CheckBox x:Name="checkBoxManual" Content="手动" HorizontalAlignment="Left" Margin="138,268,0,0" VerticalAlignment="Top" Checked="checkBoxManual_Checked" IsEnabled="False"/>
+        <Label x:Name="label1_Copy" Content="图形边界处理(分区域中连续交界)" HorizontalAlignment="Left" Margin="14,292,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="213,296,0,0" VerticalAlignment="Top" Width="88" SelectedIndex="0" RenderTransformOrigin="0.511,0.444" IsEnabled="False">
             <ComboBoxItem Content="独立刀补"/>
             <ComboBoxItem Content="单边刀补"/>
             <ComboBoxItem Content="融合(无刀补)"/>
         </ComboBox>
-        <Button x:Name="buttonAdd" Content="添加图形..." HorizontalAlignment="Left" Margin="10,30,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
-        <Label x:Name="labelAdd" Content="" HorizontalAlignment="Left" Margin="15,54,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="buttonAdd" Content="添加图形..." HorizontalAlignment="Left" Margin="13,160,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click" IsEnabled="False"/>
+        <Label x:Name="labelAdd" Content="" HorizontalAlignment="Left" Margin="18,184,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="buttonPrev" Content="上一步" HorizontalAlignment="Left" Margin="57,346,0,0" VerticalAlignment="Top" Width="75" Visibility="Hidden" Click="buttonPrev_Click"/>
 
     </Grid>
 </Window>
