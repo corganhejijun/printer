@@ -324,8 +324,6 @@
     <Image Include="res\LIGHTON.ICO" />
     <Image Include="res\RP.ico" />
     <Image Include="res\Toolbar.bmp" />
-    <Image Include="res\ToolbarDisabled.bmp" />
-    <Image Include="res\ToolbarNormal.bmp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\RP.rc2" />

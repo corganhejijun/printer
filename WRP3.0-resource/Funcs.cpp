@@ -1671,7 +1671,7 @@ void CRPApp::SaveParams()
 	WriteProfileInt("参数","保存参数",AppParam.bAutoSaveParam);
 	if(AppParam.bAutoSaveParam==0)return;
 	/////////////////////硬件参数
-
+    /*
 	DWORD dw;long lResult;
 	HKEY hAppKey=MyGetAppRegistryKey();HKEY hSecKey;
 	if(hAppKey==NULL) goto regerror;
@@ -1686,6 +1686,7 @@ void CRPApp::SaveParams()
 		RegCloseKey(hSecKey);
 	}
 	RegCloseKey(hAppKey);
+    */
 	//////////////////////软件参数
 	WriteProfileInt("参数","每次都调整中心",AppParam.bCenterAjustEveryTime);
 	WriteProfileFloat("参数","缩放比例",AppParam.fScale);
@@ -1697,7 +1698,7 @@ void CRPApp::SaveParams()
 	WriteProfileFloat("参数","初始角度",AppParam.fCncFirstAngle);
 	WriteProfileInt("参数","扫描方式",AppParam.bCncOrder);
 	WriteProfileInt("参数","反馈间隔",AppParam.ifreebackinterval);
-	dw=0;
+	DWORD dw=0;
 	if(AppParam.bCheckSelfXOnLoopBuild)dw|=0x0001;
 	if(AppParam.bCheckSelfXAfterLoopBuild)dw|=0x0010;
 	if(AppParam.bCheckSelfXAfterOffset)dw|=0x0100;
@@ -1705,8 +1706,10 @@ void CRPApp::SaveParams()
 	WriteProfileInt("参数","十字网格平行栅",AppParam.bCncLineCross);
 	WriteProfileInt("参数","自相交",dw);
 	return;
+    /*
 regerror:
 	AfxMessageBox("注册表读取错误");
+    */
 }
 
 

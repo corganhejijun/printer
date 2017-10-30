@@ -77,8 +77,6 @@ IDI_ICON1               ICON                    "res\\ico00001.ico"
 //
 
 IDB_IMAGELIST           BITMAP                  "res\\bitmap1.bmp"
-IDB_DISABLED            BITMAP                  "res\\ToolbarDisabled.bmp"
-IDB_NORMAL              BITMAP                  "res\\ToolbarNormal.bmp"
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -678,7 +676,7 @@ END
 // Toolbar
 //
 
-IDR_MAINFRAME TOOLBAR 32, 32
+IDR_MAINFRAME TOOLBAR 16, 16
 BEGIN
     BUTTON      ID_FILE_NEW
     BUTTON      ID_FILE_OPEN_WITH_CAD

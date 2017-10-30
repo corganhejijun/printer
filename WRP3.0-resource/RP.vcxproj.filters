@@ -222,12 +222,6 @@
     <Image Include="res\Toolbar.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\ToolbarDisabled.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\ToolbarNormal.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\RP.rc2">
