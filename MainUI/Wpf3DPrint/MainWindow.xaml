@@ -21,6 +21,7 @@
                 <MenuItem x:Name="menuSaveAs" Header="保存实体..." Click="buttonSaveAs_Click"></MenuItem>
                 <MenuItem x:Name="menuOpenSlice" Header="导入切片..." Click="buttonOpenSlice_Click"></MenuItem>
                 <MenuItem x:Name="menuSaveSlice" Header="导出切片..." Click="buttonSave_Click"></MenuItem>
+                <MenuItem x:Name="menuDxfSlice" Header="导出切片到RP..." Click="buttonSaveDxf_Click"></MenuItem>
                 <MenuItem x:Name="menuCloseFile" Header="关闭" Click="buttonClose_Click"></MenuItem>
                 <MenuItem x:Name="menuQuit" Header="退出" Click="buttonQuit_Click"></MenuItem>
             </MenuItem>
@@ -80,6 +81,12 @@
                         <StackPanel Orientation="Horizontal">
                             <Image Source="images/Slice.ico" Width="16"></Image>
                             <TextBlock Margin="5,0,0,0">切片</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button ToolTip="导出到RP" x:Name="exportRp" Click="buttonSaveDxf_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="images/RP.ico" Width="16"></Image>
+                            <TextBlock Margin="5,0,0,0">导出到RP</TextBlock>
                         </StackPanel>
                     </Button>
                     <Button ToolTip="旋转" x:Name="ButtonRotate" Click="menuRotate_Click">

@@ -34,6 +34,7 @@ typedef struct Slice{
     void* data;
     Slice* next;
     Slice* prev;
+    double z;
 }Slice;
 
 #endif

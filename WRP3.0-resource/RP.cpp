@@ -128,11 +128,16 @@ BOOL CRPApp::InitInstance()
 	// The main window has been initialized, so show and update it.
 	m_nCmdShow=SW_SHOWMAXIMIZED;
 	ShowChildWindow(VIEW_2D_SHAPE);	
-	
 
 	pFrame->ShowWindow(m_nCmdShow);
 	pFrame->UpdateWindow();
 	// create  2d 3d MDI child window
+    for (int i = 1; i < __argc; i++)
+    {
+        if (strncmp("-f", __argv[i], strlen("-f")) == 0) {
+            AppFileOpen(&(__argv[i][strlen("-f ")]));
+        }
+    }
 
 //	ShowChildWindow(VIEW_3D_DESIGN);
 	return TRUE;
@@ -224,8 +229,8 @@ void CRPApp::OnFileOpen()
 {
 		/////////////////////打开一个DXF文件 
 		static char szOpenFile[MAX_PATH];
-		static OPENFILENAMEEX ofn={ sizeof(OPENFILENAME),m_pMainWnd->m_hWnd,NULL,
-		"所有支持文件(*.dxf,*.dwg)\0*.dxf;*.dwg\0AutoCAD 2000 DXF文件(*.dxf)\0*.dxf\0AutoCAD 2000 dwg文件(*.dwg)\0*.dwg\0所有文件(*.*)\0*.*\0\0",
+        static OPENFILENAMEEX ofn = { sizeof(OPENFILENAME),m_pMainWnd->m_hWnd,NULL,
+        "所有支持文件(*.dxf,*.dwg,*.pr)\0*.pr;*.dxf;*.dwg;\0PR文件(*.pr)\0*.pr\0AutoCAD 2000 DXF文件(*.dxf)\0*.dxf\0AutoCAD 2000 dwg文件(*.dwg)\0*.dwg\0所有文件(*.*)\0*.*\0\0",
 		(LPSTR)NULL,0L,1,szOpenFile,sizeof(szOpenFile),szFileTitle,sizeof(szFileTitle),
 		NULL,(LPSTR)NULL,OFN_FILEMUSTEXIST,0,0,"dxf",
 		NULL,NULL,NULL

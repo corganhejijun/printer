@@ -11,7 +11,7 @@
         <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="251,283,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
         <Label x:Name="labelThickness" Content="分层厚度:" HorizontalAlignment="Left" Margin="10,205,0,0" VerticalAlignment="Top"/>
         <Label x:Name="labelCnt" Content="Label" HorizontalAlignment="Left" Margin="212,205,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBoxThick" HorizontalAlignment="Left" Height="23" Margin="76,207,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" LostFocus="textBoxThick_LostFocus"/>
+        <TextBox x:Name="textBoxThick" HorizontalAlignment="Left" Height="23" Margin="76,207,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" LostFocus="textBoxThick_LostFocus" KeyUp="textBoxThick_KeyUp"/>
         <CheckBox x:Name="checkBoxLocatePlane" Content="突变形体处理" HorizontalAlignment="Left" Margin="10,139,0,0" VerticalAlignment="Top" IsChecked="True"/>
         <CheckBox x:Name="checkBoxGradient" Content="渐变形体处理" HorizontalAlignment="Left" Margin="107,139,0,0" VerticalAlignment="Top"/>
         <Label x:Name="labelThickness_Copy" Content="输出比例:" HorizontalAlignment="Left" Margin="10,170,0,0" VerticalAlignment="Top"/>

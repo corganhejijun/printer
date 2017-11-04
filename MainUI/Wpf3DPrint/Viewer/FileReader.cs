@@ -86,6 +86,17 @@ namespace Wpf3DPrint.Viewer
             list.Clear();
             list.Add(result);
             Shape shape = new Shape(shapePt, count);
+            for (int i = 0; i < count; i++)
+            {
+                double zMin = 0, zMax = 0, yMin = 0, yMax = 0, xMin = 0, xMax = 0;
+                Cpp2Managed.getShapeBoundary(shape.shape, i, ref zMin, ref zMax, ref yMin, ref yMax, ref xMin, ref xMax);
+                shape.Zmin = shape.Zmin < zMin ? shape.Zmin : zMin;
+                shape.Zmax = shape.Zmax > zMax ? shape.Zmax : zMax;
+                shape.Ymin = shape.Ymin < yMin ? shape.Ymin : yMin;
+                shape.Ymax = shape.Ymax > yMax ? shape.Ymax : yMax;
+                shape.Xmin = shape.Xmin < xMin ? shape.Xmin : xMin;
+                shape.Xmax = shape.Xmax > xMax ? shape.Xmax : xMax;
+            }
             if (isSlice)
                 shape.stepSlice = slice;
             list.Add(shape);

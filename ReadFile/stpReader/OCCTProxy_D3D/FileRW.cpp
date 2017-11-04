@@ -151,6 +151,7 @@ void addBSpline(Slice* slice, double beginX, double beginY, double endX, double 
 void addVertex(TopoDS_Shape shape, Slice* slice, Point* bSplinePoles, int polesCnt) {
     int i = 0;
     double beginX, beginY, endX, endY;
+    double z;
     for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
         i++;
         TopoDS_Shape child = anIt.Value();
@@ -162,6 +163,7 @@ void addVertex(TopoDS_Shape shape, Slice* slice, Point* bSplinePoles, int polesC
             case 1:
                 beginX = pt.X();
                 beginY = pt.Y();
+                z = pt.Z();
                 break;
             case 2:
                 endX = pt.X();
@@ -177,8 +179,10 @@ void addVertex(TopoDS_Shape shape, Slice* slice, Point* bSplinePoles, int polesC
         addBSpline(slice, beginX, beginY, endX, endY, bSplinePoles, polesCnt);
     }
     else {
-        if (polesCnt == 0)
+        if (polesCnt == 0) {
             addLine(slice, beginX, beginY, endX, endY);
+            slice->z = z;
+        }
         if (polesCnt == 1)
             addCircleVertex(slice, beginX, beginY, endX, endY);
     }
@@ -202,6 +206,7 @@ void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
                     ", center is (" << center.X() << "," << center.Y() << "," << center.Z() << ")" 
                     ", start angle is " << (first/M_PI*180) << ", end angle is " << (last/M_PI*180) << endl;
                 addVertex(child, target, NULL, 1);
+                target->z = center.Z();
             } else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_BSplineCurve) {
                 Handle_Geom_BSplineCurve bSpline = adpCurve.BSpline();
                 for (int i = 0; i < layer; i++)
@@ -232,6 +237,7 @@ void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
                 }
                 file << endl;
                 addVertex(child, slice, pointArray, polesCount);
+                slice->z = Poles(1).Z();
             }
             else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_Line) {
                 addVertex(child, slice, NULL, 0);
@@ -494,4 +500,57 @@ EXPORT bool exportStep(char* fileName, ShapeContainer** slices, int length) {
 
 EXPORT bool exportTransformStep(char* fileName, ShapeContainer** slices, int length) {
     return exportStep(fileName, slices, length);
+}
+
+EXPORT Slice* exportSlice(Slice** ss, int layerNum, Slice* current, int* type, double* x, double* y, double* z, double* p) {
+    Slice* slice = NULL;
+    if (current == NULL)
+        slice = &(*ss)[layerNum];
+    else
+        slice = current;
+    *type = slice->type;
+    *z = slice->z;
+    switch (slice->type)
+    {
+    case EdgeType::circle: {
+        Circle* circle = (Circle*)(slice->data);
+        *x = circle->center.x;
+        *y = circle->center.y;
+        p[0] = circle->radius;
+        p[1] = circle->startAngle;
+        p[2] = circle->endAngle;
+        p[3] = circle->start.x;
+        p[4] = circle->start.y;
+        p[5] = circle->end.x;
+        p[6] = circle->end.y;
+    }
+        break;
+    case EdgeType::bSplice: {
+        BSpline* bspline = (BSpline*)(slice->data);
+        *x = bspline->start.x;
+        *y = bspline->start.y;
+        p[0] = bspline->polesCnt;
+        p[1] = bspline->end.x;
+        p[2] = bspline->end.y;
+    }
+        break;
+    case EdgeType::line: {
+        Line* line = (Line*)(slice->data);
+        *x = line->start.x;
+        *y = line->start.y;
+        p[0] = line->end.x;
+        p[1] = line->end.y;
+    }
+        break;
+    default:
+        break;
+    }
+    return slice->next;
+}
+
+EXPORT bool exportBspline(Slice* current, int index, double* x, double* y) {
+    BSpline* bspline = (BSpline*)(current->data);
+    *x = bspline->poles[index].x;
+    *y = bspline->poles[index].y;
+    return true;
 }

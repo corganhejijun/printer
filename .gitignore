@@ -11,3 +11,5 @@ Release_x86
 *.lib
 *.dxf
 *.exp
+*.step
+*.slc

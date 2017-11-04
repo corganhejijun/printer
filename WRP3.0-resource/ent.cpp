@@ -209,7 +209,7 @@ int XLineLine(double a1,double b1,double c1,EntFull*pEnt,float&x,float&y){
 }
 
 int XLineLine(EntFull*pEnt1,EntFull*pEnt2,float& x,float& y){
-	int p1,p2;
+	int p1 = 0,p2 = 0;
 	ASSERT(pEnt1->flag&ENT_ABCVALID);
 	p2=XLineLine(pEnt1->a,pEnt1->b,pEnt1->c,pEnt2,x,y);
 	if(p2==PTUNKNOW){////直线重合

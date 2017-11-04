@@ -157,7 +157,7 @@ BOOL AppFileOpen(LPSTR szFile){
 		npos=str.ReverseFind('.');
 		if(npos==-1)return FALSE;
 		str.Delete(0,npos+1);
-		if(str.CompareNoCase("dxf")==0){
+		if(str.CompareNoCase("dxf")==0 || str.CompareNoCase("pr")==0){
 			if(!ReadDxfFile(szFile,&EntSpace))return FALSE;
 		}else  if(str.CompareNoCase("dwg")==0){
 			if(!ReadDwgFile(szFile,&EntSpace))return FALSE;

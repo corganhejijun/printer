@@ -72,7 +72,7 @@ namespace Wpf3DPrint.Dialog
             }
         }
 
-        private void textBoxThick_LostFocus(object sender, RoutedEventArgs e)
+        void calculateLayerNum()
         {
             try
             {
@@ -84,6 +84,16 @@ namespace Wpf3DPrint.Dialog
             {
                 textBoxThick.Text = "输入值错误";
             }
+        }
+
+        private void textBoxThick_LostFocus(object sender, RoutedEventArgs e)
+        {
+            calculateLayerNum();
+        }
+
+        private void textBoxThick_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            calculateLayerNum();
         }
     }
 }

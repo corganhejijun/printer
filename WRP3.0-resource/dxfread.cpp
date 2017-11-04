@@ -55,16 +55,19 @@ BOOL ReadDxfFile(LPSTR szFile,ESpace *pEntSpace){
 //		if(!(dxfCode.Compare("  9")||dxfValue.Compare("$ACADVER"))) 
 //			return NULL;
 		//读取图幅大小
-		if((dxfCode=="  9")&&(dxfValue=="$EXTMIN")||
-			(dxfValue=="$EXTMAX"))
+		if((dxfCode=="  9") && (dxfValue=="$EXTMIN")||(dxfValue=="$EXTMAX"))
 			ReadSize(dxfFile,dxfCode,dxfValue,pEntSpace);
 		//读取实体信息
 		if((dxfCode=="  2")&&(dxfValue=="ENTITIES")) {
 			while(TRUE){
-				if(dxfValue=="ARC") ReadArc(dxfFile,era,dxfValue,pEntSpace);
-				else if(dxfValue=="CIRCLE") ReadCircle(dxfFile,era,dxfValue,pEntSpace);
-				else if(dxfValue=="LINE") ReadLine(dxfFile,era,dxfValue,pEntSpace);
-				else if(dxfValue=="ENDSEC") break;
+				if(dxfValue=="ARC") 
+                    ReadArc(dxfFile,era,dxfValue,pEntSpace);
+				else if(dxfValue=="CIRCLE") 
+                    ReadCircle(dxfFile,era,dxfValue,pEntSpace);
+				else if(dxfValue=="LINE") 
+                    ReadLine(dxfFile,era,dxfValue,pEntSpace);
+				else if(dxfValue=="ENDSEC") 
+                    break;
 				else{
 					dxfFile.ReadString(dxfCode);
 					dxfFile.ReadString(dxfValue);}

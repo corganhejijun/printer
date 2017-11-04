@@ -147,6 +147,7 @@
     <Compile Include="Dialog\Rotate.xaml.cs">
       <DependentUpon>Rotate.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DxfWriter.cs" />
     <Compile Include="Themes\IndentConverter.cs" />
     <Compile Include="Themes\TreeViewItemExt.cs" />
     <Compile Include="Themes\VisualTreeEx.cs" />
@@ -324,6 +325,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="images\Rotate8.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="images\RP.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

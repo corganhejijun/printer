@@ -551,5 +551,34 @@ namespace Wpf3DPrint
             }
             fileReader.base0AllShapes();
         }
+
+        private void buttonSaveDxf_Click(object sender, RoutedEventArgs e)
+        {
+            if (!fileReader.HasFile)
+            {
+                MessageBox.Show("未打开3D文件");
+                return;
+            }
+            if (fileReader.Shape.sliceList.Count == 0)
+            {
+                MessageBox.Show("没有切片");
+                return;
+            }
+            SaveFileDialog saveFile = new SaveFileDialog();
+            saveFile.FileName = "model";
+            saveFile.DefaultExt = "pr";
+            saveFile.Filter = "pr file (*.pr)|*.pr";
+            if (false == saveFile.ShowDialog())
+                return;
+            DxfWriter writer = new DxfWriter(saveFile.FileName, fileReader.Shape);
+            writer.writeSlice();
+            writer.Dispose();
+            if (MessageBox.Show("保存完成, 是否使用RP软件打开?", "OK", MessageBoxButton.OKCancel) != MessageBoxResult.OK)
+                return;
+            System.Diagnostics.Process exep = new System.Diagnostics.Process();
+            exep.StartInfo.FileName = "RP.exe";
+            exep.StartInfo.Arguments = "-f " + saveFile.FileName;
+            exep.Start();
+        }
     }
 }
