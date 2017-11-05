@@ -230,7 +230,7 @@ void CRPApp::OnFileOpen()
 		/////////////////////打开一个DXF文件 
 		static char szOpenFile[MAX_PATH];
         static OPENFILENAMEEX ofn = { sizeof(OPENFILENAME),m_pMainWnd->m_hWnd,NULL,
-        "所有支持文件(*.dxf,*.dwg,*.pr)\0*.pr;*.dxf;*.dwg;\0PR文件(*.pr)\0*.pr\0AutoCAD 2000 DXF文件(*.dxf)\0*.dxf\0AutoCAD 2000 dwg文件(*.dwg)\0*.dwg\0所有文件(*.*)\0*.*\0\0",
+        "所有支持文件(*.dxf,*.dwg,*.rp)\0*.rp;*.dxf;*.dwg;\0RP文件(*.rp)\0*.rp\0AutoCAD 2000 DXF文件(*.dxf)\0*.dxf\0AutoCAD 2000 dwg文件(*.dwg)\0*.dwg\0所有文件(*.*)\0*.*\0\0",
 		(LPSTR)NULL,0L,1,szOpenFile,sizeof(szOpenFile),szFileTitle,sizeof(szFileTitle),
 		NULL,(LPSTR)NULL,OFN_FILEMUSTEXIST,0,0,"dxf",
 		NULL,NULL,NULL

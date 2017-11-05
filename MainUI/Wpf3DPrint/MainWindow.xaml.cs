@@ -566,8 +566,8 @@ namespace Wpf3DPrint
             }
             SaveFileDialog saveFile = new SaveFileDialog();
             saveFile.FileName = "model";
-            saveFile.DefaultExt = "pr";
-            saveFile.Filter = "pr file (*.pr)|*.pr";
+            saveFile.DefaultExt = "rp";
+            saveFile.Filter = "RP file (*.rp)|*.rp";
             if (false == saveFile.ShowDialog())
                 return;
             DxfWriter writer = new DxfWriter(saveFile.FileName, fileReader.Shape);
