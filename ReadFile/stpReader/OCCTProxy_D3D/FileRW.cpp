@@ -122,7 +122,7 @@ void addCircleVertex(Slice* slice, double beginX, double beginY, double endX, do
     circle->end.y = endY;
 }
 
-void addLine(Slice* slice, double beginX, double beginY, double endX, double endY) {
+Slice* addLine(Slice* slice, double beginX, double beginY, double endX, double endY) {
     Slice* target = getEmptySlice(slice);
     target->type = EdgeType::line;
     target->data = new Line();
@@ -131,6 +131,7 @@ void addLine(Slice* slice, double beginX, double beginY, double endX, double end
     line->start.y = beginY;
     line->end.x = endX;
     line->end.y = endY;
+    return target;
 }
 
 void addBSpline(Slice* slice, double beginX, double beginY, double endX, double endY, Point* bSplinePoles, int polesCnt) {
@@ -180,8 +181,8 @@ void addVertex(TopoDS_Shape shape, Slice* slice, Point* bSplinePoles, int polesC
     }
     else {
         if (polesCnt == 0) {
-            addLine(slice, beginX, beginY, endX, endY);
-            slice->z = z;
+            Slice* target = addLine(slice, beginX, beginY, endX, endY);
+            target->z = z;
         }
         if (polesCnt == 1)
             addCircleVertex(slice, beginX, beginY, endX, endY);

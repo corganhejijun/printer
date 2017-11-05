@@ -135,9 +135,9 @@ namespace Wpf3DPrint
             __file.WriteLine(" 40");
             __file.WriteLine(r.ToString());
             __file.WriteLine(" 50");
-            __file.WriteLine(startAngle.ToString());
+            __file.WriteLine((startAngle * 180 / Math.PI).ToString());
             __file.WriteLine(" 51");
-            __file.WriteLine(endAngle.ToString());
+            __file.WriteLine((endAngle * 180 / Math.PI).ToString());
             if (normal < 0)
             {
                 __file.WriteLine("230");
