@@ -30,20 +30,20 @@ namespace Wpf3DPrint
             __file.WriteLine("  9");
             __file.WriteLine("$EXTMIN");
             __file.WriteLine(" 10");
-            __file.WriteLine(minX.ToString());
+            __file.WriteLine(Math.Round(minX, 4).ToString());
             __file.WriteLine(" 20");
-            __file.WriteLine(minY.ToString());
+            __file.WriteLine(Math.Round(minY, 4).ToString());
             __file.WriteLine(" 30");
-            __file.WriteLine(minZ.ToString());
+            __file.WriteLine(Math.Round(minZ, 4).ToString());
 
             __file.WriteLine("  9");
             __file.WriteLine("$EXTMAX");
             __file.WriteLine(" 10");
-            __file.WriteLine(maxX.ToString());
+            __file.WriteLine(Math.Round(maxX, 4).ToString());
             __file.WriteLine(" 20");
-            __file.WriteLine(maxY.ToString());
+            __file.WriteLine(Math.Round(maxY, 4).ToString());
             __file.WriteLine(" 30");
-            __file.WriteLine(maxZ.ToString());
+            __file.WriteLine(Math.Round(maxZ, 4).ToString());
             __file.WriteLine("  0");
             __file.WriteLine("ENDSEC");
         }
@@ -108,13 +108,13 @@ namespace Wpf3DPrint
             __file.WriteLine("  0");
             __file.WriteLine("CIRCLE");
             __file.WriteLine(" 10");
-            __file.WriteLine(cx.ToString());
+            __file.WriteLine(Math.Round(cx, 4).ToString());
             __file.WriteLine(" 20");
-            __file.WriteLine(cy.ToString());
+            __file.WriteLine(Math.Round(cy, 4).ToString());
             __file.WriteLine(" 30");
-            __file.WriteLine(cz.ToString());
+            __file.WriteLine(Math.Round(cz, 4).ToString());
             __file.WriteLine(" 40");
-            __file.WriteLine(r.ToString());
+            __file.WriteLine(Math.Round(r, 4).ToString());
             if (normal < 0)
             {
                 __file.WriteLine("230");
@@ -127,17 +127,17 @@ namespace Wpf3DPrint
             __file.WriteLine("  0");
             __file.WriteLine("ARC");
             __file.WriteLine(" 10");
-            __file.WriteLine(cx.ToString());
+            __file.WriteLine(Math.Round(cx, 4).ToString());
             __file.WriteLine(" 20");
-            __file.WriteLine(cy.ToString());
+            __file.WriteLine(Math.Round(cy, 4).ToString());
             __file.WriteLine(" 30");
-            __file.WriteLine(cz.ToString());
+            __file.WriteLine(Math.Round(cz, 4).ToString());
             __file.WriteLine(" 40");
-            __file.WriteLine(r.ToString());
+            __file.WriteLine(Math.Round(r, 4).ToString());
             __file.WriteLine(" 50");
-            __file.WriteLine((startAngle * 180 / Math.PI).ToString());
+            __file.WriteLine(Math.Round((startAngle * 180 / Math.PI), 4).ToString());
             __file.WriteLine(" 51");
-            __file.WriteLine((endAngle * 180 / Math.PI).ToString());
+            __file.WriteLine(Math.Round((endAngle * 180 / Math.PI), 4).ToString());
             if (normal < 0)
             {
                 __file.WriteLine("230");
@@ -150,15 +150,15 @@ namespace Wpf3DPrint
             __file.WriteLine("  0");
             __file.WriteLine("LINE");
             __file.WriteLine(" 10");
-            __file.WriteLine(xStart.ToString());
+            __file.WriteLine(Math.Round(xStart, 4).ToString());
             __file.WriteLine(" 20");
-            __file.WriteLine(yStart.ToString());
+            __file.WriteLine(Math.Round(yStart, 4).ToString());
             __file.WriteLine(" 30");
-            __file.WriteLine(z.ToString());
+            __file.WriteLine(Math.Round(z, 4).ToString());
             __file.WriteLine(" 11");
-            __file.WriteLine(xEnd.ToString());
+            __file.WriteLine(Math.Round(xEnd, 4).ToString());
             __file.WriteLine(" 21");
-            __file.WriteLine(yEnd.ToString());
+            __file.WriteLine(Math.Round(yEnd, 4).ToString());
         }
 
         public void Dispose()

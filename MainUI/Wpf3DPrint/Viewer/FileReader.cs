@@ -76,14 +76,32 @@ namespace Wpf3DPrint.Viewer
         {
             ArrayList list = (ArrayList)args;
             string fileName = (string)list[0];
-            bool isSlice = (bool)list[1];
-            int count = 500;
-            IntPtr shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * count);
-            IntPtr slice = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
             IntPtr fileNameSpace = NativeUtf8FromString(fileName);
-            bool result = Cpp2Managed.ImportStep(fileNameSpace, ref count, shapePt, isSlice, slice);
-            Marshal.FreeHGlobal(fileNameSpace);
+            bool result = false;
+            IntPtr shapePt = IntPtr.Zero;
+            int count = 1;
+            bool isSlice = (bool)list[1];
+            IntPtr slice = IntPtr.Zero;
             list.Clear();
+            if (fileName.EndsWith(".stp") || fileName.EndsWith(".step") || fileName.EndsWith(".slc"))
+            {
+                count = 500;
+                shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * count);
+                slice = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
+                result = Cpp2Managed.ImportStep(fileNameSpace, ref count, shapePt, isSlice, slice);
+                Marshal.FreeHGlobal(fileNameSpace);
+            }
+            else if (fileName.EndsWith(".stl") || fileName.EndsWith("ast"))
+            {
+                shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
+                result = Cpp2Managed.ImportStl(fileNameSpace, shapePt);
+                Marshal.FreeHGlobal(fileNameSpace);
+            }
+            else
+            {
+                list.Add(false);
+                return list;
+            }
             list.Add(result);
             Shape shape = new Shape(shapePt, count);
             for (int i = 0; i < count; i++)

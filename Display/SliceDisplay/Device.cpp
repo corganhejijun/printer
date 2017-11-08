@@ -579,7 +579,7 @@ int SliceDevice::drawBSpline(BSpline* spline) {
     int totalLine = 10;
     int skipCount = spline->polesCnt / totalLine;
     for (int i = 0; i < spline->polesCnt; i++) {
-        if (i % skipCount < skipCount - 1)
+        if (skipCount > 0 && i % skipCount < skipCount - 1)
             continue;
         point2 = D2D1::Point2F(spline->poles[i].x, spline->poles[i].y); 
         float x = point2.x - point.x;

@@ -437,9 +437,10 @@ void ParamMakeExt(EntFull*pEnt){
 				pEnt->gstart<=-1.5f*PI) pEnt->ymax=pEnt->yc+pEnt->r ;
 			else pEnt->ymax=pEnt->ystart>pEnt->yend?pEnt->ystart:pEnt->yend; 
 				
-			if((pEnt->gstart-1.5f*PI)*(pEnt->gend-1.5f*PI)<=0||
-				(pEnt->gstart+HALFPI)*(pEnt->gend+HALFPI)<=0) pEnt->ymin=pEnt->yc-pEnt->r;
-			else pEnt->ymin=pEnt->ystart>pEnt->yend?pEnt->yend:pEnt->ystart;
+			if((pEnt->gstart-1.5f*PI)*(pEnt->gend-1.5f*PI)<=0||(pEnt->gstart+HALFPI)*(pEnt->gend+HALFPI)<=0) 
+                pEnt->ymin=pEnt->yc-pEnt->r;
+			else 
+                pEnt->ymin=pEnt->ystart>pEnt->yend?pEnt->yend:pEnt->ystart;
 		}
 	}
 	pEnt->flag|=ENT_EXTVALID;

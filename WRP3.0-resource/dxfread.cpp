@@ -4,8 +4,8 @@
 #include <afxtempl.h>
 
 /////static 
-static CArray<float,float>Zar;
-static CArray<int,int>Iar;
+static CArray<float,float>Zar;  // 用于存储z向高度列表
+static CArray<int,int>Iar;      // 对应高度列表的实体数目递增编号
 ///////////////Local Functions///////////////////
 void AppFileClose();
 static void ReadSize(CStdioFile& dxfFile,CString& Code,CString& Value,ESpace *pEntSpace);

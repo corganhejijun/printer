@@ -64,7 +64,7 @@ namespace Wpf3DPrint
             }
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.DefaultExt = ".stp";
-            openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step";
+            openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step|STL Mesh(*.stl;*.ast)|*.stl;*.ast";
             if (openFile.ShowDialog() == false)
                 return;
             if (!fileReader.openStep(openFile.FileName, afterOpenStep, false))

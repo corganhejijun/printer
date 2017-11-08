@@ -9,6 +9,9 @@ namespace Wpf3DPrint.Viewer
         public static extern bool ImportStep(IntPtr theFileName, ref int cnt, IntPtr shapes, bool isSlice, IntPtr slice);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImportStl(IntPtr theFileName, IntPtr shapes);
+
+        [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool deleteShape(IntPtr shapes, int cnt);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]

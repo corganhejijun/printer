@@ -66,6 +66,12 @@
 #include <gp_Trsf.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepAlgoAPI_Fuse.hxx>
+#include <RWStl.hxx>
+#include <StlMesh_Mesh.hxx>
+#include <StlMesh_MeshExplorer.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
+#include <BRepBuilderAPI_MakePolygon.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
 
 #include <iostream>
 #include <fstream>
@@ -264,9 +270,69 @@ void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
     --layer;
 }
 
+EXPORT bool ImportStl(char* theFileName, void** shapes) {
+    OSD_Path aFile(theFileName);
+    Standard_Boolean ReturnValue = Standard_True;
+
+    Handle(StlMesh_Mesh) aSTLMesh = RWStl::ReadFile(aFile);
+
+    TopoDS_Compound ResultShape;
+    BRep_Builder CompoundBuilder;
+    CompoundBuilder.MakeCompound(ResultShape);
+
+    Standard_Integer NumberDomains = aSTLMesh->NbDomains();
+    Standard_Integer iND;
+    gp_XYZ p1, p2, p3;
+    TopoDS_Vertex Vertex1, Vertex2, Vertex3;
+    TopoDS_Face AktFace;
+    TopoDS_Wire AktWire;
+    BRep_Builder B;
+    Standard_Real x1, y1, z1;
+    Standard_Real x2, y2, z2;
+    Standard_Real x3, y3, z3;
+
+    StlMesh_MeshExplorer aMExp(aSTLMesh);
+
+    //	BRepBuilderAPI_MakeWire WireCollector;
+    for (iND = 1; iND <= NumberDomains; iND++) {
+        for (aMExp.InitTriangle(iND); aMExp.MoreTriangle(); aMExp.NextTriangle())
+        {
+            aMExp.TriangleVertices(x1,y1,z1,x2,y2,z2,x3,y3,z3);
+                p1.SetCoord(x1,y1,z1);
+                p2.SetCoord(x2,y2,z2);
+                p3.SetCoord(x3,y3,z3);
+
+                if ((!(p1.IsEqual(p2,0.0))) && (!(p1.IsEqual(p3,0.0))))
+                {
+                    Vertex1 = BRepBuilderAPI_MakeVertex(p1);
+                        Vertex2 = BRepBuilderAPI_MakeVertex(p2);
+                    Vertex3 = BRepBuilderAPI_MakeVertex(p3);
+
+                    AktWire = BRepBuilderAPI_MakePolygon(Vertex1, Vertex2, Vertex3, Standard_True);
+
+                    if (!AktWire.IsNull())
+                    {
+                        AktFace = BRepBuilderAPI_MakeFace(AktWire);
+                        if (!AktFace.IsNull())
+                            CompoundBuilder.Add(ResultShape,AktFace);
+                    }
+                }
+        }
+    }
+    TopoDS_Shape aShape = ResultShape;
+    Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
+    aHSequenceOfShape->Append(aShape);
+    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
+    Bnd_Box Box;
+    BRepBndLib::Add(aShape, Box);
+    Box.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
+    ShapeContainer* sc = new ShapeContainer(aHSequenceOfShape, Zmin);
+    *shapes = sc;
+    return true;
+}
+
 EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice, void** slice)
 {
-    int length = *cnt;
     *cnt = 0;
     STEPControl_Reader aReader;
     if (aReader.ReadFile(theFileName) != IFSelect_RetDone)
