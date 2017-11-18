@@ -41,6 +41,7 @@
                     <MenuItem Header="旋转..." x:Name="menuRotate" Click="menuRotate_Click"></MenuItem>
                     <MenuItem Header="平移..." x:Name="menuPan" Click="menuPan_Click"></MenuItem>
                     <MenuItem Header="图形最低点z轴置零" x:Name="menuBase0" Click="menuBase0_Click"></MenuItem>
+                    <MenuItem Header="图形xy轴几何中心置零" x:Name="menuBase0xy" Click="menuBase0xy_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem x:Name="menuEntityEdit" Header="图形编辑..." Click="menuEntityEdit_Click"></MenuItem>
             </MenuItem>

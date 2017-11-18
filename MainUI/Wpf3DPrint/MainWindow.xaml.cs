@@ -552,6 +552,17 @@ namespace Wpf3DPrint
             fileReader.base0AllShapes();
         }
 
+
+        private void menuBase0xy_Click(object sender, RoutedEventArgs e)
+        {
+            if (!fileReader.HasFile)
+            {
+                MessageBox.Show("未打开3D文件");
+                return;
+            }
+            fileReader.base0XyCenter();
+        }
+
         private void buttonSaveDxf_Click(object sender, RoutedEventArgs e)
         {
             if (!fileReader.HasFile)

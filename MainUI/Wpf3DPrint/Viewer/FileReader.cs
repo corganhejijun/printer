@@ -438,7 +438,7 @@ namespace Wpf3DPrint.Viewer
 
         public void base0AllShapes()
         {
-            double Zmin = 0;
+            double Zmin = double.MaxValue;
             foreach (Shape shape in shapeList)
             {
                 if (Zmin > shape.Zmin)
@@ -455,6 +455,42 @@ namespace Wpf3DPrint.Viewer
                 shape.shape = move;
                 shape.Zmin = shape.Zmin - Zmin;
                 shape.Zmax = shape.Zmax - Zmin;
+            }
+            scene.Proxy.removeObjects();
+            scene.Proxy.ZoomAllView();
+            foreach (Shape shape in shapeList)
+            {
+                scene.Proxy.displayShape(shape.shape, 0, 0);
+            }
+        }
+
+        public void base0XyCenter()
+        {
+            double xmin = double.MaxValue, ymin = double.MaxValue, xmax = double.MinValue, ymax = double.MinValue;
+            foreach (Shape shape in shapeList)
+            {
+                if (xmin > shape.Xmin)
+                    xmin = shape.Xmin;
+                if (ymin > shape.Ymin)
+                    ymin = shape.Ymin;
+                if (xmax < shape.Xmax)
+                    xmax = shape.Xmax;
+                if (ymax < shape.Ymax)
+                    ymax = shape.Ymax;
+            }
+            double centerX = xmin + (xmax - xmin) / 2;
+            double centerY = ymin + (ymax - ymin) / 2;
+            foreach (Shape shape in shapeList)
+            {
+                IntPtr move = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * shape.count);
+                Cpp2Managed.moveShape(shape.shape, move, shape.count, -centerX, -centerY, 0);
+                Cpp2Managed.deleteShape(shape.shape, shape.count);
+                Marshal.FreeHGlobal(shape.shape);
+                shape.shape = move;
+                shape.Xmin -= centerX;
+                shape.Xmax -= centerX;
+                shape.Ymax -= centerY;
+                shape.Ymin -= centerY;
             }
             scene.Proxy.removeObjects();
             scene.Proxy.ZoomAllView();
