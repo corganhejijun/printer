@@ -123,7 +123,7 @@ namespace Wpf3DPrint
                 return;
             setSlicingView();
             textBoxSliceThick.Text = fileReader.Shape.sliceThick.ToString();
-            fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, onAfterSlice, new SceneThread.onFunction(onSlice));
+            fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, onAfterSlice, new SceneThread.onFunction(onSlice));
         }
 
         private string saveSlice()

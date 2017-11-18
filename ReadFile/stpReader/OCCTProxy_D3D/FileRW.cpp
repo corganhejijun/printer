@@ -569,12 +569,14 @@ EXPORT bool exportTransformStep(char* fileName, ShapeContainer** slices, int len
     return exportStep(fileName, slices, length);
 }
 
-EXPORT Slice* exportSlice(Slice** ss, int layerNum, Slice* current, int* type, double* x, double* y, double* z, double* p) {
+EXPORT Slice* exportSlice(Slice** ss, int layerNum, Slice** current, int* type, double* x, double* y, double* z, double* p) {
     Slice* slice = NULL;
-    if (current == NULL)
+    if (*current == NULL) {
         slice = &(*ss)[layerNum];
+        *current = &(*ss)[layerNum];
+    }
     else
-        slice = current;
+        slice = *current;
     *type = slice->type;
     *z = slice->z;
     switch (slice->type)

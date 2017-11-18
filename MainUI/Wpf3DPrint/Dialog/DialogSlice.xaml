@@ -33,5 +33,6 @@
                 <TextBox x:Name="textBoxZ2" HorizontalAlignment="Left" Height="23" Margin="203,66,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
             </Grid>
         </GroupBox>
+        <CheckBox x:Name="checkBoxQuikSlice" Content="快速切割" HorizontalAlignment="Left" Margin="10,248,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

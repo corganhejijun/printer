@@ -42,7 +42,7 @@ namespace Wpf3DPrint.Viewer
         public static extern bool exportTransformStep(IntPtr fileName, IntPtr slices, int length);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr exportSlice(IntPtr ss, int layerNum, IntPtr current, ref int type, ref double x, ref double y, ref double z, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.I1)]double[] p);
+        public static extern IntPtr exportSlice(IntPtr ss, int layerNum, ref IntPtr current, ref int type, ref double x, ref double y, ref double z, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.I1)]double[] p);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool exportBspline(IntPtr current, int index, ref double x, ref double y);

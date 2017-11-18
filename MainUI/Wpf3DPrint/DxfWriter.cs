@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Text;
 using Wpf3DPrint.Viewer;
@@ -53,7 +54,7 @@ namespace Wpf3DPrint
             writeMinMax(__shape.Xmin, __shape.Ymin, __shape.Zmin, __shape.Xmax, __shape.Ymax, __shape.Zmax);
             __file.WriteLine("  2");
             __file.WriteLine("ENTITIES");
-            IntPtr current = IntPtr.Zero;
+            IntPtr nextCurrent = IntPtr.Zero;
             for (int i = 0; i < __shape.count; i++)
             {
                 do
@@ -61,7 +62,8 @@ namespace Wpf3DPrint
                     int type = -1;
                     double x = 0, y = 0, z = 0;
                     double[] p = { 0, 0, 0, 0, 0, 0, 0 };
-                    current = Cpp2Managed.exportSlice(__shape.stepSlice, i, current, ref type, ref x, ref y, ref z, p);
+                    IntPtr slice = nextCurrent;
+                    nextCurrent = Cpp2Managed.exportSlice(__shape.stepSlice, i, ref slice, ref type, ref x, ref y, ref z, p);
                     switch (type)
                     {
                         case (int)Type.circle:
@@ -71,14 +73,62 @@ namespace Wpf3DPrint
                             writeLine(x, y, p[0], p[1], z);
                             break;
                         case (int)Type.bSplice:
+                            writeBSplice(slice, x, y, z, (int)p[0], p[1], p[2]);
                             break;
                         default:
                             break;
                     }
-                } while (current != IntPtr.Zero);
+                } while (nextCurrent != IntPtr.Zero);
             }
             __file.WriteLine("  0");
             __file.WriteLine("ENDSEC");
+        }
+
+        void writeBSplice(IntPtr slice, double startX, double startY, double z, int ptCount, double endX, double endY)
+        {
+            double newStartX = startX;
+            double newStartY = startY;
+            double newEndX = 0;
+            double newEndY = 0;
+            for (int i = 0; i <= ptCount; i++) {
+                double x = 0, y = 0;
+                if (i < ptCount)
+                    Cpp2Managed.exportBspline(slice, i, ref x, ref y);
+                else
+                {
+                    x = endX;
+                    y = endY;
+                }
+                if (i == 0)
+                {
+                    newEndX = x;
+                    newEndY = y;
+                    continue;
+                }
+                if (getDistance(newStartX, newStartY, x, y, newEndX, newEndY) < 0.001)
+                {
+                    newEndX = x;
+                    newEndY = y;
+                    continue;
+                }
+                writeLine(newStartX, newStartY, newEndX, newEndY, z);
+                newStartX = newEndX;
+                newStartY = newEndY;
+                newEndX = x;
+                newEndY = y;
+            }
+        }
+
+        double getDistance(double x1, double y1, double x2, double y2, double x3, double y3)
+        {
+            // y = ax + b
+            double a = (y1 - y2) / (x1 - x2);
+            double b = y1 - a * x1;
+            // Ax + By + C = 0
+            double A = a;
+            double B = -1;
+            double C = b;
+            return Math.Abs(A * x3 + B * y3 + C) / Math.Sqrt(A * A + B * B);
         }
 
         bool IsTwoPi(double value)

@@ -170,13 +170,14 @@ namespace Wpf3DPrint.Viewer
             Cpp2Managed.exportTransformStep(fileName, shape.shape, 1);
         }
 
-        public void sliceShape(Control control, bool locatePlane, bool gradientShape, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)
+        public void sliceShape(Control control, bool locatePlane, bool gradientShape, bool noDelay, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)
         {
             ArrayList args = new ArrayList();
             args.Add(control);
             args.Add(onSlice);
             args.Add(locatePlane);
             args.Add(gradientShape);
+            args.Add(noDelay);
             scene.D3DThread.addWork(sliceShapeWork, args, afterSlice);
         }
 
@@ -188,6 +189,7 @@ namespace Wpf3DPrint.Viewer
             SceneThread.onFunction onslice = (SceneThread.onFunction)list[1];
             bool locatePlane = (bool)list[2];
             bool gradientShape = (bool)list[3];
+            bool noDelay = (bool)list[4];
             foreach (Shape shape in shapeList)
             {
                 // 确定定位面，与定位面等高的切割线要特殊处理
@@ -236,7 +238,8 @@ namespace Wpf3DPrint.Viewer
                         continue;
                     shape.sliceList.Add(new Shape.Slice(slice, height));
                     onGetSlice(slice, height, shape, control, onslice);
-                    System.Threading.Thread.Sleep(100);
+                    if (!noDelay)
+                        System.Threading.Thread.Sleep(100);
                 }
                 shape.sortSliceList();
             }

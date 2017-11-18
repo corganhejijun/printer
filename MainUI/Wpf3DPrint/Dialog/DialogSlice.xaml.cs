@@ -27,6 +27,14 @@ namespace Wpf3DPrint.Dialog
             }
         }
 
+        public bool quickSlice
+        {
+            get
+            {
+                return (bool)checkBoxQuikSlice.IsChecked;
+            }
+        }
+
         public DialogSlice(Viewer.Shape shape, string thick, string unit)
         {
             this.shape = shape;
