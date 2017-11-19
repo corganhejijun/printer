@@ -35,6 +35,22 @@ namespace Wpf3DPrint.Dialog
             }
         }
 
+        public double outputRatio {
+            get
+            {
+                try {
+                    double ratio = double.Parse(textBoxRatio.Text);
+                    if (ratio < 0)
+                        return 1;
+                    return ratio;
+                }
+                catch
+                {
+                    return 1;
+                }
+            }
+        }
+
         public DialogSlice(Viewer.Shape shape, string thick, string unit)
         {
             this.shape = shape;

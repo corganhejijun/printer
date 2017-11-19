@@ -90,7 +90,7 @@ namespace Wpf3DPrint
         private void displayStep(object workResult)
         {
             fileReader.displayStep(workResult, false);
-            fileReader.resetView();
+            fileReader.resetView(1);
             Dialog.DialogUnit unit = new Dialog.DialogUnit(fileReader.Shape);
             unit.Owner = this;
             unit.ShowDialog();
@@ -101,7 +101,7 @@ namespace Wpf3DPrint
         private void displayImportMoreStep(object workResult)
         {
             fileReader.displayStep(workResult, dlgEntityEdit.Combine);
-            fileReader.resetView();
+            fileReader.resetView(1);
             afterOpenFile();
         }
 
@@ -123,7 +123,7 @@ namespace Wpf3DPrint
                 return;
             setSlicingView();
             textBoxSliceThick.Text = fileReader.Shape.sliceThick.ToString();
-            fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, onAfterSlice, new SceneThread.onFunction(onSlice));
+            fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, dlSlice.outputRatio, onAfterSlice, new SceneThread.onFunction(onSlice));
         }
 
         private string saveSlice()
@@ -147,7 +147,7 @@ namespace Wpf3DPrint
                 total += shape.locateCount;
             labelStatus.Content = "总层数：" + total + " 当前层数：" + shape.sliceList.Count;
             if (shape.sliceList.Count == 1)
-                fileReader.resetView();
+                fileReader.resetView(shape.outputRatio);
         }
 
         private void onAfterSlice(object args)
@@ -157,7 +157,8 @@ namespace Wpf3DPrint
 
         private void afterSlice(object args)
         {
-            fileReader.resetView();
+            Shape shape = fileReader.Shape;
+            fileReader.resetView(shape.outputRatio);
             string fileName = saveSlice();
             if (fileName.Length == 0)
                 return;
@@ -231,6 +232,7 @@ namespace Wpf3DPrint
             sliceScene.clearWindow();
             TreeView_Slice.Items.Clear();
             set3DView();
+            set3DFunction(true);
         }
 
         private void buttonOpenSlice_Click(object sender, RoutedEventArgs e)
@@ -289,6 +291,20 @@ namespace Wpf3DPrint
             TreeView_Slice.SelectedItemChanged += TreeView_Slice_SelectedItemChanged;
             root.IsExpanded = true;
             TreeView_Slice.Items.Add(root);
+            set3DFunction(false);
+        }
+
+        void set3DFunction(bool enable)
+        {
+            ButtonRotate.IsEnabled = enable;
+            ButtonMove.IsEnabled = enable;
+            menuRotate.IsEnabled = enable;
+            menuPan.IsEnabled = enable;
+            menuBase0.IsEnabled = enable;
+            menuBase0xy.IsEnabled = enable;
+            ButtonSlice.IsEnabled = enable;
+            menuEntityEdit.IsEnabled = enable;
+            menuSlice.IsEnabled = enable;
         }
 
         private void TreeView_Slice_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

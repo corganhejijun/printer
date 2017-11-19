@@ -21,6 +21,9 @@ namespace Wpf3DPrint.Viewer
         public static extern IntPtr SliceShape(IntPtr pt, int index, double height);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr ScaleSlice(IntPtr pt, double ratio);
+
+        [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void combineShapes(IntPtr pt, IntPtr pt1, IntPtr pt2);
 
         [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]

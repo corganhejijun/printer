@@ -497,8 +497,23 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
     if (sectionShape.IsNull())
         return NULL;
     Handle_TopTools_HSequenceOfShape Wires = getWires(sectionShape);
+    if (Wires->IsEmpty())
+        return NULL;
     ShapeContainer* container = new ShapeContainer(Wires);
     return container;
+}
+
+EXPORT ShapeContainer* ScaleSlice(void* pt, double ratio) {
+    ShapeContainer* shape = (ShapeContainer*)pt;
+    TopoDS_Shape slice = shape->getShape(1);
+    gp_Trsf xTrsf;
+    gp_Pnt scaleCenter(0, 0, 0);
+    xTrsf.SetScale(scaleCenter, ratio);
+    BRepBuilderAPI_Transform myTrans(slice, xTrsf, true);
+    TopoDS_Shape newSlice = myTrans.Shape();
+    Handle_TopTools_HSequenceOfShape newSeq = new TopTools_HSequenceOfShape();
+    newSeq->Append(newSlice);
+    return new ShapeContainer(newSeq);
 }
 
 EXPORT void combineShapes(void** pt, void** pt1, void** pt2) {

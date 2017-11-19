@@ -170,7 +170,7 @@ namespace Wpf3DPrint.Viewer
             Cpp2Managed.exportTransformStep(fileName, shape.shape, 1);
         }
 
-        public void sliceShape(Control control, bool locatePlane, bool gradientShape, bool noDelay, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)
+        public void sliceShape(Control control, bool locatePlane, bool gradientShape, bool noDelay, double outputRatio, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)
         {
             ArrayList args = new ArrayList();
             args.Add(control);
@@ -178,6 +178,7 @@ namespace Wpf3DPrint.Viewer
             args.Add(locatePlane);
             args.Add(gradientShape);
             args.Add(noDelay);
+            args.Add(outputRatio);
             scene.D3DThread.addWork(sliceShapeWork, args, afterSlice);
         }
 
@@ -190,6 +191,7 @@ namespace Wpf3DPrint.Viewer
             bool locatePlane = (bool)list[2];
             bool gradientShape = (bool)list[3];
             bool noDelay = (bool)list[4];
+            double ratio = (double)list[5];
             foreach (Shape shape in shapeList)
             {
                 // 确定定位面，与定位面等高的切割线要特殊处理
@@ -197,11 +199,18 @@ namespace Wpf3DPrint.Viewer
                 IntPtr containers = Cpp2Managed.getLocatPlane(shape.shape, 0, ref count);
                 shape.locateCount = count;
                 shape.countLocate = locatePlane;
+                shape.outputRatio = ratio;
                 ArrayList locatePlaneList = new ArrayList();
                 for (int i = 0; i < count; i++)
                 {
                     double locateHeight = 0;
                     IntPtr slice = Cpp2Managed.getShapeContainer(containers, i, ref locateHeight);
+                    if (ratio > 1.0 + 0.01 || ratio < 1.0 - 0.01)
+                    {
+                        IntPtr newSlice = Cpp2Managed.ScaleSlice(slice, ratio);
+                        Cpp2Managed.deleteSlice(slice);
+                        slice = newSlice;
+                    }
                     locatePlaneList.Add(new Shape.Slice(slice, locateHeight));
                     if (locatePlane)
                         shape.sliceList.Add(new Shape.Slice(slice, locateHeight));
@@ -236,6 +245,12 @@ namespace Wpf3DPrint.Viewer
                     IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, height);
                     if (slice == IntPtr.Zero)
                         continue;
+                    if (ratio > 1.0 + 0.01 || ratio < 1.0 - 0.01)
+                    {
+                        IntPtr newSlice = Cpp2Managed.ScaleSlice(slice, ratio);
+                        Cpp2Managed.deleteSlice(slice);
+                        slice = newSlice;
+                    }
                     shape.sliceList.Add(new Shape.Slice(slice, height));
                     onGetSlice(slice, height, shape, control, onslice);
                     if (!noDelay)
@@ -296,7 +311,7 @@ namespace Wpf3DPrint.Viewer
             {
                 scene.Proxy.displaySlice(slice.slice);
             }
-            resetView();
+            resetView(1);
         }
 
         public void selectSlice(int i)
@@ -386,17 +401,17 @@ namespace Wpf3DPrint.Viewer
             scene.Proxy.ZoomAllView();
         }
 
-        public void resetView()
+        public void resetView(double ratio)
         {
             scene.Proxy.ZoomAllView();
             double scale = scene.Proxy.getZoomScale();
-            sliceScene.Proxy.setZoomScale(scale);
+            sliceScene.Proxy.setZoomScale(scale / ratio);
             double x = 0, y = 0, z = 0;
             unsafe
             {
                 scene.Proxy.getViewPoint(&x, &y, &z);
             }
-            sliceScene.Proxy.setViewPoint(x, y, z);
+            sliceScene.Proxy.setViewPoint(x * ratio, y * ratio, z * ratio);
         }
 
         public void rotateAllShape(double x, double y, double z)

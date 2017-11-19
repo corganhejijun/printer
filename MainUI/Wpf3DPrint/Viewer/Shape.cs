@@ -13,6 +13,7 @@ namespace Wpf3DPrint.Viewer
         public int locateCount;
         public bool countLocate;
         public ArrayList sliceList;
+        public double outputRatio;
         public IntPtr transform;
 
         public class SliceCompare : IComparer {
