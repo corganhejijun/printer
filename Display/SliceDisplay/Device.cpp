@@ -99,8 +99,12 @@ int SliceDevice::drawSlice(Slice* slice) {
     D2D1_SIZE_F size = m_pRenderTarget->GetSize();
     float xLength = (float)(boundBox.right - boundBox.left);
     float yLength = (float)(boundBox.bottom - boundBox.top);
-    float xScale = xLength * (1 + m_sceneMargin) / size.width;
-    float yScale = yLength * (1 + m_sceneMargin) / size.height;
+    float xScale = -1;
+    if (size.width > 0)
+        xScale = xLength * (1 + m_sceneMargin) / size.width;
+    float yScale = -1;
+    if (size.height > 0)
+        yScale = yLength * (1 + m_sceneMargin) / size.height;
     m_sceneScale = m_sceneScale > xScale ? m_sceneScale : xScale;
     m_sceneScale = m_sceneScale > yScale ? m_sceneScale : yScale;
     // objectCenter may be not at (0, 0)
@@ -576,18 +580,12 @@ int SliceDevice::drawBSpline(BSpline* spline) {
     D2D1_POINT_2F point = D2D1::Point2F(spline->start.x, spline->start.y);
     pSink->BeginFigure(point, D2D1_FIGURE_BEGIN_HOLLOW);
     D2D1_POINT_2F point2 = point;
-    int totalLine = 10;
-    int skipCount = spline->polesCnt / totalLine;
     for (int i = 0; i < spline->polesCnt; i++) {
-        if (skipCount > 0 && i % skipCount < skipCount - 1)
-            continue;
         point2 = D2D1::Point2F(spline->poles[i].x, spline->poles[i].y); 
         float x = point2.x - point.x;
         float y = point2.y - point.y;
-        if (sqrt(x * x + y * y) > m_curveWith / m_sceneScale * 2) {
-            pSink->AddLine(point2);
-            point = point2;
-        }
+        pSink->AddLine(point2);
+        point = point2;
     }
     pSink->AddLine(D2D1::Point2F(spline->end.x, spline->end.y));
     pSink->EndFigure(D2D1_FIGURE_END_OPEN);

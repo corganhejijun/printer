@@ -239,6 +239,7 @@ void ReadArrange(ESpace *pEntSpace,CArray<float,float>*pZar,CArray<int,int>*pIar
 	pEntSpace->ymin-=YO;	pEntSpace->ymax-=YO;
 	//////°´²ã
 	pEntSpace->pLayer=new ELayer[pEntSpace->LayerNum];
+    memset(pEntSpace->pLayer, 0, sizeof(ELayer) * pEntSpace->LayerNum);
 	ELayer*pLayer=pEntSpace->pLayer;
 	float z;
 	pLayer[0].pEntRaw=pEntSpace->pEntRaw;

@@ -245,6 +245,11 @@ void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
                 file << endl;
                 addVertex(child, slice, pointArray, polesCount);
                 slice->z = Poles(1).Z();
+                Slice* nextSlice = slice->next;
+                while (nextSlice != NULL) {
+                    nextSlice->z = slice->z;
+                    nextSlice = nextSlice->next;
+                }
             }
             else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_Line) {
                 addVertex(child, slice, NULL, 0);
@@ -286,7 +291,6 @@ EXPORT bool ImportStl(char* theFileName, void** shapes) {
     TopoDS_Vertex Vertex1, Vertex2, Vertex3;
     TopoDS_Face AktFace;
     TopoDS_Wire AktWire;
-    BRep_Builder B;
     Standard_Real x1, y1, z1;
     Standard_Real x2, y2, z2;
     Standard_Real x3, y3, z3;

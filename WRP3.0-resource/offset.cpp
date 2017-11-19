@@ -270,6 +270,8 @@ static BOOL Link_Ent_Tangent_Point(ELoop*ploop,EntFull*&p,float d,int& count,flo
 	EntTrimOffsetEnd(p,x,y,ag,d,x1,y1);
 	AngleFix(ag,ag2);
 	pa=EntNewArc(x,y,x1,y1,pn->xend,pn->yend,ag,ag2,d);
+    if (pa == NULL)
+        return FALSE;
 	pa->pre=p;pa->next=pn;
 	p->next=pa;pn->pre=pa;
 	if((xs>>16)==PTONSTART){

@@ -31,10 +31,10 @@ enum EdgeType { unknown, line, circle, bSplice };
 
 typedef struct Slice{
     EdgeType type;
+    double z;
     void* data;
     Slice* next;
     Slice* prev;
-    double z;
 }Slice;
 
 #endif

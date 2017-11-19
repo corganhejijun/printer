@@ -280,24 +280,28 @@ namespace Wpf3DPrint
             setSliceView();
             TreeViewItem root = new TreeViewItem();
             root.Header = fileReader.FileName.Substring(fileReader.FileName.LastIndexOf('\\') + 1);
-            root.ItemsSource = list;
+            foreach (int i in list)
+            {
+                TreeViewItem item = new TreeViewItem();
+                item.Header = i;
+                root.Items.Add(item);
+            }
             TreeView_Slice.SelectedItemChanged += TreeView_Slice_SelectedItemChanged;
             root.IsExpanded = true;
             TreeView_Slice.Items.Add(root);
-            /*root = (TreeViewItem)TreeView_Slice.Items[0];
-            TreeViewItem first = (TreeViewItem)root.Items[0];
-            first.IsSelected = true;
-            */
         }
 
         private void TreeView_Slice_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             try {
-                int value = (int)e.NewValue;
+                int value = (int)((TreeViewItem)e.NewValue).Header;
                 selectSlice(value - 1);
+                if ((int)comboBoxSliceNumber.SelectedItem != value)
+                    comboBoxSliceNumber.SelectedItem = value;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return;
             }
         }
@@ -366,8 +370,21 @@ namespace Wpf3DPrint
 
         private void comboBoxSliceNumber_SelectionChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            int index = (int)comboBoxSliceNumber.SelectedItem - 1;
-            selectSlice(index);
+            int index = (int)comboBoxSliceNumber.SelectedItem;
+            if (TreeView_Slice.Items.Count > 0)
+            {
+                TreeViewItem root = (TreeViewItem)TreeView_Slice.Items[0];
+                foreach (TreeViewItem item in root.Items)
+                {
+                    if ((int)item.Header == index)
+                    {
+                        if (!item.IsSelected)
+                            item.IsSelected = true;
+                        break;
+                    }
+                }
+            }
+            selectSlice(index - 1);
         }
 
         private void selectSlice(int index)

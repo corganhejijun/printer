@@ -520,7 +520,8 @@ EntFull*EntNewArc(float xc,float yc,float gstart,float ag,float r){
 
 EntFull*EntNewArc(float xc,float yc,float xstart,float ystart,float xend,
 				  float yend,float gstart,float gend,float r){
-	if(AEQU(gstart,gend)||ZERO(r))return NULL;
+	if(AEQU(gstart,gend)||ZERO(r))
+        return NULL;
 	EntFull*p=new EntFull;
 	p->flag=0;
 	p->r=r;

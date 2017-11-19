@@ -86,11 +86,12 @@ namespace Wpf3DPrint
 
         void writeBSplice(IntPtr slice, double startX, double startY, double z, int ptCount, double endX, double endY)
         {
-            double newStartX = startX;
-            double newStartY = startY;
-            double newEndX = 0;
-            double newEndY = 0;
-            for (int i = 0; i <= ptCount; i++) {
+            ArrayList xList = new ArrayList();
+            ArrayList yList = new ArrayList();
+            xList.Add(startX);
+            yList.Add(startY);
+            for (int i = 0; i <= ptCount; i++)
+            {
                 double x = 0, y = 0;
                 if (i < ptCount)
                     Cpp2Managed.exportBspline(slice, i, ref x, ref y);
@@ -99,23 +100,21 @@ namespace Wpf3DPrint
                     x = endX;
                     y = endY;
                 }
-                if (i == 0)
+                xList.Add(x);
+                yList.Add(y);
+            }
+            for (int i = 1; i < xList.Count - 1; i++)
+            {
+                if (getDistance((double)xList[i - 1], (double)yList[i - 1], (double)xList[i], (double)yList[i], (double)xList[i + 1], (double)yList[i + 1]) < 0.001)
                 {
-                    newEndX = x;
-                    newEndY = y;
+                    xList.RemoveAt(i);
+                    yList.RemoveAt(i);
+                    i--;
                     continue;
                 }
-                if (getDistance(newStartX, newStartY, x, y, newEndX, newEndY) < 0.001)
-                {
-                    newEndX = x;
-                    newEndY = y;
-                    continue;
-                }
-                writeLine(newStartX, newStartY, newEndX, newEndY, z);
-                newStartX = newEndX;
-                newStartY = newEndY;
-                newEndX = x;
-                newEndY = y;
+            }
+            for (int i = 1; i < xList.Count; i++) { 
+                writeLine((double)xList[i - 1], (double)yList[i - 1], (double)xList[i], (double)yList[i], z);
             }
         }
 
