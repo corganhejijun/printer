@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{A93AE5EA-C3B0-4A58-9284-CF6A092E9009}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Wpf3DPrint</RootNamespace>
     <AssemblyName>Wpf3DPrint</AssemblyName>
@@ -129,6 +129,9 @@
     <Compile Include="Dialog\DialogUnit.xaml.cs">
       <DependentUpon>DialogUnit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\DisplaySetting.xaml.cs">
+      <DependentUpon>DisplaySetting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\EntityProp.xaml.cs">
       <DependentUpon>EntityProp.xaml</DependentUpon>
     </Compile>
@@ -166,6 +169,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\DialogUnit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\DisplaySetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -288,48 +295,45 @@
     <Resource Include="images\rebuild.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="images\Base0.png">
+    <Resource Include="images\Base0.png" />
+    <Resource Include="images\Close.png" />
+    <Resource Include="images\Import.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Close.png">
+    </Resource>
+    <Resource Include="images\Move.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Import.png">
+    </Resource>
+    <Resource Include="images\Roll.png" />
+    <Resource Include="images\Rotate1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Move.png">
+    </Resource>
+    <Resource Include="images\Rotate2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Roll.png">
+    </Resource>
+    <Resource Include="images\Rotate3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Rotate1.png">
+    </Resource>
+    <Resource Include="images\Rotate4.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Rotate2.png">
+    </Resource>
+    <Resource Include="images\Rotate5.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Rotate3.png">
+    </Resource>
+    <Resource Include="images\Rotate6.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Rotate4.png">
+    </Resource>
+    <Resource Include="images\Rotate7.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Rotate5.png">
+    </Resource>
+    <Resource Include="images\Rotate8.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Rotate6.png">
+    </Resource>
+    <Resource Include="images\RP.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Rotate7.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\Rotate8.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\RP.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\Base0xy.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

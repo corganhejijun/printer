@@ -805,6 +805,7 @@ public:
             aisShape->SetTransparency();
         else
             aisShape->SetTransparency(transparency);
+        aisShape->SetColor(Quantity_Color(194.0 / 255.0, 194.0 / 255.0, 194.0 / 255.0, Quantity_TOC_RGB));
         myAISContext()->Display(aisShape, Standard_True);
         return true;
     }

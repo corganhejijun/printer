@@ -218,6 +218,8 @@ namespace Wpf3DPrint
                 slicingScene.Proxy.RedrawView();
                 mouseOrigin = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
             }
+            scene.Proxy.MoveTo((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
+            scene.Proxy.Select();
         }
 
         private void GridScene_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
@@ -623,6 +625,13 @@ namespace Wpf3DPrint
             exep.StartInfo.FileName = "RP.exe";
             exep.StartInfo.Arguments = "-f " + saveFile.FileName;
             exep.Start();
+        }
+
+        private void menuDisplaySetting_Click(object sender, RoutedEventArgs e)
+        {
+            Dialog.DisplaySetting dspSetDlg = new Dialog.DisplaySetting();
+            if (false == dspSetDlg.ShowDialog())
+                return;
         }
     }
 }
