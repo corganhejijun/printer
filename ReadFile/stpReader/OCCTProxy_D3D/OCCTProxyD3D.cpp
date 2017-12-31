@@ -326,6 +326,21 @@ public:
         }
     }
 
+    void Select(int theX, int theY)
+    {
+        if (!myAISContext().IsNull() && !myView().IsNull()) {
+            myAISContext()->MoveTo(theX, theY, myView());
+            myAISContext()->Select();
+            myAISContext()->InitCurrent();
+            if (!myAISContext()->MoreCurrent())
+            {
+                return;
+            }
+            Handle(AIS_InteractiveObject) aCurrent = myAISContext()->Current();
+            myAISContext()->SetColor(aCurrent, Quantity_Color(255 / 255.0, 0 / 255.0, 0 / 255.0, Quantity_TOC_RGB));
+        }
+    }
+
     /// <summary>
     ///Select by click
     /// </summary>

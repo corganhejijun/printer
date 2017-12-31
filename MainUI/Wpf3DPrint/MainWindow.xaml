@@ -228,7 +228,7 @@
                 </Grid>
                 <GridSplitter x:Name="treeViewSplitter" Width="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
                 <Border BorderBrush="Black" BorderThickness="1" Grid.Column="3">
-                    <Grid x:Name="GridScene" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel"></Grid>
+                    <Grid x:Name="GridScene" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel" MouseUp="GridScene_MouseUp" Cursor="Cross"></Grid>
                 </Border>
                 <GridSplitter x:Name="sliceSplitter" Width="0" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
                 <Border Grid.Column="5" BorderBrush="Black" BorderThickness="1">

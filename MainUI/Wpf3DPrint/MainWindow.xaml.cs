@@ -222,6 +222,11 @@ namespace Wpf3DPrint
             scene.Proxy.Select();
         }
 
+        private void GridScene_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            scene.Proxy.Select((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
+        }
+
         private void GridScene_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
             beginRotate = false;
