@@ -146,7 +146,7 @@ namespace Wpf3DPrint.Viewer
         private bool displayShape(Shape shape)
         {
             scene.Proxy.SetDisplayMode(1);
-            scene.Proxy.displayShape(shape.shape, 0, 0);
+            scene.Proxy.displayShape(shape.shape, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
             return true;
         }
 
@@ -273,9 +273,9 @@ namespace Wpf3DPrint.Viewer
 
         private bool displaySlice(IntPtr slice, double height, SceneThread.onFunction onSlice, ArrayList onArgs)
         {
-            sliceScene.Proxy.displaySlice(slice);
+            sliceScene.Proxy.displaySlice(slice, sliceScene.Setting.lineColor.R, sliceScene.Setting.lineColor.G, sliceScene.Setting.lineColor.B);
             Shape shape = (Shape)onArgs[0];
-            scene.Proxy.displaySliceCut(shape.shape, height, 0);
+            scene.Proxy.displaySliceCut(shape.shape, height, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
             onSlice(onArgs);
             return true;
         }
@@ -309,7 +309,7 @@ namespace Wpf3DPrint.Viewer
         {
             foreach(Shape.Slice slice in Shape.sliceList)
             {
-                scene.Proxy.displaySlice(slice.slice);
+                scene.Proxy.displaySlice(slice.slice, sliceScene.Setting.lineColor.R, sliceScene.Setting.lineColor.G, sliceScene.Setting.lineColor.B);
             }
             resetView(1);
         }
@@ -397,7 +397,7 @@ namespace Wpf3DPrint.Viewer
         public void displayAfterTransform(Shape shape)
         {
             scene.Proxy.removeObjects();
-            scene.Proxy.displayShape(shape.shape, 0, 0);
+            scene.Proxy.displayShape(shape.shape, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
             scene.Proxy.ZoomAllView();
         }
 
@@ -423,7 +423,7 @@ namespace Wpf3DPrint.Viewer
                 Cpp2Managed.rotateShape(shape.shape, rotate, shape.count, x, y, z);
                 releaseTransform(shape);
                 shape.transform = rotate;
-                scene.Proxy.displayShape(shape.transform, 0, 0);
+                scene.Proxy.displayShape(shape.transform, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
                 scene.Proxy.ZoomAllView();
             }
         }
@@ -437,7 +437,7 @@ namespace Wpf3DPrint.Viewer
                 Cpp2Managed.moveShape(shape.shape, move, shape.count, x, y, z);
                 releaseTransform(shape);
                 shape.transform = move;
-                scene.Proxy.displayShape(shape.transform, 0, 0);
+                scene.Proxy.displayShape(shape.transform, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
                 scene.Proxy.ZoomAllView();
             }
         }
@@ -478,7 +478,7 @@ namespace Wpf3DPrint.Viewer
             scene.Proxy.ZoomAllView();
             foreach (Shape shape in shapeList)
             {
-                scene.Proxy.displayShape(shape.shape, 0, 0);
+                scene.Proxy.displayShape(shape.shape, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
             }
         }
 
@@ -514,7 +514,7 @@ namespace Wpf3DPrint.Viewer
             scene.Proxy.ZoomAllView();
             foreach (Shape shape in shapeList)
             {
-                scene.Proxy.displayShape(shape.shape, 0, 0);
+                scene.Proxy.displayShape(shape.shape, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
             }
         }
     }

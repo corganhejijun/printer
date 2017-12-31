@@ -132,7 +132,7 @@ namespace Wpf3DPrint
             saveFile.FileName = "model";
             saveFile.DefaultExt = "slc";
             saveFile.Filter = "Slice file (*.slc)|*.slc";
-            if (false == saveFile.ShowDialog())
+            if (false == saveFile.ShowDialog(this))
                 return "";
             fileReader.saveSlice(saveFile.FileName);
             return saveFile.FileName;
@@ -545,7 +545,7 @@ namespace Wpf3DPrint
             saveFile.FileName = "model";
             saveFile.DefaultExt = "step";
             saveFile.Filter = "Step file (*.step)|*.step";
-            if (false == saveFile.ShowDialog())
+            if (false == saveFile.ShowDialog(this))
                 return ;
             fileReader.saveStep(saveFile.FileName, fileReader.Shape);
         }
@@ -614,7 +614,7 @@ namespace Wpf3DPrint
             saveFile.FileName = "model";
             saveFile.DefaultExt = "rp";
             saveFile.Filter = "RP file (*.rp)|*.rp";
-            if (false == saveFile.ShowDialog())
+            if (false == saveFile.ShowDialog(this))
                 return;
             DxfWriter writer = new DxfWriter(saveFile.FileName, fileReader.Shape);
             writer.writeSlice();
@@ -629,7 +629,7 @@ namespace Wpf3DPrint
 
         private void menuDisplaySetting_Click(object sender, RoutedEventArgs e)
         {
-            Dialog.DisplaySetting dspSetDlg = new Dialog.DisplaySetting();
+            Dialog.DisplaySetting dspSetDlg = new Dialog.DisplaySetting(scene.Setting);
             if (false == dspSetDlg.ShowDialog())
                 return;
         }

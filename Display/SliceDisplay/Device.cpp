@@ -90,10 +90,12 @@ int SliceDevice::drawSlice(Slice* slice) {
 
     getBoundBox(&boundBox, slice);
 
+	/*
     // 获取网格线与图形的交点列表
     vector<Point>* listX = new vector<Point>;
     vector<Point>* listY = new vector<Point>;
     getInterSect(listX, listY, slice, boundBox);
+	*/
 
     // 通过变换调整图像比例，使图像放大居中
     D2D1_SIZE_F size = m_pRenderTarget->GetSize();
@@ -123,7 +125,7 @@ int SliceDevice::drawSlice(Slice* slice) {
         drawCurve(curve);
         curve = curve->next;
     }
-    drawInterSec(listX, listY);
+    //drawInterSec(listX, listY);
     m_pRenderTarget->EndDraw();
     return S_OK;
 }

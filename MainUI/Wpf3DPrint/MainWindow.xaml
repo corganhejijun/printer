@@ -16,7 +16,6 @@
         </Grid.RowDefinitions>
         <Menu DockPanel.Dock="Top" Grid.Row="0" FontSize="15" Height="25">
             <MenuItem Header="文件" HorizontalAlignment="Right" Width="48">
-                <MenuItem Header="新建"></MenuItem>
                 <MenuItem x:Name="menuOpenFile" Header="打开..." Click="buttonOpen_Click"></MenuItem>
                 <MenuItem x:Name="menuSaveAs" Header="保存实体..." Click="buttonSaveAs_Click"></MenuItem>
                 <MenuItem x:Name="menuOpenSlice" Header="导入切片..." Click="buttonOpenSlice_Click"></MenuItem>
@@ -27,7 +26,7 @@
             </MenuItem>
             <MenuItem Header="编辑" Width="48">
                 <MenuItem Header="撤销"></MenuItem>
-                <MenuItem Header="重复"></MenuItem>
+                <MenuItem Header="重做"></MenuItem>
                 <MenuItem Header="复制"></MenuItem>
                 <MenuItem Header="粘贴"></MenuItem>
                 <MenuItem Header="剪切"></MenuItem>
@@ -60,7 +59,6 @@
                 <MenuItem Header="排列"></MenuItem>
                 <MenuItem Header="显示"></MenuItem>
             </MenuItem>
-            <MenuItem Header="窗口" Width="48"></MenuItem>
             <MenuItem Header="帮助" Width="48">
                 <MenuItem x:Name="menuAbout" Header="关于..." Click="menuAbout_Click"></MenuItem>
             </MenuItem>

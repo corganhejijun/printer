@@ -797,7 +797,7 @@ public:
 
 public:
 
-    bool displayShape(System::IntPtr pt, int index, double transparency)
+    bool displayShape(System::IntPtr pt, int index, double transparency, double r, double g, double b)
     {
         ShapeContainer* shape = ShapeContainer::getContainer((void**)pt.ToPointer(), index);
         Handle(AIS_Shape) aisShape = new AIS_Shape(shape->getShape(1));
@@ -805,7 +805,7 @@ public:
             aisShape->SetTransparency();
         else
             aisShape->SetTransparency(transparency);
-        aisShape->SetColor(Quantity_Color(194.0 / 255.0, 194.0 / 255.0, 194.0 / 255.0, Quantity_TOC_RGB));
+        aisShape->SetColor(Quantity_Color(r / 255.0, g / 255.0, b / 255.0, Quantity_TOC_RGB));
         myAISContext()->Display(aisShape, Standard_True);
         return true;
     }
@@ -814,7 +814,7 @@ public:
         myAISContext()->RemoveAll();
     }
 
-    bool displaySlice(System::IntPtr pt)
+    bool displaySlice(System::IntPtr pt, double r, double g, double b)
     {
         if (pt == IntPtr::Zero)
             return false;
@@ -822,13 +822,14 @@ public:
         Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = shape->shapeSequence;
         for (int i = 1; i <= aHSequenceOfShape->Length(); i++) {
             Handle(AIS_Shape) aisShape = new AIS_Shape(aHSequenceOfShape->Value(i));
+			aisShape->SetColor(Quantity_Color(r / 255.0, g / 255.0, b / 255.0, Quantity_TOC_RGB));
             myAISContext()->Display(aisShape, Standard_True);
             myAISContext()->SetSelected(aisShape);
         }
         return true;
     }
 
-    bool displaySliceCut(System::IntPtr pt, double height, int index) {
+    bool displaySliceCut(System::IntPtr pt, double height, int index, double r, double g, double b) {
         if (pt == IntPtr::Zero)
             return false;
         myAISContext()->RemoveAll();
@@ -843,6 +844,7 @@ public:
         TopoDS_Shape box = BRepPrimAPI_MakeBox(pt1, pt2).Shape();
         TopoDS_Shape cutResult = BRepAlgoAPI_Cut(shape, box);
         Handle(AIS_Shape) aisShape = new AIS_Shape(cutResult);
+		aisShape->SetColor(Quantity_Color(r / 255.0, g / 255.0, b / 255.0, Quantity_TOC_RGB));
         myAISContext()->Display(aisShape);
         return true;
     }

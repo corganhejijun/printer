@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Media;
+using System.Windows.Forms;
 
 namespace Wpf3DPrint.Dialog
 {
@@ -8,51 +9,66 @@ namespace Wpf3DPrint.Dialog
     /// </summary>
     public partial class DisplaySetting : Window
     {
-        public DisplaySetting()
+        Color entityColor;
+        Color lineColor;
+        Color selectEntityColor;
+        Color selectLineColor;
+        public DisplaySetting(Viewer.Setting setting)
         {
             InitializeComponent();
-            textBoxColor.Background = new SolidColorBrush(Color.FromArgb(255, 156, 156, 156));
-            r = 156;
-            g = 156;
-            b = 156;
+            entityColor = setting.entityColor;
+            setTextBoxEntityColor();
+            lineColor = setting.lineColor;
+            setTextBoxLineColor();
+            selectEntityColor = setting.selectEntityColor;
+            setTextBoxSelectEntityColor();
+            selectLineColor = setting.selectLineColor;
+            setTextBoxSelectLineColor();
         }
 
-        int r, g, b;
-
-        public int ColorR
+        public Color EntityColor
         {
-            get
-            {
-                return r;
+            get {
+                return entityColor;
             }
         }
 
-        public int ColorG
+        private void button_OK_Click(object sender, RoutedEventArgs e)
         {
-            get
-            {
-                return g;
-            }
+            
         }
 
-        public int ColorB
+        private void buttonEntityColor_Click(object sender, RoutedEventArgs e)
         {
-            get
-            {
-                return b;
-            }
-        }
-
-        private void buttonSelectColor_Click(object sender, RoutedEventArgs e)
-        {
-            System.Windows.Forms.ColorDialog clDlg = new System.Windows.Forms.ColorDialog();
+            ColorDialog clDlg = new ColorDialog();
             if (clDlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 return;
-            textBoxColor.Background = new SolidColorBrush(Color.FromRgb(clDlg.Color.R, clDlg.Color.G, clDlg.Color.B));
-            textBoxColor.Text = "(" + clDlg.Color.R + "," + clDlg.Color.G + "," + clDlg.Color.B + ")";
-            r = clDlg.Color.R;
-            g = clDlg.Color.G;
-            b = clDlg.Color.B;
+            entityColor = Color.FromArgb(255, clDlg.Color.R, clDlg.Color.G, clDlg.Color.B);
+            setTextBoxEntityColor();
+        }
+
+        void setTextBoxEntityColor()
+        {
+            textBoxEntityColor.Background = new SolidColorBrush(entityColor);
+            textBoxEntityColor.Text = "(" + entityColor.R + "," + entityColor.G + "," + entityColor.B + ")";
+        }
+
+        void setTextBoxLineColor()
+        {
+            textBoxLineColor.Background = new SolidColorBrush(lineColor);
+            textBoxLineColor.Text = "(" + lineColor.R + "," + lineColor.G + "," + lineColor.B + ")";
+        }
+
+        void setTextBoxSelectEntityColor()
+        {
+            textBoxSelectEntityColor.Background = new SolidColorBrush(selectEntityColor);
+            textBoxSelectEntityColor.Text = "(" + selectEntityColor.R + "," + selectEntityColor.G + "," + selectEntityColor.B + ")";
+        }
+
+        void setTextBoxSelectLineColor()
+        {
+            textBoxSelectLineColor.Background = new SolidColorBrush(selectLineColor);
+            textBoxSelectLineColor.Text = "(" + selectLineColor.R + "," + selectLineColor.G + "," + selectLineColor.B + ")";
         }
     }
 }

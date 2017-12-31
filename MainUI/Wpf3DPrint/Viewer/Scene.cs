@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -8,12 +7,13 @@ namespace Wpf3DPrint.Viewer
 {
     class Scene : IDisposable
     {
-        private IntPtr d3DRender;
-        private D3DImage d3DImage = new D3DImage();
-        private IntPtr d3DColorSurface;
-        private bool deviceInitFail = false;
-        private OCCTProxyD3D occtProxy;
-        private SceneThread sceneThread;
+        IntPtr d3DRender;
+        D3DImage d3DImage = new D3DImage();
+        IntPtr d3DColorSurface;
+        bool deviceInitFail = false;
+        OCCTProxyD3D occtProxy;
+        SceneThread sceneThread;
+        Setting setting;
 
         public D3DImage Image
         {
@@ -30,8 +30,14 @@ namespace Wpf3DPrint.Viewer
             get { return sceneThread; }
         }
 
+        public Setting Setting
+        {
+            get { return setting; }
+        }
+
         public Scene()
         {
+            setting = new Setting();
             sceneThread = new SceneThread();
             d3DImage.IsFrontBufferAvailableChanged += new DependencyPropertyChangedEventHandler(onFrontBufferChange);
             occtProxy = new OCCTProxyD3D();
