@@ -51,35 +51,34 @@ namespace Wpf3DPrint
 
         public void writeSlice()
         {
-            writeMinMax(__shape.Xmin, __shape.Ymin, __shape.Zmin, __shape.Xmax, __shape.Ymax, __shape.Zmax);
+            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
+            Cpp2Managed.Shape3D.getBoundary(__shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            writeMinMax(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
             __file.WriteLine("  2");
             __file.WriteLine("ENTITIES");
             IntPtr nextCurrent = IntPtr.Zero;
-            for (int i = 0; i < __shape.count; i++)
+            do
             {
-                do
+                int type = -1;
+                double x = 0, y = 0, z = 0;
+                double[] p = { 0, 0, 0, 0, 0, 0, 0 };
+                IntPtr slice = nextCurrent;
+                //nextCurrent = Cpp2Managed.Shape3D.exportSlice(__shape.stepSlice, i, ref slice, ref type, ref x, ref y, ref z, p);
+                switch (type)
                 {
-                    int type = -1;
-                    double x = 0, y = 0, z = 0;
-                    double[] p = { 0, 0, 0, 0, 0, 0, 0 };
-                    IntPtr slice = nextCurrent;
-                    nextCurrent = Cpp2Managed.exportSlice(__shape.stepSlice, i, ref slice, ref type, ref x, ref y, ref z, p);
-                    switch (type)
-                    {
-                        case (int)Type.circle:
-                            getCircle(x, y, z, p[0], p[1], p[2], p[3], p[4], p[5], p[6]);
-                            break;
-                        case (int)Type.line:
-                            writeLine(x, y, p[0], p[1], z);
-                            break;
-                        case (int)Type.bSplice:
-                            writeBSplice(slice, x, y, z, (int)p[0], p[1], p[2]);
-                            break;
-                        default:
-                            break;
-                    }
-                } while (nextCurrent != IntPtr.Zero);
-            }
+                    case (int)Type.circle:
+                        getCircle(x, y, z, p[0], p[1], p[2], p[3], p[4], p[5], p[6]);
+                        break;
+                    case (int)Type.line:
+                        writeLine(x, y, p[0], p[1], z);
+                        break;
+                    case (int)Type.bSplice:
+                        writeBSplice(slice, x, y, z, (int)p[0], p[1], p[2]);
+                        break;
+                    default:
+                        break;
+                }
+            } while (nextCurrent != IntPtr.Zero);
             __file.WriteLine("  0");
             __file.WriteLine("ENDSEC");
         }
@@ -94,7 +93,9 @@ namespace Wpf3DPrint
             {
                 double x = 0, y = 0;
                 if (i < ptCount)
-                    Cpp2Managed.exportBspline(slice, i, ref x, ref y);
+                {
+                    //Cpp2Managed.exportBspline(slice, i, ref x, ref y);
+                }
                 else
                 {
                     x = endX;

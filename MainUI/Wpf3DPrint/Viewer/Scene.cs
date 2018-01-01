@@ -5,14 +5,13 @@ using System.Windows.Media;
 
 namespace Wpf3DPrint.Viewer
 {
-    class Scene : IDisposable
+    class Scene
     {
         IntPtr d3DRender;
         D3DImage d3DImage = new D3DImage();
         IntPtr d3DColorSurface;
         bool deviceInitFail = false;
         OCCTProxyD3D occtProxy;
-        SceneThread sceneThread;
         Setting setting;
 
         public D3DImage Image
@@ -25,11 +24,6 @@ namespace Wpf3DPrint.Viewer
             get { return occtProxy; }
         }
 
-        public SceneThread D3DThread
-        {
-            get { return sceneThread; }
-        }
-
         public Setting Setting
         {
             get { return setting; }
@@ -38,17 +32,11 @@ namespace Wpf3DPrint.Viewer
         public Scene()
         {
             setting = new Setting();
-            sceneThread = new SceneThread();
             d3DImage.IsFrontBufferAvailableChanged += new DependencyPropertyChangedEventHandler(onFrontBufferChange);
             occtProxy = new OCCTProxyD3D();
             occtProxy.InitOCCTProxy();
             beginRender();
             Resize(1, 1);
-        }
-
-        public void Dispose()
-        {
-            sceneThread.Dispose(null);
         }
 
         private void onFrontBufferChange(object sender, DependencyPropertyChangedEventArgs e)
@@ -122,6 +110,40 @@ namespace Wpf3DPrint.Viewer
             }
             d3DImage.Unlock();
             occtProxy.ResizeBridgeFBO(proxyWndSize.cx, proxyWndSize.cy, d3DColorSurface, colorSurf);
+        }
+
+        public bool displayShape(IntPtr shape)
+        {
+            occtProxy.SetDisplayMode(1);
+            occtProxy.displayShape(shape, 0, setting.entityColor.R, setting.entityColor.G, setting.entityColor.B);
+            return true;
+        }
+
+        public void zoom(int delta)
+        {
+            occtProxy.Zoom(0, 0, delta / 8, 0);
+        }
+
+        public void displaySlice(IntPtr slice)
+        {
+            occtProxy.displaySlice(slice, setting.lineColor.R, setting.lineColor.G, setting.lineColor.B);
+        }
+
+        public void displaySliceCut(IntPtr shape, double height)
+        {
+            occtProxy.displaySliceCut(shape, height, setting.entityColor.R, setting.entityColor.G, setting.entityColor.B);
+        }
+
+        public void selectSlice(IntPtr slice)
+        {
+            occtProxy.selectSlice(slice);
+        }
+
+        public void displayAfterTransform(IntPtr shape)
+        {
+            occtProxy.removeObjects();
+            occtProxy.displayShape(shape, 0, setting.entityColor.R, setting.entityColor.G, setting.entityColor.B);
+            occtProxy.ZoomAllView();
         }
     }
 }

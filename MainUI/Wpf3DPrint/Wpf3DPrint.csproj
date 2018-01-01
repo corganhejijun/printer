@@ -161,6 +161,7 @@
     <Compile Include="Viewer\SceneThread.cs" />
     <Compile Include="Viewer\Setting.cs" />
     <Compile Include="Viewer\Shape.cs" />
+    <Compile Include="Viewer\Slice.cs" />
     <Page Include="Dialog\About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -812,10 +812,12 @@ public:
 
 public:
 
-    bool displayShape(System::IntPtr pt, int index, double transparency, double r, double g, double b)
+    bool displayShape(System::IntPtr pt, double transparency, double r, double g, double b)
     {
-        ShapeContainer* shape = ShapeContainer::getContainer((void**)pt.ToPointer(), index);
-        Handle(AIS_Shape) aisShape = new AIS_Shape(shape->getShape(1));
+        //ShapeContainer* shape = ShapeContainer::getContainer((void**)pt.ToPointer(), index);
+        //Handle(AIS_Shape) aisShape = new AIS_Shape(shape->getShape(1));
+        ShapeContainer* shape = (ShapeContainer*)(pt.ToPointer());
+        Handle(AIS_Shape) aisShape = new AIS_Shape(shape->getShape());
         if (transparency < 0 || transparency >= 1)
             aisShape->SetTransparency();
         else
@@ -834,22 +836,19 @@ public:
         if (pt == IntPtr::Zero)
             return false;
         ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
-        Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = shape->shapeSequence;
-        for (int i = 1; i <= aHSequenceOfShape->Length(); i++) {
-            Handle(AIS_Shape) aisShape = new AIS_Shape(aHSequenceOfShape->Value(i));
-			aisShape->SetColor(Quantity_Color(r / 255.0, g / 255.0, b / 255.0, Quantity_TOC_RGB));
-            myAISContext()->Display(aisShape, Standard_True);
-            myAISContext()->SetSelected(aisShape);
-        }
+        Handle(AIS_Shape) aisShape = new AIS_Shape(shape->getShape());
+		aisShape->SetColor(Quantity_Color(r / 255.0, g / 255.0, b / 255.0, Quantity_TOC_RGB));
+        myAISContext()->Display(aisShape, Standard_True);
+        myAISContext()->SetSelected(aisShape);
         return true;
     }
 
-    bool displaySliceCut(System::IntPtr pt, double height, int index, double r, double g, double b) {
+    bool displaySliceCut(System::IntPtr pt, double height, double r, double g, double b) {
         if (pt == IntPtr::Zero)
             return false;
         myAISContext()->RemoveAll();
-        ShapeContainer* container = ShapeContainer::getContainer((void**)pt.ToPointer(), index);
-        TopoDS_Shape shape = container->getShape(1);
+        ShapeContainer* container = (ShapeContainer*) pt.ToPointer();
+        TopoDS_Shape shape = container->getShape();
         double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
         Bnd_Box C;
         BRepBndLib::Add(shape, C);
@@ -866,43 +865,37 @@ public:
 
     bool selectSlice(System::IntPtr pt) {
         ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
-        Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = shape->shapeSequence;
-        for (int i = 1; i <= aHSequenceOfShape->Length(); i++) {
-            Handle(AIS_Shape) aisShape = new AIS_Shape(aHSequenceOfShape->Value(i));
-            myAISContext()->SetSelected(aisShape);
-        }
+        Handle(AIS_Shape) aisShape = new AIS_Shape(shape->getShape());
+        myAISContext()->SetSelected(aisShape);
         return true;
     }
 
     bool strechSlice(System::IntPtr pt, double thickness) {
         ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
-        Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = shape->shapeSequence;
-        for (int i = 1; i <= aHSequenceOfShape->Length(); i++) {
-            Handle(TopTools_HSequenceOfShape) Edges = new TopTools_HSequenceOfShape();
-            TopoDS_Shape wireShape = aHSequenceOfShape->Value(i);
-            BRepBuilderAPI_MakeWire mkWire;
-            for (TopExp_Explorer faceExp(wireShape, TopAbs_COMPOUND); faceExp.More(); faceExp.Next()) {
-                for (TopExp_Explorer edgeExp(faceExp.Current(), TopAbs_EDGE); edgeExp.More(); edgeExp.Next()) {
-                    TopoDS_Edge edge = TopoDS::Edge(edgeExp.Current());
-                    Edges->Append(edge);
-                }
+        Handle(TopTools_HSequenceOfShape) Edges = new TopTools_HSequenceOfShape();
+        TopoDS_Shape wireShape = shape->getShape();
+        BRepBuilderAPI_MakeWire mkWire;
+        for (TopExp_Explorer faceExp(wireShape, TopAbs_COMPOUND); faceExp.More(); faceExp.Next()) {
+            for (TopExp_Explorer edgeExp(faceExp.Current(), TopAbs_EDGE); edgeExp.More(); edgeExp.Next()) {
+                TopoDS_Edge edge = TopoDS::Edge(edgeExp.Current());
+                Edges->Append(edge);
             }
-            Handle(TopTools_HSequenceOfShape) Wires = new TopTools_HSequenceOfShape();
-            ShapeAnalysis_FreeBounds::ConnectEdgesToWires(Edges, Precision::Confusion(), Standard_False, Wires);
-            if (Wires->Length() < 1)
-                return false;
-            TopoDS_Face myFaceProfile = BRepBuilderAPI_MakeFace(TopoDS::Wire(Wires->Value(1)));
-            if (Wires->Length() > 1) {
-                for (int w = 2; w <= Wires->Length(); w++) {
-                    myFaceProfile = BRepBuilderAPI_MakeFace(myFaceProfile, TopoDS::Wire(Wires->Value(w)));
-                }
-            }
-            gp_Vec aPrismVec(0, 0, thickness);
-            TopoDS_Shape myBody = BRepPrimAPI_MakePrism(myFaceProfile, aPrismVec);
-            Handle(AIS_Shape) aisShape = new AIS_Shape(myBody);
-            myAISContext()->SetDisplayMode(AIS_DisplayMode::AIS_Shaded);
-            myAISContext()->Display(aisShape);
         }
+        Handle(TopTools_HSequenceOfShape) Wires = new TopTools_HSequenceOfShape();
+        ShapeAnalysis_FreeBounds::ConnectEdgesToWires(Edges, Precision::Confusion(), Standard_False, Wires);
+        if (Wires->Length() < 1)
+            return false;
+        TopoDS_Face myFaceProfile = BRepBuilderAPI_MakeFace(TopoDS::Wire(Wires->Value(1)));
+        if (Wires->Length() > 1) {
+            for (int w = 2; w <= Wires->Length(); w++) {
+                myFaceProfile = BRepBuilderAPI_MakeFace(myFaceProfile, TopoDS::Wire(Wires->Value(w)));
+            }
+        }
+        gp_Vec aPrismVec(0, 0, thickness);
+        TopoDS_Shape myBody = BRepPrimAPI_MakePrism(myFaceProfile, aPrismVec);
+        Handle(AIS_Shape) aisShape = new AIS_Shape(myBody);
+        myAISContext()->SetDisplayMode(AIS_DisplayMode::AIS_Shaded);
+        myAISContext()->Display(aisShape);
         return true;
     }
 

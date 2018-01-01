@@ -78,7 +78,7 @@ int SliceDevice::clearScene() {
     return S_OK;
 }
 
-int SliceDevice::drawSlice(Slice* slice) {
+int SliceDevice::drawSlice(EdgeType* type, void* slice, int count) {
     if (m_pRenderTarget == NULL)
         return E_HANDLE;
     m_pRenderTarget->BeginDraw();
@@ -88,7 +88,7 @@ int SliceDevice::drawSlice(Slice* slice) {
     boundBox.left = boundBox.top = D2D1::FloatMax();
     boundBox.right = boundBox.bottom = -D2D1::FloatMax();
 
-    getBoundBox(&boundBox, slice);
+    getBoundBox(&boundBox, type, slice, count);
 
 	/*
     // 获取网格线与图形的交点列表
@@ -120,10 +120,20 @@ int SliceDevice::drawSlice(Slice* slice) {
 
     //D2D1_RECT_F rectangle = D2D1::Rect(boundBox.left, boundBox.top, boundBox.right, boundBox.bottom);
     //m_pRenderTarget->DrawRectangle(rectangle, m_pBlackBrush, m_curveWith * m_sceneScale);
-    Slice* curve = slice;
-    while (curve != NULL) {
-        drawCurve(curve);
-        curve = curve->next;
+    for (int i = 0; i < count; i++){
+        switch (type[i]) {
+        case EdgeType::bSplice:
+            return drawBSpline((BSpline*)((int*)slice + i));
+            break;
+        case EdgeType::circle:
+            return drawCircle((Circle*)((int*)slice + i));
+            break;
+        case EdgeType::line:
+            return drawLine((Line*)((int*)slice + i));
+            break;
+        default:
+            printf_s("unknow curve type\n");
+        }
     }
     //drawInterSec(listX, listY);
     m_pRenderTarget->EndDraw();
@@ -215,53 +225,46 @@ void SliceDevice::getBSplineBoundBox(BoundBox* box, BSpline* spline) {
         setBoundBox(box, spline->poles[i].y, spline->poles[i + 1].y, spline->poles[i].x, spline->poles[i + 1].x);
 }
 
-void SliceDevice::getBoundBox(BoundBox* box, Slice* slice) {
-    Slice* ss = slice;
+void SliceDevice::getBoundBox(BoundBox* box, EdgeType* type, void* slice, int count) {
     BSpline* b = NULL;
     Line* line = NULL;
     Circle* circle = NULL;
-    while (ss != NULL) {
-        switch (ss->type)
+    for (int i = 0; i < count; i++){
+        switch (type[i])
         {
         case EdgeType::bSplice:
-            b = (BSpline*)(ss->data);
+            b = (BSpline*)((int*)slice + i);
             getBSplineBoundBox(box, b);
             break;
         case EdgeType::line:
-            line = (Line*)(ss->data);
+            line = (Line*)((int*)slice + i);
             setBoundBox(box, line->start.y, line->end.y, line->start.x, line->end.x);
             break;
         case EdgeType::circle:
-            circle = (Circle*)(ss->data);
+            circle = (Circle*)((int*)slice + i);
             setBoundBox(box, circle->center.y - circle->radius, circle->center.y + circle->radius, circle->center.x - circle->radius, circle->center.x + circle->radius);
             break;
         default:
             break;
         }
-        ss = ss->next;
     }
 }
 
-void SliceDevice::getInterSect(vector<Point>* listX, vector<Point>* listY, Slice* slice, BoundBox boundBox) {
-    Slice* ss = slice;
-    while (ss != NULL) {
-        if (ss->data != NULL) {
-            switch (ss->type)
-            {
-            case EdgeType::bSplice:
-                interSecBspline(listX, listY, (BSpline*)(ss->data), boundBox);
-                break;
-            case EdgeType::circle:
-                interSecCircle(listX, listY, (Circle*)(ss->data), boundBox);
-                break;
-            case EdgeType::line:
-                interSecLine(listX, listY, (Line*)(ss->data), boundBox);
-                break;
-            default:
-                break;
-            }
+void SliceDevice::getInterSect(vector<Point>* listX, vector<Point>* listY, EdgeType* type, void* slice, int count, BoundBox boundBox) {
+    for (int i = 0; i < count; i++){
+        switch (type[i])
+        {
+        case EdgeType::bSplice:
+            interSecBspline(listX, listY, (BSpline*)((int*)slice + i), boundBox);
+            break;
+        case EdgeType::circle:
+            interSecCircle(listX, listY, (Circle*)((int*)slice + i), boundBox);
+            break;
+        case EdgeType::line:
+            interSecLine(listX, listY, (Line*)((int*)slice + i), boundBox);
+            break;
+        default: break;
         }
-        ss = ss->next;
     }
     std::sort(listX->begin(), listX->end(), sortXInterSects);
     std::sort(listY->begin(), listY->end(), sortYInterSects);
@@ -502,25 +505,6 @@ bool sortYInterSects(Point pt1, Point pt2) {
         return pt1.y < pt2.y;
 }
     
-int SliceDevice::drawCurve(Slice* curve) {
-    if (curve->data == NULL)
-        return S_OK;
-    switch (curve->type) {
-    case EdgeType::bSplice:
-        return drawBSpline((BSpline*)(curve->data));
-        break;
-    case EdgeType::circle:
-        return drawCircle((Circle*)(curve->data));
-        break;
-    case EdgeType::line:
-        return drawLine((Line*)(curve->data));
-        break;
-    default:
-        printf_s("unknow curve type\n");
-    }
-    return S_OK;
-}
-
 int SliceDevice::drawLine(Line* line) {
     m_pRenderTarget->DrawLine(
         D2D1::Point2F((float)line->start.x, (float)line->start.y),

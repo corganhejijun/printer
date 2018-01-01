@@ -10,16 +10,18 @@ namespace Wpf3DPrint.Dialog
     {
         public EntityProp(Shape shape, string unit)
         {
+            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
+            Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
             InitializeComponent();
-            textBoxX.Text = (shape.Xmax - shape.Xmin).ToString("0.00") + " " + unit;
-            textBoxXMax.Text = shape.Xmax.ToString("0.00") + " " + unit;
-            textBoxXMin.Text = shape.Xmin.ToString("0.00") + " " + unit;
-            textBoxY.Text = (shape.Ymax - shape.Ymin).ToString("0.00") + " " + unit;
-            textBoxYMax.Text = shape.Ymax.ToString("0.00") + " " + unit;
-            textBoxYMin.Text = shape.Ymin.ToString("0.00") + " " + unit;
-            textBoxZ.Text = (shape.Zmax - shape.Zmin).ToString("0.00") + " " + unit;
-            textBoxZMax.Text = shape.Zmax.ToString("0.00") + " " + unit;
-            textBoxZMin.Text = shape.Zmin.ToString("0.00") + " " + unit;
+            textBoxX.Text = (Xmax - Xmin).ToString("0.00") + " " + unit;
+            textBoxXMax.Text = Xmax.ToString("0.00") + " " + unit;
+            textBoxXMin.Text = Xmin.ToString("0.00") + " " + unit;
+            textBoxY.Text = (Ymax - Ymin).ToString("0.00") + " " + unit;
+            textBoxYMax.Text = Ymax.ToString("0.00") + " " + unit;
+            textBoxYMin.Text = Ymin.ToString("0.00") + " " + unit;
+            textBoxZ.Text = (Zmax - Zmin).ToString("0.00") + " " + unit;
+            textBoxZMax.Text = Zmax.ToString("0.00") + " " + unit;
+            textBoxZMin.Text = Zmin.ToString("0.00") + " " + unit;
         }
 
         private void buttonOK_Click(object sender, RoutedEventArgs e)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using Wpf3DPrint.Viewer;
 
 namespace Wpf3DPrint.Dialog
 {
@@ -51,21 +52,23 @@ namespace Wpf3DPrint.Dialog
             }
         }
 
+        double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
         public DialogSlice(Viewer.Shape shape, string thick, string unit)
         {
             this.shape = shape;
             InitializeComponent();
-            textBoxX.Text = (shape.Xmax - shape.Xmin).ToString("0.00") + " " + unit;
-            textBoxX2.Text = shape.Xmin.ToString("0.00") + "~" + shape.Xmax.ToString("0.00") + " " + unit;
-            textBoxY.Text = (shape.Ymax - shape.Ymin).ToString("0.00") + " " + unit;
-            textBoxY2.Text = shape.Ymin.ToString("0.00") + "~" + shape.Ymax.ToString("0.00") + " " + unit;
-            textBoxZ.Text = (shape.Zmax - shape.Zmin).ToString("0.00") + " " + unit;
-            textBoxZ2.Text = shape.Zmin.ToString("0.00") + "~" + shape.Zmax.ToString("0.00") + " " + unit;
+            Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            textBoxX.Text = (Xmax - Xmin).ToString("0.00") + " " + unit;
+            textBoxX2.Text = Xmin.ToString("0.00") + "~" + Xmax.ToString("0.00") + " " + unit;
+            textBoxY.Text = (Ymax - Ymin).ToString("0.00") + " " + unit;
+            textBoxY2.Text = Ymin.ToString("0.00") + "~" + Ymax.ToString("0.00") + " " + unit;
+            textBoxZ.Text = (Zmax - Zmin).ToString("0.00") + " " + unit;
+            textBoxZ2.Text = Zmin.ToString("0.00") + "~" + Zmax.ToString("0.00") + " " + unit;
             try
             {
                 thickness = double.Parse(thick);
                 textBoxThick.Text = thick;
-                int cnt = (int)((shape.Zmax - shape.Zmin) / thickness);
+                int cnt = (int)((Zmax - Zmin) / thickness);
                 labelCnt.Content = "预计层数：" + cnt;
             }
             catch
@@ -79,14 +82,14 @@ namespace Wpf3DPrint.Dialog
         {
             try {
                 thickness = double.Parse(textBoxThick.Text);
-                int cnt = (int)((shape.Zmax - shape.Zmin) / thickness);
+                int cnt = (int)((Zmax - Zmin) / thickness);
                 float ratio = float.Parse(textBoxRatio.Text);
                 labelCnt.Content = "预计层数：" + cnt;
                 if (cnt < 2)
                 {
                     throw new Exception();
                 }
-                shape.sliceThick = thickness;
+                shape.slice.sliceThick = thickness;
                 this.DialogResult = true;
             }
             catch
@@ -101,7 +104,7 @@ namespace Wpf3DPrint.Dialog
             try
             {
                 thickness = double.Parse(textBoxThick.Text);
-                int cnt = (int)((shape.Zmax - shape.Zmin) / thickness);
+                int cnt = (int)((Zmax - Zmin) / thickness);
                 labelCnt.Content = "预计层数：" + cnt;
             }
             catch

@@ -80,6 +80,9 @@
 
 #define EXPORT extern "C" __declspec( dllexport )
 
+typedef void(_stdcall *OnGetShape)(void* shape);
+typedef void(_stdcall *OnGetEdge)(EdgeType type, double* data, int length);
+
 // ============================================
 // Import / export functionality
 // ============================================
@@ -91,78 +94,12 @@ int layer = 1;
 const char* TopAbs_ShapeEnum_str[] = { "COMPOUND", "COMPSOLID", "SOLID", "SHELL", "FACE", "WIRE", "EDGE", "VERTEX", "SHAPE" };
 const char* GeomAbs_CurveType_str[] = { "Line", "Circle", "Ellipse", "Hyperbola", "Parabola", "BezierCurve", "BSplineCurve", "OtherCurve" };
 
-Slice* getEmptySlice(Slice* slice) {
-    Slice* target = slice;
-    Slice* prev = NULL;
-    while (target != NULL && target->type != EdgeType::unknown) {
-        prev = target;
-        target = target->next;
-    }
-    if (target == NULL){
-        prev->next = new Slice();
-        target = prev->next;
-        target->next = NULL;
-        target->prev = prev;
-    }
-    return target;
-}
-
-Slice* addCircle(Slice* slice, double centerX, double centerY, double startAngle, double endAngle, double radius) {
-    Slice* target = getEmptySlice(slice);
-    target->type = EdgeType::circle;
-    target->data = new Circle();
-    Circle* circle = (Circle*)(target->data);
-    circle->center.x = centerX;
-    circle->center.y = centerY;
-    circle->startAngle = startAngle;
-    circle->endAngle = endAngle;
-    circle->radius = radius;
-    return target;
-}
-
-void addCircleVertex(Slice* slice, double beginX, double beginY, double endX, double endY) {
-    Circle* circle = (Circle*)(slice->data);
-    circle->start.x = beginX;
-    circle->start.y = beginY;
-    circle->end.x = endX;
-    circle->end.y = endY;
-}
-
-Slice* addLine(Slice* slice, double beginX, double beginY, double endX, double endY) {
-    Slice* target = getEmptySlice(slice);
-    target->type = EdgeType::line;
-    target->data = new Line();
-    Line* line = (Line*)(target->data);
-    line->start.x = beginX;
-    line->start.y = beginY;
-    line->end.x = endX;
-    line->end.y = endY;
-    return target;
-}
-
-void addBSpline(Slice* slice, double beginX, double beginY, double endX, double endY, Point* bSplinePoles, int polesCnt) {
-    Slice* target = getEmptySlice(slice);
-    target->type = EdgeType::bSplice;
-    target->data = new BSpline();
-    BSpline* b = (BSpline*)(target->data);
-    b->start.x = beginX;
-    b->start.y = beginY;
-    b->end.x = endX;
-    b->end.y = endY;
-    bSplinePoles[polesCnt - 1].x = endX;
-    bSplinePoles[polesCnt - 1].y = endY;
-    b->poles = bSplinePoles;
-    b->polesCnt = polesCnt;
-}
-
-void addVertex(TopoDS_Shape shape, Slice* slice, Point* bSplinePoles, int polesCnt) {
+void addVertex(TopoDS_Shape shape, double& beginX, double& beginY, double& beginZ, double& endX, double& endY, double& endZ) {
     int i = 0;
-    double beginX, beginY, endX, endY;
-    double z;
     for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
         i++;
         TopoDS_Shape child = anIt.Value();
-        if (child.ShapeType() == TopAbs_ShapeEnum::TopAbs_VERTEX){
+        if (child.ShapeType() == TopAbs_ShapeEnum::TopAbs_VERTEX) {
             TopoDS_Vertex vertex = TopoDS::Vertex(child);
             gp_Pnt pt = BRep_Tool::Pnt(vertex);
             switch (i)
@@ -170,11 +107,12 @@ void addVertex(TopoDS_Shape shape, Slice* slice, Point* bSplinePoles, int polesC
             case 1:
                 beginX = pt.X();
                 beginY = pt.Y();
-                z = pt.Z();
+                beginZ = pt.Z();
                 break;
             case 2:
                 endX = pt.X();
                 endY = pt.Y();
+                endZ = pt.Z();
                 break;
             default:
                 printf("error on add line with %d vertex\n", i);
@@ -182,20 +120,9 @@ void addVertex(TopoDS_Shape shape, Slice* slice, Point* bSplinePoles, int polesC
             }
         }
     }
-    if (bSplinePoles != NULL) {
-        addBSpline(slice, beginX, beginY, endX, endY, bSplinePoles, polesCnt);
-    }
-    else {
-        if (polesCnt == 0) {
-            Slice* target = addLine(slice, beginX, beginY, endX, endY);
-            target->z = z;
-        }
-        if (polesCnt == 1)
-            addCircleVertex(slice, beginX, beginY, endX, endY);
-    }
 }
 
-void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
+void showType(TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
     layer++;
     for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
         TopoDS_Shape child = anIt.Value();
@@ -206,14 +133,13 @@ void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
                 gp_Pnt center = circle.Location();
                 Standard_Real first = 0, last = 0;
                 Handle_Geom_Curve theCurve = BRep_Tool::Curve(TopoDS::Edge(child), first, last);
-                Slice* target = addCircle(slice, center.X(), center.Y(), first, last, circle.Radius());
                 for (int i = 0; i < layer; i++)
                     file << '\t';
-                file << "circle radius is " << circle.Radius() << 
-                    ", center is (" << center.X() << "," << center.Y() << "," << center.Z() << ")" 
-                    ", start angle is " << (first/M_PI*180) << ", end angle is " << (last/M_PI*180) << endl;
-                addVertex(child, target, NULL, 1);
-                target->z = center.Z();
+                file << "circle radius is " << circle.Radius() << ", center is (" << center.X() << "," << center.Y() << "," << center.Z() << "), start angle is " << (first/M_PI*180) << ", end angle is " << (last/M_PI*180) << endl;
+                double beginX, beginY, beginZ, endX, endY, endZ;
+                addVertex(child, beginX, beginY, beginZ, endX, endY, endZ);
+                double circleData[10] = {center.Z(), center.X(), center.Y(), first, last, circle.Radius(), beginX, beginY, endX, endY};
+                getEdge(EdgeType::circle, circleData, 10);
             } else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_BSplineCurve) {
                 Handle_Geom_BSplineCurve bSpline = adpCurve.BSpline();
                 for (int i = 0; i < layer; i++)
@@ -235,24 +161,27 @@ void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
                 TColgp_Array1OfPnt Poles(1, polesCount);
                 bSpline->Poles(Poles);
                 file << " poles value";
-                Point* pointArray = new Point[polesCount];
+
+                double beginX, beginY, beginZ, endX, endY, endZ;
+                addVertex(child, beginX, beginY, beginZ, endX, endY, endZ);
+                int length = 5 + polesCount * 2;
+                double* bSplineData = new double[length];
+                bSplineData[0] = beginZ; bSplineData[1] = beginX; bSplineData[2] = beginY; bSplineData[3] = endX; bSplineData[4] = endY;
                 for (int i = 1; i < polesCount; i++) {
                     gp_Pnt pt = Poles(i);
-                    pointArray[i - 1].x = pt.X();
-                    pointArray[i - 1].y = pt.Y();
+                    bSplineData[4 + i * 2 - 1] = pt.X();
+                    bSplineData[4 + i * 2] = pt.Y();
                     file << "(" << pt.X() << "," << pt.Y() << "," << pt.Z() << ") ";
                 }
                 file << endl;
-                addVertex(child, slice, pointArray, polesCount);
-                slice->z = Poles(1).Z();
-                Slice* nextSlice = slice->next;
-                while (nextSlice != NULL) {
-                    nextSlice->z = slice->z;
-                    nextSlice = nextSlice->next;
-                }
+                getEdge(EdgeType::bSplice, bSplineData, length);
+                delete bSplineData;
             }
             else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_Line) {
-                addVertex(child, slice, NULL, 0);
+                double beginX, beginY, beginZ, endX, endY, endZ;
+                addVertex(child, beginX, beginY, beginZ, endX, endY, endZ);
+                double lineData[5] = {beginZ, beginX, beginY, endX, endY};
+                getEdge(EdgeType::line, lineData, 5);
             }
             else {
                 for (int i = 0; i < layer; i++)
@@ -270,114 +199,69 @@ void showType(TopoDS_Shape shape, ofstream& file, Slice* slice) {
                 file << '\t';
             file << "type is " << TopAbs_ShapeEnum_str[child.ShapeType()] << endl;
         }
-        showType(child, file, slice);
+        showType(child, file, getEdge);
     }
     --layer;
 }
 
-EXPORT bool ImportStl(char* theFileName, void** shapes) {
-    OSD_Path aFile(theFileName);
-    Standard_Boolean ReturnValue = Standard_True;
-
-    Handle(StlMesh_Mesh) aSTLMesh = RWStl::ReadFile(aFile);
-
+EXPORT void* ImportStl(char* theFileName) {
     TopoDS_Compound ResultShape;
     BRep_Builder CompoundBuilder;
     CompoundBuilder.MakeCompound(ResultShape);
 
+    OSD_Path aFile(theFileName);
+    Handle(StlMesh_Mesh) aSTLMesh = RWStl::ReadFile(aFile);
     Standard_Integer NumberDomains = aSTLMesh->NbDomains();
-    Standard_Integer iND;
-    gp_XYZ p1, p2, p3;
-    TopoDS_Vertex Vertex1, Vertex2, Vertex3;
-    TopoDS_Face AktFace;
-    TopoDS_Wire AktWire;
-    Standard_Real x1, y1, z1;
-    Standard_Real x2, y2, z2;
-    Standard_Real x3, y3, z3;
-
     StlMesh_MeshExplorer aMExp(aSTLMesh);
-
-    //	BRepBuilderAPI_MakeWire WireCollector;
-    for (iND = 1; iND <= NumberDomains; iND++) {
+    for (Standard_Integer iND = 1; iND <= NumberDomains; iND++) {
         for (aMExp.InitTriangle(iND); aMExp.MoreTriangle(); aMExp.NextTriangle())
         {
+            Standard_Real x1, y1, z1, x2, y2, z2, x3, y3, z3;
             aMExp.TriangleVertices(x1,y1,z1,x2,y2,z2,x3,y3,z3);
-                p1.SetCoord(x1,y1,z1);
-                p2.SetCoord(x2,y2,z2);
-                p3.SetCoord(x3,y3,z3);
-
-                if ((!(p1.IsEqual(p2,0.0))) && (!(p1.IsEqual(p3,0.0))))
-                {
-                    Vertex1 = BRepBuilderAPI_MakeVertex(p1);
-                        Vertex2 = BRepBuilderAPI_MakeVertex(p2);
-                    Vertex3 = BRepBuilderAPI_MakeVertex(p3);
-
-                    AktWire = BRepBuilderAPI_MakePolygon(Vertex1, Vertex2, Vertex3, Standard_True);
-
-                    if (!AktWire.IsNull())
-                    {
-                        AktFace = BRepBuilderAPI_MakeFace(AktWire);
-                        if (!AktFace.IsNull())
-                            CompoundBuilder.Add(ResultShape,AktFace);
-                    }
+            gp_XYZ p1, p2, p3;
+            p1.SetCoord(x1,y1,z1);
+            p2.SetCoord(x2,y2,z2);
+            p3.SetCoord(x3,y3,z3);
+            if ((!(p1.IsEqual(p2,0.0))) && (!(p1.IsEqual(p3,0.0)))) {
+                TopoDS_Vertex Vertex1 = BRepBuilderAPI_MakeVertex(p1);
+                TopoDS_Vertex Vertex2 = BRepBuilderAPI_MakeVertex(p2);
+                TopoDS_Vertex Vertex3 = BRepBuilderAPI_MakeVertex(p3);
+                TopoDS_Wire AktWire = BRepBuilderAPI_MakePolygon(Vertex1, Vertex2, Vertex3, Standard_True);
+                if (!AktWire.IsNull()) {
+                    TopoDS_Face AktFace = BRepBuilderAPI_MakeFace(AktWire);
+                    if (!AktFace.IsNull())
+                        CompoundBuilder.Add(ResultShape, AktFace);
                 }
+            }
         }
     }
-    TopoDS_Shape aShape = ResultShape;
-    Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
-    aHSequenceOfShape->Append(aShape);
-    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
-    Bnd_Box Box;
-    BRepBndLib::Add(aShape, Box);
-    Box.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
-    ShapeContainer* sc = new ShapeContainer(aHSequenceOfShape, Zmin);
-    *shapes = sc;
-    return true;
+    if (ResultShape.IsNull())
+        return NULL;
+    ShapeContainer* sc = new ShapeContainer(ResultShape);
+    return sc;
 }
 
-EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice, void** slice)
+EXPORT bool ImportStep(char* theFileName, OnGetShape getShape)
 {
-    *cnt = 0;
     STEPControl_Reader aReader;
     if (aReader.ReadFile(theFileName) != IFSelect_RetDone)
-    {
         return false;
-    }
 
     bool isFailsonly = false;
     aReader.PrintCheckLoad(isFailsonly, IFSelect_ItemsByEntity);
 
     int aNbRoot = aReader.NbRootsForTransfer();
     aReader.PrintCheckTransfer(isFailsonly, IFSelect_ItemsByEntity);
-    ofstream file("log.txt");
-    Slice** ss = (Slice**)slice;
-    *ss = new Slice[aNbRoot];
-    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
+    ofstream file("logReadStep.txt");
     for (Standard_Integer aRootIter = 1; aRootIter <= aNbRoot; ++aRootIter)
     {
         aReader.TransferRoot(aRootIter);
         int aNbShap = aReader.NbShapes();
         if (aNbShap > 0)
         {
-            Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
             TopoDS_Shape shape = aReader.Shape(aNbShap);
-            if (isSlice) {
-                file << "begin shape" << endl;
-                Slice* sss = &(*ss)[(*cnt)];
-                sss->data = sss->next = sss->prev = NULL;
-                sss->type = EdgeType::unknown;
-                Bnd_Box B;
-                BRepBndLib::Add(shape, B);
-                B.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
-                showType(shape, file, sss);
-                file << "end shape" << endl;
-            }
-            else
-                Zmin = 0;
-            aHSequenceOfShape->Append(shape);
-            ShapeContainer* sc = new ShapeContainer(aHSequenceOfShape, Zmin);
-            *(shapes + (*cnt)*sizeof(void*)) = sc;
-            (*cnt)++;
+            ShapeContainer* singleShape = new ShapeContainer(shape);
+            getShape(singleShape);
         }
     }
     aReader.ClearShapes();
@@ -385,88 +269,77 @@ EXPORT bool ImportStep(char* theFileName, int* cnt, void** shapes, bool isSlice,
     return true;
 }
 
-EXPORT void* getSliceFromShape(void** shapes, int index, double* height) {
-    ShapeContainer* container = *((ShapeContainer**)shapes + index*sizeof(void*));
-    *height = container->height;
-    return container;
-}
+EXPORT bool ImportSlice(char* fileName, OnGetEdge getEdge) {
+    STEPControl_Reader aReader;
+    if (aReader.ReadFile(fileName) != IFSelect_RetDone)
+        return false;
 
-EXPORT bool rotateShape(void** pt, void** rotateResult, int count, double x, double y, double z) {
-    gp_Trsf xTrsf;
-    xTrsf.SetRotation(gp::OX(), x * M_PI / 180);
-    gp_Trsf yTrsf;
-    yTrsf.SetRotation(gp::OY(), y * M_PI / 180);
-    gp_Trsf zTrsf;
-    zTrsf.SetRotation(gp::OZ(), z * M_PI / 180);
-    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
-    for (int i = 0; i < count; i++) {
-        ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
-        BRepBuilderAPI_Transform xform1(shape->getShape(1), xTrsf*yTrsf*zTrsf);
-        TopoDS_Shape transShape = xform1.Shape();
-        Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
-        aHSequenceOfShape->Append(transShape);
-        Bnd_Box B;
-        BRepBndLib::Add(transShape, B);
-        B.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
-        ShapeContainer* transContainer = new ShapeContainer(aHSequenceOfShape, Zmin);
-        *(rotateResult + i * sizeof(void*)) = transContainer;
-    }
-    return true;
-}
+    bool isFailsonly = false;
+    aReader.PrintCheckLoad(isFailsonly, IFSelect_ItemsByEntity);
 
-EXPORT bool moveShape(void** pt, void** moveResult, int count, double x, double y, double z) {
-    gp_Trsf trsf;
-    trsf.SetTranslation(gp_Vec(x, y, z));
-    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
-    for (int i = 0; i < count; i++) {
-        ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
-        BRepBuilderAPI_Transform xform(shape->getShape(1), trsf);
-        TopoDS_Shape transShape = xform.Shape();
-        Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
-        aHSequenceOfShape->Append(transShape);
-        Bnd_Box B;
-        BRepBndLib::Add(transShape, B);
-        B.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
-        ShapeContainer* transContainer = new ShapeContainer(aHSequenceOfShape, Zmin);
-        *(moveResult + i * sizeof(void*)) = transContainer;
-    }
-    return true;
-}
-
-EXPORT bool deleteShape(void** pt, int count)
-{
-    for (int i = 0; i < count; i++)
+    int aNbRoot = aReader.NbRootsForTransfer();
+    aReader.PrintCheckTransfer(isFailsonly, IFSelect_ItemsByEntity);
+    ofstream file("logReadSlice.txt");
+    for (Standard_Integer aRootIter = 1; aRootIter <= aNbRoot; ++aRootIter)
     {
-        ShapeContainer* shape = (ShapeContainer*)(*(pt + i * sizeof(void*)));
-        if (shape != NULL) {
-            shape->shapeSequence->Clear();
-            // 这里不要delete 否则析构函数会再次delete，造成崩溃
-            //shape->shapeSequence->Delete();
+        aReader.TransferRoot(aRootIter);
+        int aNbShap = aReader.NbShapes();
+        if (aNbShap > 0)
+        {
+            TopoDS_Shape shape = aReader.Shape(aNbShap);
+            file << "begin shape" << endl;
+            showType(shape, file, getEdge);
+            file << "end shape" << endl;
         }
-        delete shape;
-        *(pt + i * sizeof(void*)) = NULL;
     }
+    aReader.ClearShapes();
+    file.close();
     return true;
 }
 
-EXPORT void getShapeBoundary(void** pt, int index, double* Zmin, double* Zmax, double* Ymin, double* Ymax, double* Xmin, double* Xmax)
-{
-    ShapeContainer* shape = ShapeContainer::getContainer(pt, index);
-    Bnd_Box B;
-    BRepBndLib::Add(shape->getShape(1), B);
-    B.Get(*Xmin, *Ymin, *Zmin, *Xmax, *Ymax, *Zmax);
-}
-
-EXPORT void deleteSlice(void* pt)
+EXPORT void del(void* pt)
 {
     ShapeContainer* container = (ShapeContainer*)pt;
     delete container;
 }
 
+EXPORT void getBoundary(ShapeContainer* shape, double* Zmin, double* Zmax, double* Ymin, double* Ymax, double* Xmin, double* Xmax)
+{
+    Bnd_Box B;
+    BRepBndLib::Add(shape->getShape(), B);
+    B.Get(*Xmin, *Ymin, *Zmin, *Xmax, *Ymax, *Zmax);
+}
+
+EXPORT void* rotate(ShapeContainer* shape, double x, double y, double z) {
+    gp_Trsf xTrsf, yTrsf, zTrsf;
+    xTrsf.SetRotation(gp::OX(), x * M_PI / 180);
+    yTrsf.SetRotation(gp::OY(), y * M_PI / 180);
+    zTrsf.SetRotation(gp::OZ(), z * M_PI / 180);
+    BRepBuilderAPI_Transform xform1(shape->getShape(), xTrsf*yTrsf*zTrsf);
+    TopoDS_Shape transShape = xform1.Shape();
+    return new ShapeContainer(transShape);
+}
+
+EXPORT void* move(ShapeContainer* shape, double x, double y, double z) {
+    gp_Trsf trsf;
+    trsf.SetTranslation(gp_Vec(x, y, z));
+    BRepBuilderAPI_Transform xform(shape->getShape(), trsf);
+    TopoDS_Shape transShape = xform.Shape();
+    return new ShapeContainer(transShape);
+}
+
+EXPORT ShapeContainer* scale(ShapeContainer* shape, double ratio, double centerX, double centerY, double centerZ) {
+    TopoDS_Shape slice = shape->getShape();
+    gp_Trsf xTrsf;
+    gp_Pnt scaleCenter(centerX, centerY, centerZ);
+    xTrsf.SetScale(scaleCenter, ratio);
+    BRepBuilderAPI_Transform myTrans(slice, xTrsf, true);
+    TopoDS_Shape newSlice = myTrans.Shape();
+    return new ShapeContainer(newSlice);
+}
+
 Handle_TopTools_HSequenceOfShape getWires(TopoDS_Shape shape) {
     Handle(TopTools_HSequenceOfShape) Edges = new TopTools_HSequenceOfShape();
-    TopoDS_Shape wireShape = shape;
-    BRepBuilderAPI_MakeWire mkWire;
     for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
         for (TopExp_Explorer edgeExp(anIt.Value(), TopAbs_EDGE); edgeExp.More(); edgeExp.Next()) {
             TopoDS_Edge edge = TopoDS::Edge(edgeExp.Current());
@@ -478,11 +351,10 @@ Handle_TopTools_HSequenceOfShape getWires(TopoDS_Shape shape) {
     return Wires;
 }
 
-EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
+EXPORT void* slice(ShapeContainer* shape, double height)
 {
-    ShapeContainer* shape = ShapeContainer::getContainer(pt, index);
     // 生成水平面，进行逐层切割
-    TopoDS_Shape face = shape->getShape(1);
+    TopoDS_Shape face = shape->getShape();
     double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
     Bnd_Box C;
     BRepBndLib::Add(face, C);
@@ -492,153 +364,43 @@ EXPORT ShapeContainer* SliceShape(void** pt, int index, double height)
         return NULL;
     }
     gp_Pln originPlane = gp_Pln(0, 0, 1, -height);
-    BRepAlgo_Section section(shape->getShape(1), originPlane, Standard_True);
+    BRepAlgo_Section section(shape->getShape(), originPlane, Standard_True);
     TopoDS_Shape sectionShape = section.Shape();
     if (sectionShape.IsNull())
         return NULL;
-    Handle_TopTools_HSequenceOfShape Wires = getWires(sectionShape);
-    if (Wires->IsEmpty())
-        return NULL;
-    ShapeContainer* container = new ShapeContainer(Wires);
-    return container;
+    return new ShapeContainer(sectionShape);
 }
 
-EXPORT ShapeContainer* ScaleSlice(void* pt, double ratio) {
-    ShapeContainer* shape = (ShapeContainer*)pt;
-    TopoDS_Shape slice = shape->getShape(1);
-    gp_Trsf xTrsf;
-    gp_Pnt scaleCenter(0, 0, 0);
-    xTrsf.SetScale(scaleCenter, ratio);
-    BRepBuilderAPI_Transform myTrans(slice, xTrsf, true);
-    TopoDS_Shape newSlice = myTrans.Shape();
-    Handle_TopTools_HSequenceOfShape newSeq = new TopTools_HSequenceOfShape();
-    newSeq->Append(newSlice);
-    return new ShapeContainer(newSeq);
+EXPORT void* combine(ShapeContainer* shape1, ShapeContainer* shape2) {
+    TopoDS_Shape shape = BRepAlgoAPI_Fuse(shape1->getShape(), shape2->getShape());
+    return new ShapeContainer(shape);
 }
 
-EXPORT void combineShapes(void** pt, void** pt1, void** pt2) {
-    ShapeContainer* container1 = ShapeContainer::getContainer(pt1, 0);
-    ShapeContainer* container2 = ShapeContainer::getContainer(pt2, 0);
-    TopoDS_Shape shape1 = container1->getShape(1);
-    TopoDS_Shape shape2 = container2->getShape(1);
-    TopoDS_Shape shape = BRepAlgoAPI_Fuse(shape1, shape2);
-    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
-    Bnd_Box B;
-    BRepBndLib::Add(shape, B);
-    B.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
-    Handle(TopTools_HSequenceOfShape) aHSequenceOfShape = new TopTools_HSequenceOfShape;
-    aHSequenceOfShape->Append(shape);
-    ShapeContainer* container = new ShapeContainer(aHSequenceOfShape, Zmin);
-    *pt = container;
-}
-
-EXPORT ShapeContainer** getLocatPlane(void** pt, int index, int* count) {
-    // 显示定位面
-    ShapeContainer* containers[128] = {0};
-    ShapeContainer* shape = ShapeContainer::getContainer(pt, index);
+EXPORT void getLocatPlane(ShapeContainer* shape, OnGetShape getShape) {
+    // 获取与XY平面平行的定位面
     TopExp_Explorer explorer;
     double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
     int counter = 0;
-    for (explorer.Init(shape->getShape(1), TopAbs_FACE); explorer.More(); explorer.Next()) {
+    for (explorer.Init(shape->getShape(), TopAbs_FACE); explorer.More(); explorer.Next()) {
         TopoDS_Shape currentFace = explorer.Current();
         Bnd_Box C;
         BRepBndLib::Add(currentFace, C);
         C.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
         if (Zmax - Zmin < 0.0001) {
-            Handle_TopTools_HSequenceOfShape wires = getWires(currentFace);
-            containers[counter++] = new ShapeContainer(wires, Zmin);
+            getShape(new ShapeContainer(currentFace));
         }
     }
-    *count = counter;
-    if (counter == 0)
-        return NULL;
-    ShapeContainer** result = new ShapeContainer*[counter];
-    for (int i = 0; i < counter; i++) {
-        result[i] = containers[i];
-    }
-    return result;
 }
 
-EXPORT ShapeContainer* getShapeContainer(void** pt, int index, double* height) {
-    ShapeContainer** containers = (ShapeContainer**)pt;
-    *height = containers[index]->height;
-    return containers[index];
-}
-
-EXPORT bool exportStep(char* fileName, ShapeContainer** slices, int length) {
-    STEPControl_StepModelType aType = STEPControl_AsIs;
-    STEPControl_Writer        aWriter;
+EXPORT bool exportStep(char* fileName, ShapeContainer** shapeList, int length) {
+    STEPControl_Writer aWriter;
     for (int i = 0; i < length; i++) {
-        int length = slices[i]->shapeSequence->Length();
-        if (length == 0)
-            continue;
         TopoDS_Compound aCompound;
         BRep_Builder aBuilder;
         aBuilder.MakeCompound(aCompound);
-        for (int j = 1; j <= length; j++) {
-            aBuilder.Add(aCompound, slices[i]->shapeSequence->Value(j));
-        }
-        if (aWriter.Transfer(aCompound, aType) != IFSelect_RetDone)
+        aBuilder.Add(aCompound, shapeList[i]->getShape());
+        if (aWriter.Transfer(aCompound, STEPControl_AsIs) != IFSelect_RetDone)
             return false;
     }
     return aWriter.Write(fileName) == IFSelect_RetDone;
-}
-
-EXPORT bool exportTransformStep(char* fileName, ShapeContainer** slices, int length) {
-    return exportStep(fileName, slices, length);
-}
-
-EXPORT Slice* exportSlice(Slice** ss, int layerNum, Slice** current, int* type, double* x, double* y, double* z, double* p) {
-    Slice* slice = NULL;
-    if (*current == NULL) {
-        slice = &(*ss)[layerNum];
-        *current = &(*ss)[layerNum];
-    }
-    else
-        slice = *current;
-    *type = slice->type;
-    *z = slice->z;
-    switch (slice->type)
-    {
-    case EdgeType::circle: {
-        Circle* circle = (Circle*)(slice->data);
-        *x = circle->center.x;
-        *y = circle->center.y;
-        p[0] = circle->radius;
-        p[1] = circle->startAngle;
-        p[2] = circle->endAngle;
-        p[3] = circle->start.x;
-        p[4] = circle->start.y;
-        p[5] = circle->end.x;
-        p[6] = circle->end.y;
-    }
-        break;
-    case EdgeType::bSplice: {
-        BSpline* bspline = (BSpline*)(slice->data);
-        *x = bspline->start.x;
-        *y = bspline->start.y;
-        p[0] = bspline->polesCnt;
-        p[1] = bspline->end.x;
-        p[2] = bspline->end.y;
-    }
-        break;
-    case EdgeType::line: {
-        Line* line = (Line*)(slice->data);
-        *x = line->start.x;
-        *y = line->start.y;
-        p[0] = line->end.x;
-        p[1] = line->end.y;
-    }
-        break;
-    default:
-        break;
-    }
-    return slice->next;
-}
-
-EXPORT bool exportBspline(Slice* current, int index, double* x, double* y) {
-    BSpline* bspline = (BSpline*)(current->data);
-    *x = bspline->poles[index].x;
-    *y = bspline->poles[index].y;
-    return true;
 }

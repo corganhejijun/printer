@@ -6,50 +6,32 @@ using System.Windows.Controls;
 
 namespace Wpf3DPrint.Viewer
 {
-    class FileReader
+    class FileReader : IDisposable
     {
-        Scene scene;
-        Scene sliceScene;
-        ArrayList shapeList;
-        string fileName;
-        public FileReader(Scene scene, Scene sliceScene)
+        Shape shape;
+        SceneThread sceneThread;
+        public FileReader()
         {
-            this.scene = scene;
-            this.sliceScene = sliceScene;
-            shapeList = new ArrayList();
+            deleGetShape = new Cpp2Managed.Shape3D.OnGetShape(getShape);
+            deleGetEdge = new Cpp2Managed.Shape3D.OnGetEdge(getSliceEdge);
+            deleGetLocatePlane = new Cpp2Managed.Shape3D.OnGetShape(getLocatePlane);
+            sceneThread = new SceneThread();
+            shape = new Shape();
         }
 
         public Shape Shape
         {
             get
             {
-                return (Shape)shapeList[0];
+                return shape;
             }
         }
 
-        public bool HasFile
-        {
-            get
-            {
-                return shapeList.Count > 0;
-            }
-        }
-
-        public string FileName
-        {
-            get
-            {
-                return fileName;
-            }
-        }
-
-        public bool openStep(string fileName, SceneThread.afterFunction afterOpenStep, bool isSlice)
+        public bool openStep(string fileName, SceneThread.afterFunction afterOpenStep)
         {
             ArrayList list = new ArrayList();
             list.Add(fileName);
-            list.Add(isSlice);
-            scene.D3DThread.addWork(openStepWork, list, afterOpenStep);
-            this.fileName = fileName;
+            sceneThread.addWork(openStepWork, list, afterOpenStep);
             return true;
         }
 
@@ -57,8 +39,7 @@ namespace Wpf3DPrint.Viewer
         {
             ArrayList list = new ArrayList();
             list.Add(fileName);
-            list.Add(false);
-            scene.D3DThread.addWork(openStepWork, list, afterImport);
+            sceneThread.addWork(openStepWork, list, afterImport);
             return true;
         }
 
@@ -72,55 +53,70 @@ namespace Wpf3DPrint.Viewer
             return nativeUtf8;
         }
 
+        Cpp2Managed.Shape3D.OnGetShape deleGetShape;
+        void getShape(IntPtr shapePt)
+        {
+            shape.setShape(shapePt);
+        }
+
         private object openStepWork(object args)
         {
             ArrayList list = (ArrayList)args;
             string fileName = (string)list[0];
             IntPtr fileNameSpace = NativeUtf8FromString(fileName);
             bool result = false;
-            IntPtr shapePt = IntPtr.Zero;
-            int count = 1;
-            bool isSlice = (bool)list[1];
-            IntPtr slice = IntPtr.Zero;
             list.Clear();
-            if (fileName.EndsWith(".stp") || fileName.EndsWith(".step") || fileName.EndsWith(".slc"))
+            if (fileName.EndsWith(".stp") || fileName.EndsWith(".step"))
             {
-                count = 500;
-                shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * count);
-                slice = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
-                result = Cpp2Managed.ImportStep(fileNameSpace, ref count, shapePt, isSlice, slice);
-                Marshal.FreeHGlobal(fileNameSpace);
+                result = Cpp2Managed.Shape3D.ImportStep(fileNameSpace, getShape);
+                if (result)
+                    shape.fileName = fileName;
             }
             else if (fileName.EndsWith(".stl") || fileName.EndsWith("ast"))
             {
-                shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
-                result = Cpp2Managed.ImportStl(fileNameSpace, shapePt);
-                Marshal.FreeHGlobal(fileNameSpace);
+                IntPtr shapePt = Cpp2Managed.Shape3D.ImportStl(fileNameSpace);
+                if (shapePt != IntPtr.Zero)
+                {
+                    shape.setShape(shapePt);
+                    shape.fileName = fileName;
+                    result = true;
+                }
             }
-            else
-            {
-                list.Add(false);
-                return list;
-            }
+            Marshal.FreeHGlobal(fileNameSpace);
             list.Add(result);
-            Shape shape = new Shape(shapePt, count);
-            for (int i = 0; i < count; i++)
-            {
-                double zMin = 0, zMax = 0, yMin = 0, yMax = 0, xMin = 0, xMax = 0;
-                Cpp2Managed.getShapeBoundary(shape.shape, i, ref zMin, ref zMax, ref yMin, ref yMax, ref xMin, ref xMax);
-                shape.Zmin = shape.Zmin < zMin ? shape.Zmin : zMin;
-                shape.Zmax = shape.Zmax > zMax ? shape.Zmax : zMax;
-                shape.Ymin = shape.Ymin < yMin ? shape.Ymin : yMin;
-                shape.Ymax = shape.Ymax > yMax ? shape.Ymax : yMax;
-                shape.Xmin = shape.Xmin < xMin ? shape.Xmin : xMin;
-                shape.Xmax = shape.Xmax > xMax ? shape.Xmax : xMax;
-            }
-            if (isSlice)
-                shape.stepSlice = slice;
-            list.Add(shape);
             return list;
         }
 
+        public bool openSlice(string fileName, SceneThread.afterFunction afterOpenSlice)
+        {
+            ArrayList list = new ArrayList();
+            list.Add(fileName);
+            sceneThread.addWork(openSliceWork, list, afterOpenSlice);
+            return true;
+        }
+
+        Cpp2Managed.Shape3D.OnGetEdge deleGetEdge;
+        void getSliceEdge(Cpp2Managed.EdgeType type, double[] data, int length)
+        {
+
+        }
+        object openSliceWork(object args)
+        {
+            ArrayList list = (ArrayList)args;
+            string fileName = (string)list[0];
+            IntPtr fileNameSpace = NativeUtf8FromString(fileName);
+            bool result = false;
+            list.Clear();
+            if (fileName.EndsWith(".slc"))
+            {
+                result = Cpp2Managed.Shape3D.ImportSlice(fileNameSpace, deleGetEdge);
+            }
+            Marshal.FreeHGlobal(fileNameSpace);
+            list.Add(result);
+            return list;
+        }
+
+        /*
         public bool displayStep(object workResult, bool combine)
         {
             ArrayList list = (ArrayList)workResult;
@@ -142,35 +138,30 @@ namespace Wpf3DPrint.Viewer
             }
             return displayShape(shape);
         }
-
-        private bool displayShape(Shape shape)
-        {
-            scene.Proxy.SetDisplayMode(1);
-            scene.Proxy.displayShape(shape.shape, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
-            return true;
-        }
+        */
 
         public void saveSlice(string path)
         {
-            Shape shape = (Shape)shapeList[0];
-            IntPtr[] slices = new IntPtr[shape.sliceList.Count];
+            IntPtr[] slices = new IntPtr[shape.slice.sliceList.Count];
             int i = 0;
-            foreach (Shape.Slice slice in shape.sliceList)
+            foreach (Slice.OneSlice slice in shape.slice.sliceList)
             {
                 slices[i++] = slice.slice;
             }
             IntPtr fileName = NativeUtf8FromString(path);
-            Cpp2Managed.exportStep(fileName, slices, shape.sliceList.Count);
+            Cpp2Managed.Shape3D.exportStep(fileName, slices, shape.slice.sliceList.Count);
             Marshal.FreeHGlobal(fileName);
         }
 
-        public void saveStep(string path, Shape shape)
+        public void saveStep(string path)
         {
             IntPtr fileName = NativeUtf8FromString(path);
-            Cpp2Managed.exportTransformStep(fileName, shape.shape, 1);
+            IntPtr[] shapeList = new IntPtr[1];
+            shapeList[0] = shape.getShape();
+            Cpp2Managed.Shape3D.exportStep(fileName, shapeList, 1);
         }
 
-        public void sliceShape(Control control, bool locatePlane, bool gradientShape, bool noDelay, double outputRatio, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)
+        public void sliceShape(Control control, bool locatePlane, bool gradientShape, bool noDelay, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)
         {
             ArrayList args = new ArrayList();
             args.Add(control);
@@ -178,11 +169,18 @@ namespace Wpf3DPrint.Viewer
             args.Add(locatePlane);
             args.Add(gradientShape);
             args.Add(noDelay);
-            args.Add(outputRatio);
-            scene.D3DThread.addWork(sliceShapeWork, args, afterSlice);
+            sceneThread.addWork(sliceShapeWork, args, afterSlice);
         }
 
-        delegate bool DisplayOneShape(IntPtr shape, double height, SceneThread.onFunction onSlice, ArrayList args);
+        delegate bool DisplayOneShape(IntPtr shape, double height, SceneThread.onFunction onSlice);
+        Cpp2Managed.Shape3D.OnGetShape deleGetLocatePlane;
+        void getLocatePlane(IntPtr locatePlanePt)
+        {
+            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
+            Cpp2Managed.Shape3D.getBoundary(locatePlanePt, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            Slice.OneSlice slice = new Slice.OneSlice(locatePlanePt, Zmin, true);
+            shape.slice.locateList.Add(slice);
+        }
         private object sliceShapeWork(object args)
         {
             ArrayList list = (ArrayList)args;
@@ -191,331 +189,99 @@ namespace Wpf3DPrint.Viewer
             bool locatePlane = (bool)list[2];
             bool gradientShape = (bool)list[3];
             bool noDelay = (bool)list[4];
-            double ratio = (double)list[5];
-            foreach (Shape shape in shapeList)
+            // 确定定位面，与定位面等高的切割线要特殊处理
+            Cpp2Managed.Shape3D.getLocatPlane(shape.getShape(), deleGetLocatePlane);
+            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
+            Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            double height = Zmin;
+            for (int i = 1; height < Zmax; i++)
             {
-                // 确定定位面，与定位面等高的切割线要特殊处理
-                int count = 0;
-                IntPtr containers = Cpp2Managed.getLocatPlane(shape.shape, 0, ref count);
-                shape.locateCount = count;
-                shape.countLocate = locatePlane;
-                shape.outputRatio = ratio;
-                ArrayList locatePlaneList = new ArrayList();
-                for (int i = 0; i < count; i++)
+                // 从1开始，跳过0高度切割
+                height = Zmin + (double)i * shape.slice.sliceThick;
+                bool skip = false;
+                foreach (Slice.OneSlice s in shape.slice.locateList)
                 {
-                    double locateHeight = 0;
-                    IntPtr slice = Cpp2Managed.getShapeContainer(containers, i, ref locateHeight);
-                    if (ratio > 1.0 + 0.01 || ratio < 1.0 - 0.01)
+                    // 与定位面高度重复的不能进行普通切割操作
+                    if (Math.Abs(s.height - height) < 0.0001)
                     {
-                        IntPtr newSlice = Cpp2Managed.ScaleSlice(slice, ratio);
-                        Cpp2Managed.deleteSlice(slice);
-                        slice = newSlice;
+                        skip = true;
+                        onGetSlice(s.slice, s.height, control, onslice);
+                        shape.slice.sliceList.Add(s);
                     }
-                    locatePlaneList.Add(new Shape.Slice(slice, locateHeight));
-                    if (locatePlane)
-                        shape.sliceList.Add(new Shape.Slice(slice, locateHeight));
-                    //onGetSlice(slice, locateHeight, shape, control, onslice);
+                    // 显示对应高度的定位面切割线
+                    else if (locatePlane && s.height < height && s.height > height - shape.slice.sliceThick)
+                    {
+                        onGetSlice(s.slice, s.height, control, onslice);
+                        shape.slice.sliceList.Add(s);
+                    }
                 }
-
-                double height = shape.Zmin;
-                for (int i = 1; height < shape.Zmax; i++)
-                {
-                    // 从1开始，跳过0高度切割
-                    height = shape.Zmin + (double)i * shape.sliceThick;
-                    bool skip = false;
-                    foreach (Shape.Slice s in locatePlaneList)
-                    {
-                        // 与定位面高度重复的不能进行普通切割操作
-                        if (Math.Abs(s.height - height) < 0.0001)
-                        {
-                            // 如果之前未作为定位面加入slice list，则现在需要加入
-                            if (!locatePlane)
-                                shape.sliceList.Add(s);
-                            skip = true;
-                            break;
-                        }
-                        // 显示对应高度的定位面切割线
-                        if (s.height < height && s.height > height - shape.sliceThick)
-                        {
-                            onGetSlice(s.slice, s.height, shape, control, onslice);
-                        }
-                    }
-                    if (skip)
-                        continue;
-                    IntPtr slice = Cpp2Managed.SliceShape(shape.shape, 0, height);
-                    if (slice == IntPtr.Zero)
-                        continue;
-                    if (ratio > 1.0 + 0.01 || ratio < 1.0 - 0.01)
-                    {
-                        IntPtr newSlice = Cpp2Managed.ScaleSlice(slice, ratio);
-                        Cpp2Managed.deleteSlice(slice);
-                        slice = newSlice;
-                    }
-                    shape.sliceList.Add(new Shape.Slice(slice, height));
-                    onGetSlice(slice, height, shape, control, onslice);
-                    if (!noDelay)
-                        System.Threading.Thread.Sleep(100);
-                }
-                shape.sortSliceList();
+                if (skip)
+                    continue;
+                IntPtr slice = Cpp2Managed.Shape3D.slice(shape.getShape(), height);
+                if (slice == IntPtr.Zero)
+                    continue;
+                shape.slice.sliceList.Add(new Slice.OneSlice(slice, height, false));
+                onGetSlice(slice, height, control, onslice);
+                if (!noDelay)
+                    System.Threading.Thread.Sleep(100);
             }
+            shape.slice.sortSliceList();
             return null;
         }
 
-        private void onGetSlice(IntPtr slice, double height, Shape shape, Control control, SceneThread.onFunction onSlice)
+        private void onGetSlice(IntPtr slice, double height, Control control, SceneThread.onFunction onSlice)
         {
             if (slice != IntPtr.Zero)
             {
-                ArrayList onArgs = new ArrayList();
-                onArgs.Add(shape);
-                control.Dispatcher.Invoke(new DisplayOneShape(displaySlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, height, onSlice, onArgs });
+                control.Dispatcher.Invoke(new DisplayOneShape(displayOnSlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, height, onSlice});
             }
         }
 
-        private bool displaySlice(IntPtr slice, double height, SceneThread.onFunction onSlice, ArrayList onArgs)
+        private bool displayOnSlice(IntPtr slice, double height, SceneThread.onFunction onSlice)
         {
-            sliceScene.Proxy.displaySlice(slice, sliceScene.Setting.lineColor.R, sliceScene.Setting.lineColor.G, sliceScene.Setting.lineColor.B);
-            Shape shape = (Shape)onArgs[0];
-            scene.Proxy.displaySliceCut(shape.shape, height, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
-            onSlice(onArgs);
+            ArrayList list = new ArrayList();
+            list.Add(slice);
+            list.Add(height);
+            onSlice(list);
             return true;
-        }
-
-        public void sceneZoom(int delta)
-        {
-            scene.Proxy.Zoom(0, 0, delta / 8, 0);
-            sliceScene.Proxy.Zoom(0, 0, delta / 8, 0);
-        }
-
-        public int afterOpenSlice(object workResult)
-        {
-            ArrayList list = (ArrayList)workResult;
-            bool result = (bool)list[0];
-            if (!result)
-            {
-                return -1;
-            }
-            Shape shape = (Shape)list[1];
-            shapeList.Add(shape);
-            for (int i = 0; i < shape.count; i++)
-            {
-                double height = 0;
-                IntPtr slice = Cpp2Managed.getSliceFromShape(shape.shape, i, ref height);
-                shape.sliceList.Add(new Shape.Slice(slice, height));
-            }
-            return shape.count;
-        }
-
-        public void displaySlice()
-        {
-            foreach(Shape.Slice slice in Shape.sliceList)
-            {
-                scene.Proxy.displaySlice(slice.slice, sliceScene.Setting.lineColor.R, sliceScene.Setting.lineColor.G, sliceScene.Setting.lineColor.B);
-            }
-            resetView(1);
-        }
-
-        public void selectSlice(int i)
-        {
-            sliceScene.Proxy.selectSlice(((Shape.Slice)(Shape.sliceList[i])).slice);
-        }
-
-        System.Windows.Forms.Timer rebuildTimer;
-        int rebuildIndex;
-        public void rebuildSlice()
-        {
-            if (rebuildTimer == null)
-                rebuildTimer = new System.Windows.Forms.Timer();
-            rebuildTimer.Tick += RebuildTimer_Elapsed;
-            rebuildTimer.Interval = 100;
-            sliceScene.Proxy.removeObjects();
-            rebuildIndex = Shape.sliceList.Count;
-            rebuildTimer.Start();
-        }
-
-        private void RebuildTimer_Elapsed(object sender, EventArgs e)
-        {
-            if (rebuildIndex == 0)
-            {
-                rebuildTimer.Stop();
-                rebuildTimer.Dispose();
-                rebuildTimer = null;
-                return;
-            }
-            Shape.Slice slice = (Shape.Slice)Shape.sliceList[rebuildIndex - 1];
-            sliceScene.Proxy.strechSlice(slice.slice, Shape.sliceThick);
-            rebuildIndex--;
         }
 
         public void releaseShape()
         {
-            afterStop();
-        }
-
-        void afterStop()
-        {
-            foreach (Shape shape in shapeList)
+            releaseTransform();
+            if (shape.slice.sliceList.Count > 0)
             {
-                releaseTransform(shape);
-                if (shape.sliceList.Count > 0)
+                foreach (Slice.OneSlice slice in shape.slice.sliceList)
                 {
-                    foreach (Shape.Slice slice in shape.sliceList)
-                    {
-                        Cpp2Managed.deleteSlice(slice.slice);
-                    }
+                    //Cpp2Managed.Shape3D.deleteSlice(slice.slice);
                 }
-                else
-                    Cpp2Managed.deleteShape(shape.shape, shape.count);
-                Marshal.FreeHGlobal(shape.shape);
             }
-            shapeList.Clear();
-            scene.Proxy.removeObjects();
-            sliceScene.Proxy.removeObjects();
+            else
+                Cpp2Managed.Shape3D.del(shape.getShape());
         }
 
-        public void releaseTransform(Shape shape)
+        public void releaseTransform()
         {
             if (shape.transform != IntPtr.Zero)
             {
-                Cpp2Managed.deleteShape(shape.transform, shape.count);
+                Cpp2Managed.Shape3D.del(shape.transform);
                 Marshal.FreeHGlobal(shape.transform);
                 shape.transform = IntPtr.Zero;
             }
         }
 
-        public void applyTransform(Shape shape)
+        public void applyTransform()
         {
             if (shape.transform == IntPtr.Zero)
                 return;
-            Cpp2Managed.deleteShape(shape.shape, shape.count);
-            Marshal.FreeHGlobal(shape.shape);
-            shape.shape = shape.transform;
+            Cpp2Managed.Shape3D.del(shape.getShape());
+            shape.setShape(shape.transform);
             shape.transform = IntPtr.Zero;
-            Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
-            displayAfterTransform(shape);
         }
 
-        public void displayAfterTransform(Shape shape)
+        public void Dispose()
         {
-            scene.Proxy.removeObjects();
-            scene.Proxy.displayShape(shape.shape, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
-            scene.Proxy.ZoomAllView();
-        }
-
-        public void resetView(double ratio)
-        {
-            scene.Proxy.ZoomAllView();
-            double scale = scene.Proxy.getZoomScale();
-            sliceScene.Proxy.setZoomScale(scale / ratio);
-            double x = 0, y = 0, z = 0;
-            unsafe
-            {
-                scene.Proxy.getViewPoint(&x, &y, &z);
-            }
-            sliceScene.Proxy.setViewPoint(x * ratio, y * ratio, z * ratio);
-        }
-
-        public void rotateAllShape(double x, double y, double z)
-        {
-            scene.Proxy.removeObjects();
-            foreach (Shape shape in shapeList)
-            {
-                IntPtr rotate = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * shape.count);
-                Cpp2Managed.rotateShape(shape.shape, rotate, shape.count, x, y, z);
-                releaseTransform(shape);
-                shape.transform = rotate;
-                scene.Proxy.displayShape(shape.transform, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
-                scene.Proxy.ZoomAllView();
-            }
-        }
-
-        public void moveAllShape(double x, double y, double z)
-        {
-            scene.Proxy.removeObjects();
-            foreach(Shape shape in shapeList)
-            {
-                IntPtr move = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * shape.count);
-                Cpp2Managed.moveShape(shape.shape, move, shape.count, x, y, z);
-                releaseTransform(shape);
-                shape.transform = move;
-                scene.Proxy.displayShape(shape.transform, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
-                scene.Proxy.ZoomAllView();
-            }
-        }
-
-        private void combineShapes(Shape newShape)
-        {
-            IntPtr shapePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
-            Cpp2Managed.combineShapes(shapePt, Shape.shape, newShape.shape);
-            Shape shape = new Shape(shapePt, 1);
-            Cpp2Managed.deleteShape(Shape.shape, Shape.count);
-            Cpp2Managed.deleteShape(newShape.shape, newShape.count);
-            Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
-            shapeList.Clear();
-            shapeList.Add(shape);
-        }
-
-        public void base0AllShapes()
-        {
-            double Zmin = double.MaxValue;
-            foreach (Shape shape in shapeList)
-            {
-                if (Zmin > shape.Zmin)
-                    Zmin = shape.Zmin;
-            }
-            if (Zmin < 0.0001 && Zmin > -0.0001)
-                return;
-            foreach (Shape shape in shapeList)
-            {
-                IntPtr move = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * shape.count);
-                Cpp2Managed.moveShape(shape.shape, move, shape.count, 0, 0, -Zmin);
-                Cpp2Managed.deleteShape(shape.shape, shape.count);
-                Marshal.FreeHGlobal(shape.shape);
-                shape.shape = move;
-                shape.Zmin = shape.Zmin - Zmin;
-                shape.Zmax = shape.Zmax - Zmin;
-            }
-            scene.Proxy.removeObjects();
-            scene.Proxy.ZoomAllView();
-            foreach (Shape shape in shapeList)
-            {
-                scene.Proxy.displayShape(shape.shape, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
-            }
-        }
-
-        public void base0XyCenter()
-        {
-            double xmin = double.MaxValue, ymin = double.MaxValue, xmax = double.MinValue, ymax = double.MinValue;
-            foreach (Shape shape in shapeList)
-            {
-                if (xmin > shape.Xmin)
-                    xmin = shape.Xmin;
-                if (ymin > shape.Ymin)
-                    ymin = shape.Ymin;
-                if (xmax < shape.Xmax)
-                    xmax = shape.Xmax;
-                if (ymax < shape.Ymax)
-                    ymax = shape.Ymax;
-            }
-            double centerX = xmin + (xmax - xmin) / 2;
-            double centerY = ymin + (ymax - ymin) / 2;
-            foreach (Shape shape in shapeList)
-            {
-                IntPtr move = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * shape.count);
-                Cpp2Managed.moveShape(shape.shape, move, shape.count, -centerX, -centerY, 0);
-                Cpp2Managed.deleteShape(shape.shape, shape.count);
-                Marshal.FreeHGlobal(shape.shape);
-                shape.shape = move;
-                shape.Xmin -= centerX;
-                shape.Xmax -= centerX;
-                shape.Ymax -= centerY;
-                shape.Ymin -= centerY;
-            }
-            scene.Proxy.removeObjects();
-            scene.Proxy.ZoomAllView();
-            foreach (Shape shape in shapeList)
-            {
-                scene.Proxy.displayShape(shape.shape, 0, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
-            }
+            sceneThread.Dispose(null);
         }
     }
 }

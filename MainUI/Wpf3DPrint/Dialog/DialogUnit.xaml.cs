@@ -18,10 +18,12 @@ namespace Wpf3DPrint.Dialog
         }
         public DialogUnit(Shape shape)
         {
+            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
+            Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
             InitializeComponent();
-            labelX.Content = "X高度：" + (shape.Xmax - shape.Xmin).ToString("0.00") + "; 范围：[" + shape.Xmin.ToString("0.00") + "," + shape.Xmax.ToString("0.00") + "]";
-            labelY.Content = "Y高度：" + (shape.Ymax - shape.Ymin).ToString("0.00") + "; 范围：[" + shape.Ymin.ToString("0.00") + "," + shape.Ymax.ToString("0.00") + "]";
-            labelZ.Content = "Z高度：" + (shape.Zmax - shape.Zmin).ToString("0.00") + "; 范围：[" + shape.Zmin.ToString("0.00") + "," + shape.Zmax.ToString("0.00") + "]";
+            labelX.Content = "X高度：" + (Xmax - Xmin).ToString("0.00") + "; 范围：[" + Xmin.ToString("0.00") + "," + Xmax.ToString("0.00") + "]";
+            labelY.Content = "Y高度：" + (Ymax - Ymin).ToString("0.00") + "; 范围：[" + Ymin.ToString("0.00") + "," + Ymax.ToString("0.00") + "]";
+            labelZ.Content = "Z高度：" + (Zmax - Zmin).ToString("0.00") + "; 范围：[" + Zmin.ToString("0.00") + "," + Zmax.ToString("0.00") + "]";
             unit = comboBox.Text;
         }
 

@@ -56,22 +56,11 @@ private:
 public class ShapeContainer
 {
 public:
-    double height;
-    ShapeContainer(const Handle(TopTools_HSequenceOfShape) shape, double z = 0){
-        shapeSequence = shape;
-        height = z;
+    TopoDS_Shape shape;
+    ShapeContainer(const TopoDS_Shape shape) {
+        this->shape = shape;
     }
-
-    Handle(TopTools_HSequenceOfShape) shapeSequence;
-
-    TopoDS_Shape getShape(int index) {
-        return shapeSequence->Value(index);
-    }
-
-    static ShapeContainer* getContainer(void** pt, int index)
-    {
-        ShapeContainer** shapes = (ShapeContainer**)pt;
-        ShapeContainer* shape = *(shapes + index*sizeof(void*));
+    TopoDS_Shape getShape() {
         return shape;
     }
 };

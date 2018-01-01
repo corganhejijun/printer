@@ -27,7 +27,7 @@ namespace Wpf3DPrint
             scene = new Scene();
             slicingScene = new Scene();
             sliceScene = new Scene2D(PanelSlice);
-            fileReader = new FileReader(scene, slicingScene);
+            fileReader = new FileReader();
             ImageBrush brush = new ImageBrush(scene.Image);
             ImageBrush slicingBrush = new ImageBrush(slicingScene.Image);
             brush.RelativeTransform = new ScaleTransform(1.0, -1.0, 0.5, 0.5);
@@ -57,7 +57,7 @@ namespace Wpf3DPrint
 
         private void buttonOpen_Click(object sender, RoutedEventArgs e)
         {
-            if (fileReader.HasFile)
+            if (!fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("请先关闭已打开的文件");
                 return;
@@ -67,7 +67,7 @@ namespace Wpf3DPrint
             openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step|STL Mesh(*.stl;*.ast)|*.stl;*.ast";
             if (openFile.ShowDialog() == false)
                 return;
-            if (!fileReader.openStep(openFile.FileName, afterOpenStep, false))
+            if (!fileReader.openStep(openFile.FileName, afterOpenStep))
             {
                 MessageBox.Show("Open file Failed!");
                 return;
@@ -89,8 +89,8 @@ namespace Wpf3DPrint
         string unit;
         private void displayStep(object workResult)
         {
-            fileReader.displayStep(workResult, false);
-            fileReader.resetView(1);
+            scene.displayShape(fileReader.Shape.getShape());
+            resetView(1);
             Dialog.DialogUnit unit = new Dialog.DialogUnit(fileReader.Shape);
             unit.Owner = this;
             unit.ShowDialog();
@@ -100,9 +100,11 @@ namespace Wpf3DPrint
 
         private void displayImportMoreStep(object workResult)
         {
+            /*
             fileReader.displayStep(workResult, dlgEntityEdit.Combine);
             fileReader.resetView(1);
             afterOpenFile();
+            */
         }
 
         private void buttonSave_Click(object sender, RoutedEventArgs e)
@@ -112,7 +114,7 @@ namespace Wpf3DPrint
 
         private void buttonSlice_Click(object sender, RoutedEventArgs e)
         {
-            if (!fileReader.HasFile)
+            if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
                 return;
@@ -122,8 +124,8 @@ namespace Wpf3DPrint
             if (dlSlice.ShowDialog() == false)
                 return;
             setSlicingView();
-            textBoxSliceThick.Text = fileReader.Shape.sliceThick.ToString();
-            fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, dlSlice.outputRatio, onAfterSlice, new SceneThread.onFunction(onSlice));
+            textBoxSliceThick.Text = fileReader.Shape.slice.sliceThick.ToString();
+            fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, onAfterSlice, new SceneThread.onFunction(onSlice));
         }
 
         private string saveSlice()
@@ -141,13 +143,19 @@ namespace Wpf3DPrint
         private void onSlice(object args)
         {
             ArrayList argList = (ArrayList)args;
-            Shape shape = (Shape)argList[0];
+            IntPtr slice = (IntPtr)argList[0];
+            double height = (double)argList[1];
+            slicingScene.displaySlice(slice);
+            scene.displaySliceCut(fileReader.Shape.getShape(), height);
+            /*
+            Shape shape = fileReader.Shape;
             int total = (int)((shape.Zmax - shape.Zmin) / shape.sliceThick);
             if (shape.countLocate)
                 total += shape.locateCount;
             labelStatus.Content = "总层数：" + total + " 当前层数：" + shape.sliceList.Count;
             if (shape.sliceList.Count == 1)
                 fileReader.resetView(shape.outputRatio);
+                */
         }
 
         private void onAfterSlice(object args)
@@ -158,11 +166,13 @@ namespace Wpf3DPrint
         private void afterSlice(object args)
         {
             Shape shape = fileReader.Shape;
-            fileReader.resetView(shape.outputRatio);
+            //fileReader.resetView(shape.outputRatio);
             string fileName = saveSlice();
             if (fileName.Length == 0)
                 return;
             fileReader.releaseShape();
+            scene.Proxy.removeObjects();
+            slicingScene.Proxy.removeObjects();
             openSlice(fileName);
         }
 
@@ -175,8 +185,9 @@ namespace Wpf3DPrint
         private void Window_Closed(object sender, EventArgs e)
         {
             fileReader.releaseShape();
-            scene.Dispose();
-            slicingScene.Dispose();
+            scene.Proxy.removeObjects();
+            slicingScene.Proxy.removeObjects();
+            fileReader.Dispose();
             sliceScene.Dispose();
         }
 
@@ -235,6 +246,8 @@ namespace Wpf3DPrint
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
             fileReader.releaseShape();
+            scene.Proxy.removeObjects();
+            slicingScene.Proxy.removeObjects();
             sliceScene.closeSlice();
             sliceScene.clearWindow();
             TreeView_Slice.Items.Clear();
@@ -244,7 +257,7 @@ namespace Wpf3DPrint
 
         private void buttonOpenSlice_Click(object sender, RoutedEventArgs e)
         {
-            if (fileReader.HasFile)
+            if (!fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("请先关闭已打开的文件");
                 return;
@@ -259,7 +272,7 @@ namespace Wpf3DPrint
 
         private void openSlice(string fileName)
         {
-            if (!fileReader.openStep(fileName, afterOpen, true))
+            if (!fileReader.openSlice(fileName, afterOpen))
             {
                 MessageBox.Show("Open file Failed!");
                 return;
@@ -274,12 +287,15 @@ namespace Wpf3DPrint
 
         private void afterOpenSlice(object workResult)
         {
-            int count = fileReader.afterOpenSlice(workResult);
-            fileReader.displaySlice();
-            sliceScene.slice(fileReader.Shape.stepSlice, count);
+            foreach (Slice.OneSlice slice in fileReader.Shape.slice.sliceList)
+            {
+                scene.displaySlice(slice.slice);
+            }
+            resetView(1);
+            //sliceScene.slice(fileReader.Shape.stepSlice, count);
             afterOpenFile();
             ArrayList list = new ArrayList();
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < fileReader.Shape.slice.sliceList.Count; i++)
             {
                 list.Add(i + 1);
             }
@@ -288,7 +304,7 @@ namespace Wpf3DPrint
             sliceScene.drawSlice((int)comboBoxSliceNumber.SelectedItem - 1);
             setSliceView();
             TreeViewItem root = new TreeViewItem();
-            root.Header = fileReader.FileName.Substring(fileReader.FileName.LastIndexOf('\\') + 1);
+            root.Header = fileReader.Shape.fileName.Substring(fileReader.Shape.fileName.LastIndexOf('\\') + 1);
             foreach (int i in list)
             {
                 TreeViewItem item = new TreeViewItem();
@@ -413,12 +429,40 @@ namespace Wpf3DPrint
         private void selectSlice(int index)
         {
             sliceScene.drawSlice(index);
-            fileReader.selectSlice(index);
+            scene.selectSlice((IntPtr)fileReader.Shape.slice.sliceList[index]);
+        }
+
+
+        System.Windows.Forms.Timer rebuildTimer;
+        int rebuildIndex;
+        public void rebuildSlice()
+        {
+            if (rebuildTimer == null)
+                rebuildTimer = new System.Windows.Forms.Timer();
+            rebuildTimer.Tick += RebuildTimer_Elapsed;
+            rebuildTimer.Interval = 100;
+            slicingScene.Proxy.removeObjects();
+            rebuildIndex = fileReader.Shape.slice.sliceList.Count;
+            rebuildTimer.Start();
+        }
+
+        private void RebuildTimer_Elapsed(object sender, EventArgs e)
+        {
+            if (rebuildIndex == 0)
+            {
+                rebuildTimer.Stop();
+                rebuildTimer.Dispose();
+                rebuildTimer = null;
+                return;
+            }
+            Slice.OneSlice slice = (Slice.OneSlice)fileReader.Shape.slice.sliceList[rebuildIndex - 1];
+            slicingScene.Proxy.strechSlice(slice.slice, fileReader.Shape.slice.sliceThick);
+            rebuildIndex--;
         }
 
         private void buttonRebuild_Click(object sender, RoutedEventArgs e)
         {
-            if (!fileReader.HasFile)
+            if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
                 return;
@@ -428,14 +472,15 @@ namespace Wpf3DPrint
             if (rebuild.ShowDialog() == false)
                 return;
             setSlicingView();
-            fileReader.rebuildSlice();
+            rebuildSlice();
         }
 
         private void GridScene_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
         {
             if (Math.Abs(e.Delta) > 8)
             {
-                fileReader.sceneZoom(e.Delta);
+                scene.zoom(e.Delta);
+                slicingScene.zoom(e.Delta);
             }
         }
 
@@ -443,7 +488,7 @@ namespace Wpf3DPrint
 
         private void menuRotate_Click(object sender, RoutedEventArgs e)
         {
-            if (!fileReader.HasFile)
+            if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
                 return;
@@ -453,22 +498,20 @@ namespace Wpf3DPrint
             Dialog.Rotate rotate = new Dialog.Rotate(preview);
             rotate.Owner = this;
             if (rotate.ShowDialog() == false)
-            {
-                fileReader.releaseTransform(fileReader.Shape);
-                fileReader.displayAfterTransform(fileReader.Shape);
-                return;
-            }
-            fileReader.applyTransform(fileReader.Shape);
+                fileReader.releaseTransform();
+            else
+                fileReader.applyTransform();
+            scene.displayAfterTransform(fileReader.Shape.getShape());
         }
 
         void rotatePreview(double xAngle, double yAngle, double zAngle)
         {
-            fileReader.rotateAllShape(xAngle, yAngle, zAngle);
+            rotateAllShape(xAngle, yAngle, zAngle);
         }
 
         private void menuEntityEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (!fileReader.HasFile)
+            if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
                 return;
@@ -497,7 +540,7 @@ namespace Wpf3DPrint
 
         private void menuEntityProp_Click(object sender, RoutedEventArgs e)
         {
-            if (!fileReader.HasFile)
+            if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
                 return;
@@ -522,7 +565,7 @@ namespace Wpf3DPrint
 
         private void menuPan_Click(object sender, RoutedEventArgs e)
         {
-            if (!fileReader.HasFile)
+            if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
                 return;
@@ -531,17 +574,15 @@ namespace Wpf3DPrint
             Dialog.Pan pan = new Dialog.Pan(unit, preview);
             pan.Owner = this;
             if (pan.ShowDialog() == false)
-            {
-                fileReader.releaseTransform(fileReader.Shape);
-                fileReader.displayAfterTransform(fileReader.Shape);
-                return;
-            }
-            fileReader.applyTransform(fileReader.Shape);
+                fileReader.releaseTransform();
+            else
+                fileReader.applyTransform();
+            scene.displayAfterTransform(fileReader.Shape.getShape());
         }
 
         void panPreview(double x, double y, double z)
         {
-            fileReader.moveAllShape(x, y, z);
+            moveAllShape(x, y, z);
         }
 
         private void buttonSaveAs_Click(object sender, RoutedEventArgs e)
@@ -552,7 +593,7 @@ namespace Wpf3DPrint
             saveFile.Filter = "Step file (*.step)|*.step";
             if (false == saveFile.ShowDialog(this))
                 return ;
-            fileReader.saveStep(saveFile.FileName, fileReader.Shape);
+            fileReader.saveStep(saveFile.FileName);
         }
 
         private void ButtonRoll_Click(object sender, RoutedEventArgs e)
@@ -584,33 +625,33 @@ namespace Wpf3DPrint
 
         private void menuBase0_Click(object sender, RoutedEventArgs e)
         {
-            if (!fileReader.HasFile)
+            if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            fileReader.base0AllShapes();
+            base0AllShapes();
         }
 
 
         private void menuBase0xy_Click(object sender, RoutedEventArgs e)
         {
-            if (!fileReader.HasFile)
+            if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            fileReader.base0XyCenter();
+            base0XyCenter();
         }
 
         private void buttonSaveDxf_Click(object sender, RoutedEventArgs e)
         {
-            if (!fileReader.HasFile)
+            if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            if (fileReader.Shape.sliceList.Count == 0)
+            if (fileReader.Shape.slice.sliceList.Count == 0)
             {
                 MessageBox.Show("没有切片");
                 return;
@@ -637,6 +678,75 @@ namespace Wpf3DPrint
             Dialog.DisplaySetting dspSetDlg = new Dialog.DisplaySetting(scene.Setting);
             if (false == dspSetDlg.ShowDialog())
                 return;
+        }
+
+        public void resetView(double ratio)
+        {
+            scene.Proxy.ZoomAllView();
+            double scale = scene.Proxy.getZoomScale();
+            slicingScene.Proxy.setZoomScale(scale / ratio);
+            double x = 0, y = 0, z = 0;
+            unsafe
+            {
+                scene.Proxy.getViewPoint(&x, &y, &z);
+            }
+            slicingScene.Proxy.setViewPoint(x * ratio, y * ratio, z * ratio);
+        }
+
+        public void rotateAllShape(double x, double y, double z)
+        {
+            scene.Proxy.removeObjects();
+            IntPtr rotate = Cpp2Managed.Shape3D.rotate(fileReader.Shape.getShape(), x, y, z);
+            fileReader.releaseTransform();
+            fileReader.Shape.transform = rotate;
+            scene.Proxy.displayShape(fileReader.Shape.transform, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
+            scene.Proxy.ZoomAllView();
+        }
+
+        public void moveAllShape(double x, double y, double z)
+        {
+            scene.Proxy.removeObjects();
+            IntPtr move = Cpp2Managed.Shape3D.move(fileReader.Shape.getShape(), x, y, z);
+            fileReader.releaseTransform();
+            fileReader.Shape.transform = move;
+            scene.Proxy.displayShape(fileReader.Shape.transform, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
+            scene.Proxy.ZoomAllView();
+        }
+
+        private void combineShapes(IntPtr newShape)
+        {
+            IntPtr shapePt = Cpp2Managed.Shape3D.combine(fileReader.Shape.getShape(), newShape);
+            fileReader.Shape.setShape(newShape);
+            Cpp2Managed.Shape3D.del(fileReader.Shape.getShape());
+            Cpp2Managed.Shape3D.del(newShape);
+        }
+
+        public void base0AllShapes()
+        {
+            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
+            Cpp2Managed.Shape3D.getBoundary(fileReader.Shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            if (Zmin < 0.0001 && Zmin > -0.0001)
+                return;
+            IntPtr move = Cpp2Managed.Shape3D.move(fileReader.Shape.getShape(), 0, 0, -Zmin);
+            Cpp2Managed.Shape3D.del(fileReader.Shape.getShape());
+            fileReader.Shape.setShape(move);
+            scene.Proxy.removeObjects();
+            scene.Proxy.ZoomAllView();
+            scene.Proxy.displayShape(fileReader.Shape.getShape(), 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
+        }
+
+        public void base0XyCenter()
+        {
+            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
+            Cpp2Managed.Shape3D.getBoundary(fileReader.Shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            double centerX = Xmin + (Xmax - Xmin) / 2;
+            double centerY = Ymin + (Ymax - Ymin) / 2;
+            IntPtr move = Cpp2Managed.Shape3D.move(fileReader.Shape.getShape(), -centerX, -centerY, 0);
+            Cpp2Managed.Shape3D.del(fileReader.Shape.getShape());
+            fileReader.Shape.setShape(move);
+            scene.Proxy.removeObjects();
+            scene.Proxy.ZoomAllView();
+            scene.Proxy.displayShape(fileReader.Shape.getShape(), 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
         }
     }
 }

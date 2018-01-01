@@ -34,14 +34,13 @@ class SliceDevice{
     float m_precise;
     double getLength(Point pt1, Point pt2);
     int CreateD2DResource();
-    int drawCurve(Slice* curve);
     int drawLine(Line* line);
     int drawCircle(Circle* circle);
     int drawBSpline(BSpline* spline);
-    void getBoundBox(BoundBox* box, Slice* slice);
+    void getBoundBox(BoundBox* box, EdgeType* type, void* slice, int count);
     void getBSplineBoundBox(BoundBox* box, BSpline* spline);
     void setBoundBox(BoundBox* box, double top, double bottom, double left, double right);
-    void getInterSect(vector<Point>* listX, vector<Point>* listY, Slice* slice, BoundBox boundBox);
+    void getInterSect(vector<Point>* listX, vector<Point>* listY, EdgeType* type, void* slice, int count, BoundBox boundBox);
     double xInterSec2Point(bool* noInter, double x, Point pt1, Point pt2);
     double yInterSec2Point(bool* noInter, double y, Point pt1, Point pt2);
     void interSecLine(vector<Point>* listX, vector<Point>* listY, Line* line, BoundBox bound);
@@ -57,7 +56,7 @@ public:
     int init();
     void resetScene();
     int clearScene();
-    int drawSlice(Slice* slice);
+    int drawSlice(EdgeType* type, void* slice, int count);
     int resizeWindow();
 };
 

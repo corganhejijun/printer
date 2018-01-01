@@ -14,17 +14,17 @@ namespace Wpf3DPrint.Viewer
         int sliceCount;
         public Scene2D(Panel panel)
         {
-            device = Cpp2Managed.create2D(panel.Handle);
+            device = Cpp2Managed.Slice2D.create(panel.Handle);
         }
 
         public void onResize()
         {
-            Cpp2Managed.resizeWindow(device);
+            Cpp2Managed.Slice2D.resizeWindow(device);
         }
 
         public void clearWindow()
         {
-            Cpp2Managed.cleanScreen(device);
+            Cpp2Managed.Slice2D.cleanScreen(device);
         }
 
         public void slice(IntPtr slice, int sliceCnt)
@@ -35,21 +35,21 @@ namespace Wpf3DPrint.Viewer
 
         public void drawSlice(int number)
         {
-            Cpp2Managed.displaySlice(device, m_slice, number);
+            Cpp2Managed.Slice2D.displaySlice(device, m_slice, number);
         }
 
         public void Dispose()
         {
             closeSlice();
-            Cpp2Managed.release2D(device);
+            Cpp2Managed.Slice2D.release(device);
         }
 
         public void closeSlice()
         {
-            Cpp2Managed.delete2DSlice(m_slice, sliceCount);
+            //Cpp2Managed.Slice2D.delete2DSlice(m_slice, sliceCount);
             Marshal.FreeHGlobal(m_slice);
             m_slice = IntPtr.Zero;
-            Cpp2Managed.reset2D(device);
+            Cpp2Managed.Slice2D.reset(device);
         }
     }
 }
