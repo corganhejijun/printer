@@ -3,42 +3,39 @@ using System.Runtime.InteropServices;
 
 namespace Wpf3DPrint.Viewer
 {
-    class Cpp2Managed
+    public class Cpp2Managed
     {
         public enum EdgeType { unknown, line, circle, bSplice };
         public struct Point
         {
-            double x;
-            double y;
+            public double x;
+            public double y;
         }
         public struct Line
         {
-            double z;
-            Point start;
-            Point end;
+            public Point start;
+            public Point end;
         }
         public struct Circle
         {
-            double z;
-            Point center;
-            double startAngle;
-            double endAngle;
-            double radius;
-            Point start;
-            Point end;
+            public Point center;
+            public double startAngle;
+            public double endAngle;
+            public double radius;
+            public Point start;
+            public Point end;
         }
         public struct BSpline
         {
-            double z;
-            Point start;
-            Point end;
-            Point[] poles;
+            public Point start;
+            public Point end;
+            public Point[] poles;
         }
 
         public class Shape3D
         {
             public delegate void OnGetShape(IntPtr shape);
-            public delegate void OnGetEdge(EdgeType type, [MarshalAs(UnmanagedType.LPArray, SizeConst = 2048)]double[] data, int length);
+            public delegate void OnGetEdge(IntPtr shape, EdgeType type, [MarshalAs(UnmanagedType.LPArray, SizeConst = 256)]double[] data, int length);
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr ImportStl(IntPtr theFileName);

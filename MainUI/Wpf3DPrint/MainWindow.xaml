@@ -35,6 +35,7 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="图形" Width="48">
+                <MenuItem x:Name="menuUnselect" Header="取消选择" Click="menuUnselect_Click"></MenuItem>
                 <MenuItem x:Name="menuEntityProp" Header="实体属性..." Click="menuEntityProp_Click"></MenuItem>
                 <MenuItem Header="图形变换">
                     <MenuItem Header="旋转..." x:Name="menuRotate" Click="menuRotate_Click"></MenuItem>
@@ -210,6 +211,9 @@
                 <DockPanel Grid.Column="0">
                     <ToolBarTray DockPanel.Dock="Left" Orientation="Vertical" Width="32">
                         <ToolBar>
+                            <ToggleButton x:Name="ButtonSelect" ToolTip="选择" Click="ButtonSelect_Click" Checked="ButtonSelect_Checked">
+                                <Image Source="images/Select.png" Width="24"></Image>
+                            </ToggleButton>
                             <ToggleButton x:Name="ButtonPan" ToolTip="平移" Click="ButtonPan_Click" Checked="ButtonPan_Checked">
                                 <Image Source="images/Move.png" Width="24"></Image>
                             </ToggleButton>
@@ -228,7 +232,7 @@
                 </Grid>
                 <GridSplitter x:Name="treeViewSplitter" Width="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
                 <Border BorderBrush="Black" BorderThickness="1" Grid.Column="3">
-                    <Grid x:Name="GridScene" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel" MouseUp="GridScene_MouseUp" Cursor="Cross"></Grid>
+                    <Grid x:Name="GridScene" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel" MouseUp="GridScene_MouseUp" Cursor="Arrow"></Grid>
                 </Border>
                 <GridSplitter x:Name="sliceSplitter" Width="0" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
                 <Border Grid.Column="5" BorderBrush="Black" BorderThickness="1">

@@ -326,7 +326,7 @@ public:
         }
     }
 
-    void Select(int theX, int theY)
+    IntPtr Select(int theX, int theY)
     {
         if (!myAISContext().IsNull() && !myView().IsNull()) {
             myAISContext()->MoveTo(theX, theY, myView());
@@ -334,11 +334,20 @@ public:
             myAISContext()->InitCurrent();
             if (!myAISContext()->MoreCurrent())
             {
-                return;
+                return IntPtr::Zero;
             }
             Handle(AIS_InteractiveObject) aCurrent = myAISContext()->Current();
-            myAISContext()->SetColor(aCurrent, Quantity_Color(255 / 255.0, 0 / 255.0, 0 / 255.0, Quantity_TOC_RGB));
+            Handle(AIS_Shape) hashape = Handle(AIS_Shape)::DownCast(aCurrent);
+            TopoDS_Shape aShape = hashape->Shape();
+            return IntPtr(new ShapeContainer(aShape));
         }
+        return IntPtr::Zero;
+    }
+
+    bool IsEqual(IntPtr pt1, IntPtr pt2){
+        ShapeContainer* shape1 = (ShapeContainer*)pt1.ToPointer();
+        ShapeContainer* shape2 = (ShapeContainer*)pt2.ToPointer();
+        return (shape1->getShape().IsEqual(shape2->getShape()));
     }
 
     /// <summary>

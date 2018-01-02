@@ -235,7 +235,33 @@ namespace Wpf3DPrint
 
         private void GridScene_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            scene.Proxy.Select((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
+            if (!(bool)ButtonSelect.IsChecked)
+                return;
+            IntPtr selected = scene.select(e.GetPosition(GridScene).X, e.GetPosition(GridScene).Y);
+            if (selected == IntPtr.Zero)
+                return;
+            Console.WriteLine("selected");
+            foreach (IntPtr shape in fileReader.Shape.selectList)
+            {
+                if (scene.Proxy.IsEqual(shape, selected))
+                {
+                    fileReader.Shape.selectList.Remove(shape);
+                    scene.displayShape(shape);
+                    Console.WriteLine("unselected");
+                    return;
+                }
+            }
+            fileReader.Shape.selectList.Add(selected);
+            scene.displaySelectShape(selected);
+        }
+
+        private void menuUnselect_Click(object sender, RoutedEventArgs e)
+        {
+            foreach(IntPtr shape in fileReader.Shape.selectList)
+            {
+                scene.displayShape(shape);
+            }
+            fileReader.Shape.selectList.Clear();
         }
 
         private void GridScene_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
@@ -429,9 +455,8 @@ namespace Wpf3DPrint
         private void selectSlice(int index)
         {
             sliceScene.drawSlice(index);
-            scene.selectSlice((IntPtr)fileReader.Shape.slice.sliceList[index]);
+            scene.selectSlice(((Slice.OneSlice)fileReader.Shape.slice.sliceList[index]).slice);
         }
-
 
         System.Windows.Forms.Timer rebuildTimer;
         int rebuildIndex;
@@ -506,7 +531,8 @@ namespace Wpf3DPrint
 
         void rotatePreview(double xAngle, double yAngle, double zAngle)
         {
-            rotateAllShape(xAngle, yAngle, zAngle);
+            fileReader.rotate(xAngle, yAngle, zAngle);
+            scene.displayAfterTransform(fileReader.Shape.transform);
         }
 
         private void menuEntityEdit_Click(object sender, RoutedEventArgs e)
@@ -582,7 +608,8 @@ namespace Wpf3DPrint
 
         void panPreview(double x, double y, double z)
         {
-            moveAllShape(x, y, z);
+            fileReader.move(x, y, z);
+            scene.displayAfterTransform(fileReader.Shape.transform);
         }
 
         private void buttonSaveAs_Click(object sender, RoutedEventArgs e)
@@ -600,6 +627,8 @@ namespace Wpf3DPrint
         {
             if ((bool)ButtonPan.IsChecked)
                 ButtonPan.IsChecked = false;
+            if ((bool)ButtonSelect.IsChecked)
+                ButtonSelect.IsChecked = false;
             ButtonRoll.IsChecked = true;
         }
 
@@ -607,8 +636,19 @@ namespace Wpf3DPrint
         {
             if ((bool)ButtonRoll.IsChecked)
                 ButtonRoll.IsChecked = false;
+            if ((bool)ButtonSelect.IsChecked)
+                ButtonSelect.IsChecked = false;
             ButtonPan.IsChecked = true;
 
+        }
+
+        private void ButtonSelect_Checked(object sender, RoutedEventArgs e)
+        {
+            if ((bool)ButtonPan.IsChecked)
+                ButtonPan.IsChecked = false;
+            if ((bool)ButtonRoll.IsChecked)
+                ButtonRoll.IsChecked = false;
+            ButtonSelect.IsChecked = true;
         }
 
         private void ButtonPan_Checked(object sender, RoutedEventArgs e)
@@ -623,6 +663,12 @@ namespace Wpf3DPrint
                 GridScene.Cursor = Cursors.Arrow;
         }
 
+        private void ButtonSelect_Click(object sender, RoutedEventArgs e)
+        {
+            if (GridScene != null && (bool)ButtonSelect.IsChecked)
+                GridScene.Cursor = Cursors.Cross;
+        }
+
         private void menuBase0_Click(object sender, RoutedEventArgs e)
         {
             if (fileReader.Shape.IsEmpty)
@@ -630,7 +676,8 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            base0AllShapes();
+            fileReader.base0AllShapes();
+            scene.displayAfterTransform(fileReader.Shape.getShape());
         }
 
 
@@ -641,7 +688,8 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            base0XyCenter();
+            fileReader.base0XyCenter();
+            scene.displayAfterTransform(fileReader.Shape.getShape());
         }
 
         private void buttonSaveDxf_Click(object sender, RoutedEventArgs e)
@@ -691,62 +739,6 @@ namespace Wpf3DPrint
                 scene.Proxy.getViewPoint(&x, &y, &z);
             }
             slicingScene.Proxy.setViewPoint(x * ratio, y * ratio, z * ratio);
-        }
-
-        public void rotateAllShape(double x, double y, double z)
-        {
-            scene.Proxy.removeObjects();
-            IntPtr rotate = Cpp2Managed.Shape3D.rotate(fileReader.Shape.getShape(), x, y, z);
-            fileReader.releaseTransform();
-            fileReader.Shape.transform = rotate;
-            scene.Proxy.displayShape(fileReader.Shape.transform, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
-            scene.Proxy.ZoomAllView();
-        }
-
-        public void moveAllShape(double x, double y, double z)
-        {
-            scene.Proxy.removeObjects();
-            IntPtr move = Cpp2Managed.Shape3D.move(fileReader.Shape.getShape(), x, y, z);
-            fileReader.releaseTransform();
-            fileReader.Shape.transform = move;
-            scene.Proxy.displayShape(fileReader.Shape.transform, 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
-            scene.Proxy.ZoomAllView();
-        }
-
-        private void combineShapes(IntPtr newShape)
-        {
-            IntPtr shapePt = Cpp2Managed.Shape3D.combine(fileReader.Shape.getShape(), newShape);
-            fileReader.Shape.setShape(newShape);
-            Cpp2Managed.Shape3D.del(fileReader.Shape.getShape());
-            Cpp2Managed.Shape3D.del(newShape);
-        }
-
-        public void base0AllShapes()
-        {
-            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
-            Cpp2Managed.Shape3D.getBoundary(fileReader.Shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
-            if (Zmin < 0.0001 && Zmin > -0.0001)
-                return;
-            IntPtr move = Cpp2Managed.Shape3D.move(fileReader.Shape.getShape(), 0, 0, -Zmin);
-            Cpp2Managed.Shape3D.del(fileReader.Shape.getShape());
-            fileReader.Shape.setShape(move);
-            scene.Proxy.removeObjects();
-            scene.Proxy.ZoomAllView();
-            scene.Proxy.displayShape(fileReader.Shape.getShape(), 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
-        }
-
-        public void base0XyCenter()
-        {
-            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
-            Cpp2Managed.Shape3D.getBoundary(fileReader.Shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
-            double centerX = Xmin + (Xmax - Xmin) / 2;
-            double centerY = Ymin + (Ymax - Ymin) / 2;
-            IntPtr move = Cpp2Managed.Shape3D.move(fileReader.Shape.getShape(), -centerX, -centerY, 0);
-            Cpp2Managed.Shape3D.del(fileReader.Shape.getShape());
-            fileReader.Shape.setShape(move);
-            scene.Proxy.removeObjects();
-            scene.Proxy.ZoomAllView();
-            scene.Proxy.displayShape(fileReader.Shape.getShape(), 0, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
         }
     }
 }

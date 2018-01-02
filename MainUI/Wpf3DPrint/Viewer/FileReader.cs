@@ -15,6 +15,7 @@ namespace Wpf3DPrint.Viewer
             deleGetShape = new Cpp2Managed.Shape3D.OnGetShape(getShape);
             deleGetEdge = new Cpp2Managed.Shape3D.OnGetEdge(getSliceEdge);
             deleGetLocatePlane = new Cpp2Managed.Shape3D.OnGetShape(getLocatePlane);
+            locatePlaneList = new ArrayList();
             sceneThread = new SceneThread();
             shape = new Shape();
         }
@@ -41,6 +42,14 @@ namespace Wpf3DPrint.Viewer
             list.Add(fileName);
             sceneThread.addWork(openStepWork, list, afterImport);
             return true;
+        }
+
+        public void combineShapes(IntPtr newShape)
+        {
+            IntPtr shapePt = Cpp2Managed.Shape3D.combine(shape.getShape(), newShape);
+            shape.setShape(shapePt);
+            Cpp2Managed.Shape3D.del(shape.getShape());
+            Cpp2Managed.Shape3D.del(newShape);
         }
 
         public static IntPtr NativeUtf8FromString(string managedString)
@@ -96,9 +105,12 @@ namespace Wpf3DPrint.Viewer
         }
 
         Cpp2Managed.Shape3D.OnGetEdge deleGetEdge;
-        void getSliceEdge(Cpp2Managed.EdgeType type, double[] data, int length)
+        void getSliceEdge(IntPtr shapePt, Cpp2Managed.EdgeType type, double[] data, int length)
         {
-
+            double height = data[0];
+            Slice.OneSlice slice = new Slice.OneSlice(shapePt, height);
+            slice.getSliceData(type, data, length);
+            shape.slice.sliceList.Add(slice);
         }
         object openSliceWork(object args)
         {
@@ -115,30 +127,6 @@ namespace Wpf3DPrint.Viewer
             list.Add(result);
             return list;
         }
-
-        /*
-        public bool displayStep(object workResult, bool combine)
-        {
-            ArrayList list = (ArrayList)workResult;
-            bool result = (bool)list[0];
-            if (!result)
-            {
-                return result;
-            }
-            Shape shape = (Shape)list[1];
-            if (combine)
-            {
-                combineShapes(shape);
-                shape = Shape;
-            }
-            else
-            {
-                Cpp2Managed.getShapeBoundary(shape.shape, 0, ref shape.Zmin, ref shape.Zmax, ref shape.Ymin, ref shape.Ymax, ref shape.Xmin, ref shape.Xmax);
-                shapeList.Add(shape);
-            }
-            return displayShape(shape);
-        }
-        */
 
         public void saveSlice(string path)
         {
@@ -178,9 +166,10 @@ namespace Wpf3DPrint.Viewer
         {
             double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
             Cpp2Managed.Shape3D.getBoundary(locatePlanePt, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
-            Slice.OneSlice slice = new Slice.OneSlice(locatePlanePt, Zmin, true);
-            shape.slice.locateList.Add(slice);
+            Slice.OneSlice slice = new Slice.OneSlice(locatePlanePt, Zmin);
+            locatePlaneList.Add(slice);
         }
+        ArrayList locatePlaneList;
         private object sliceShapeWork(object args)
         {
             ArrayList list = (ArrayList)args;
@@ -189,6 +178,7 @@ namespace Wpf3DPrint.Viewer
             bool locatePlane = (bool)list[2];
             bool gradientShape = (bool)list[3];
             bool noDelay = (bool)list[4];
+            locatePlaneList.Clear();
             // 确定定位面，与定位面等高的切割线要特殊处理
             Cpp2Managed.Shape3D.getLocatPlane(shape.getShape(), deleGetLocatePlane);
             double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
@@ -199,7 +189,7 @@ namespace Wpf3DPrint.Viewer
                 // 从1开始，跳过0高度切割
                 height = Zmin + (double)i * shape.slice.sliceThick;
                 bool skip = false;
-                foreach (Slice.OneSlice s in shape.slice.locateList)
+                foreach (Slice.OneSlice s in locatePlaneList)
                 {
                     // 与定位面高度重复的不能进行普通切割操作
                     if (Math.Abs(s.height - height) < 0.0001)
@@ -220,7 +210,7 @@ namespace Wpf3DPrint.Viewer
                 IntPtr slice = Cpp2Managed.Shape3D.slice(shape.getShape(), height);
                 if (slice == IntPtr.Zero)
                     continue;
-                shape.slice.sliceList.Add(new Slice.OneSlice(slice, height, false));
+                shape.slice.sliceList.Add(new Slice.OneSlice(slice, height));
                 onGetSlice(slice, height, control, onslice);
                 if (!noDelay)
                     System.Threading.Thread.Sleep(100);
@@ -253,11 +243,24 @@ namespace Wpf3DPrint.Viewer
             {
                 foreach (Slice.OneSlice slice in shape.slice.sliceList)
                 {
-                    //Cpp2Managed.Shape3D.deleteSlice(slice.slice);
+                    Cpp2Managed.Shape3D.del(slice.slice);
                 }
             }
-            else
-                Cpp2Managed.Shape3D.del(shape.getShape());
+            Cpp2Managed.Shape3D.del(shape.getShape());
+        }
+
+        public void move(double x, double y, double z)
+        {
+            IntPtr move = Cpp2Managed.Shape3D.move(shape.getShape(), x, y, z);
+            releaseTransform();
+            shape.transform = move;
+        }
+
+        public void rotate(double x, double y, double z)
+        {
+            IntPtr rotate = Cpp2Managed.Shape3D.rotate(shape.getShape(), x, y, z);
+            releaseTransform();
+            shape.transform = rotate;
         }
 
         public void releaseTransform()
@@ -265,7 +268,6 @@ namespace Wpf3DPrint.Viewer
             if (shape.transform != IntPtr.Zero)
             {
                 Cpp2Managed.Shape3D.del(shape.transform);
-                Marshal.FreeHGlobal(shape.transform);
                 shape.transform = IntPtr.Zero;
             }
         }
@@ -277,6 +279,28 @@ namespace Wpf3DPrint.Viewer
             Cpp2Managed.Shape3D.del(shape.getShape());
             shape.setShape(shape.transform);
             shape.transform = IntPtr.Zero;
+        }
+
+        public void base0AllShapes()
+        {
+            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
+            Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            if (Zmin < 0.0001 && Zmin > -0.0001)
+                return;
+            IntPtr move = Cpp2Managed.Shape3D.move(shape.getShape(), 0, 0, -Zmin);
+            Cpp2Managed.Shape3D.del(shape.getShape());
+            shape.setShape(move);
+        }
+
+        public void base0XyCenter()
+        {
+            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
+            Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            double centerX = Xmin + (Xmax - Xmin) / 2;
+            double centerY = Ymin + (Ymax - Ymin) / 2;
+            IntPtr move = Cpp2Managed.Shape3D.move(shape.getShape(), -centerX, -centerY, 0);
+            Cpp2Managed.Shape3D.del(shape.getShape());
+            shape.setShape(move);
         }
 
         public void Dispose()

@@ -79,9 +79,10 @@
 #include "slice.h"
 
 #define EXPORT extern "C" __declspec( dllexport )
+#define MAX_SLICE_DATA_LENGTH 256
 
 typedef void(_stdcall *OnGetShape)(void* shape);
-typedef void(_stdcall *OnGetEdge)(EdgeType type, double* data, int length);
+typedef void(_stdcall *OnGetEdge)(void* shape, EdgeType type, double* data, int length);
 
 // ============================================
 // Import / export functionality
@@ -138,8 +139,8 @@ void showType(TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
                 file << "circle radius is " << circle.Radius() << ", center is (" << center.X() << "," << center.Y() << "," << center.Z() << "), start angle is " << (first/M_PI*180) << ", end angle is " << (last/M_PI*180) << endl;
                 double beginX, beginY, beginZ, endX, endY, endZ;
                 addVertex(child, beginX, beginY, beginZ, endX, endY, endZ);
-                double circleData[10] = {center.Z(), center.X(), center.Y(), first, last, circle.Radius(), beginX, beginY, endX, endY};
-                getEdge(EdgeType::circle, circleData, 10);
+                double circleData[MAX_SLICE_DATA_LENGTH] = {center.Z(), center.X(), center.Y(), first, last, circle.Radius(), beginX, beginY, endX, endY};
+                getEdge(new ShapeContainer(shape), EdgeType::circle, circleData, 10);
             } else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_BSplineCurve) {
                 Handle_Geom_BSplineCurve bSpline = adpCurve.BSpline();
                 for (int i = 0; i < layer; i++)
@@ -164,9 +165,11 @@ void showType(TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
 
                 double beginX, beginY, beginZ, endX, endY, endZ;
                 addVertex(child, beginX, beginY, beginZ, endX, endY, endZ);
-                int length = 5 + polesCount * 2;
-                double* bSplineData = new double[length];
+                // 后面for循环是从1开始的，因此需要-2
+                int length = 5 + polesCount * 2 - 2;
+                double* bSplineData = new double[MAX_SLICE_DATA_LENGTH];
                 bSplineData[0] = beginZ; bSplineData[1] = beginX; bSplineData[2] = beginY; bSplineData[3] = endX; bSplineData[4] = endY;
+                // TODO:这里PolesCount过大的话要精简
                 for (int i = 1; i < polesCount; i++) {
                     gp_Pnt pt = Poles(i);
                     bSplineData[4 + i * 2 - 1] = pt.X();
@@ -174,14 +177,14 @@ void showType(TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
                     file << "(" << pt.X() << "," << pt.Y() << "," << pt.Z() << ") ";
                 }
                 file << endl;
-                getEdge(EdgeType::bSplice, bSplineData, length);
+                getEdge(new ShapeContainer(shape), EdgeType::bSplice, bSplineData, length);
                 delete bSplineData;
             }
             else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_Line) {
                 double beginX, beginY, beginZ, endX, endY, endZ;
                 addVertex(child, beginX, beginY, beginZ, endX, endY, endZ);
-                double lineData[5] = {beginZ, beginX, beginY, endX, endY};
-                getEdge(EdgeType::line, lineData, 5);
+                double lineData[MAX_SLICE_DATA_LENGTH] = {beginZ, beginX, beginY, endX, endY};
+                getEdge(new ShapeContainer(shape), EdgeType::line, lineData, 5);
             }
             else {
                 for (int i = 0; i < layer; i++)

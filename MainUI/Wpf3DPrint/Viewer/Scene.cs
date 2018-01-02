@@ -119,6 +119,13 @@ namespace Wpf3DPrint.Viewer
             return true;
         }
 
+        public bool displaySelectShape(IntPtr shape)
+        {
+            occtProxy.SetDisplayMode(1);
+            occtProxy.displayShape(shape, 0, setting.selectEntityColor.R, setting.selectEntityColor.G, setting.selectEntityColor.B);
+            return true;
+        }
+
         public void zoom(int delta)
         {
             occtProxy.Zoom(0, 0, delta / 8, 0);
@@ -144,6 +151,11 @@ namespace Wpf3DPrint.Viewer
             occtProxy.removeObjects();
             occtProxy.displayShape(shape, 0, setting.entityColor.R, setting.entityColor.G, setting.entityColor.B);
             occtProxy.ZoomAllView();
+        }
+
+        public IntPtr select(double x, double y)
+        {
+            return occtProxy.Select((int)x, (int)y);
         }
     }
 }

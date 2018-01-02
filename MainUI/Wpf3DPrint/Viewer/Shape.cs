@@ -9,6 +9,7 @@ namespace Wpf3DPrint.Viewer
         IntPtr shape;
         public IntPtr transform;
         public Slice slice;
+        public ArrayList selectList;
 
         public Shape()
         {
@@ -16,6 +17,7 @@ namespace Wpf3DPrint.Viewer
             shape = IntPtr.Zero;
             transform = IntPtr.Zero;
             slice = new Slice();
+            selectList = new ArrayList();
         }
 
         public void setShape(IntPtr shape)
