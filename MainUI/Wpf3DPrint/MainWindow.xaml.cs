@@ -240,14 +240,12 @@ namespace Wpf3DPrint
             IntPtr selected = scene.select(e.GetPosition(GridScene).X, e.GetPosition(GridScene).Y);
             if (selected == IntPtr.Zero)
                 return;
-            Console.WriteLine("selected");
             foreach (IntPtr shape in fileReader.Shape.selectList)
             {
                 if (scene.Proxy.IsEqual(shape, selected))
                 {
                     fileReader.Shape.selectList.Remove(shape);
                     scene.displayShape(shape);
-                    Console.WriteLine("unselected");
                     return;
                 }
             }

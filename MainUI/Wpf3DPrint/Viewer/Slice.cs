@@ -39,6 +39,14 @@ namespace Wpf3DPrint.Viewer
                 }
             }
 
+            public object Data
+            {
+                get
+                {
+                    return data;
+                }
+            }
+
             Cpp2Managed.BSpline getBSplice(double[] dataList, int length)
             {
                 Cpp2Managed.BSpline bSpline = new Cpp2Managed.BSpline();

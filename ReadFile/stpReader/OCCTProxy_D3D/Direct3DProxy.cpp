@@ -118,7 +118,7 @@ private:
     // The Ex functions are only supported with WDDM drivers, so they will not be available on XP.
     HMODULE aD3D9 = GetModuleHandleW (L"d3d9");
     FuncCreate9Ex = (DIRECT3DCREATE9EX )GetProcAddress (aD3D9, "Direct3DCreate9Ex");
-    
+
     // Set up the structure used to create the D3DDevice
     D3DPRESENT_PARAMETERS aParams;
     ZeroMemory (&aParams, sizeof(aParams));
@@ -129,7 +129,7 @@ private:
     aParams.BackBufferFormat = D3DFMT_X8R8G8B8;
     (FuncCreate9Ex != NULL) ? InitializeD3DEx (aParams) : InitializeD3D (aParams);
   }
-  
+
   bool InitializeD3D (D3DPRESENT_PARAMETERS theParams)
   {
     D3D = Direct3DCreate9 (D3D_SDK_VERSION);
@@ -142,7 +142,7 @@ private:
                                          &theParams, &D3DDevice);
     return SUCCEEDED (aResult);
   }
-  
+
   bool InitializeD3DEx (D3DPRESENT_PARAMETERS theParams)
   {
     if (FAILED (FuncCreate9Ex (D3D_SDK_VERSION, &D3DEx))

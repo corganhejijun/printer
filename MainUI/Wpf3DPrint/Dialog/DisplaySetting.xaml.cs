@@ -35,7 +35,7 @@ namespace Wpf3DPrint.Dialog
 
         private void button_OK_Click(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void buttonEntityColor_Click(object sender, RoutedEventArgs e)

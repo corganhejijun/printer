@@ -56,54 +56,42 @@ namespace Wpf3DPrint
             writeMinMax(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
             __file.WriteLine("  2");
             __file.WriteLine("ENTITIES");
-            IntPtr nextCurrent = IntPtr.Zero;
-            do
+            foreach (Slice.OneSlice slice in __shape.slice.sliceList)
             {
-                int type = -1;
-                double x = 0, y = 0, z = 0;
-                double[] p = { 0, 0, 0, 0, 0, 0, 0 };
-                IntPtr slice = nextCurrent;
-                //nextCurrent = Cpp2Managed.Shape3D.exportSlice(__shape.stepSlice, i, ref slice, ref type, ref x, ref y, ref z, p);
-                switch (type)
+                object data = slice.Data;
+                if (data is Cpp2Managed.Circle)
                 {
-                    case (int)Type.circle:
-                        getCircle(x, y, z, p[0], p[1], p[2], p[3], p[4], p[5], p[6]);
-                        break;
-                    case (int)Type.line:
-                        writeLine(x, y, p[0], p[1], z);
-                        break;
-                    case (int)Type.bSplice:
-                        writeBSplice(slice, x, y, z, (int)p[0], p[1], p[2]);
-                        break;
-                    default:
-                        break;
+                    Cpp2Managed.Circle circle = (Cpp2Managed.Circle)data;
+                    getCircle(circle.center.x, circle.center.y, slice.height, circle.radius, circle.startAngle, circle.endAngle, circle.start.x, circle.start.y, circle.end.x, circle.end.y);
                 }
-            } while (nextCurrent != IntPtr.Zero);
+                else if (data is Cpp2Managed.Line)
+                {
+                    Cpp2Managed.Line line = (Cpp2Managed.Line)data;
+                    writeLine(line.start.x, line.start.y, line.end.x, line.end.y, slice.height);
+                }
+                else if (data is Cpp2Managed.BSpline)
+                {
+                    Cpp2Managed.BSpline bs = (Cpp2Managed.BSpline)data;
+                    writeBSplice(bs.poles, bs.start.x, bs.start.y, slice.height, bs.end.x, bs.end.y);
+                }
+            }
             __file.WriteLine("  0");
             __file.WriteLine("ENDSEC");
         }
 
-        void writeBSplice(IntPtr slice, double startX, double startY, double z, int ptCount, double endX, double endY)
+        void writeBSplice(Cpp2Managed.Point[] polesList, double startX, double startY, double z, double endX, double endY)
         {
             ArrayList xList = new ArrayList();
             ArrayList yList = new ArrayList();
             xList.Add(startX);
             yList.Add(startY);
-            for (int i = 0; i <= ptCount; i++)
+            foreach(Cpp2Managed.Point pole in polesList)
             {
-                double x = 0, y = 0;
-                if (i < ptCount)
-                {
-                    //Cpp2Managed.exportBspline(slice, i, ref x, ref y);
-                }
-                else
-                {
-                    x = endX;
-                    y = endY;
-                }
-                xList.Add(x);
-                yList.Add(y);
+                xList.Add(pole.x);
+                yList.Add(pole.y);
             }
+            xList.Add(endX);
+            yList.Add(endY);
             for (int i = 1; i < xList.Count - 1; i++)
             {
                 if (getDistance((double)xList[i - 1], (double)yList[i - 1], (double)xList[i], (double)yList[i], (double)xList[i + 1], (double)yList[i + 1]) < 0.001)
@@ -114,7 +102,7 @@ namespace Wpf3DPrint
                     continue;
                 }
             }
-            for (int i = 1; i < xList.Count; i++) { 
+            for (int i = 1; i < xList.Count; i++) {
                 writeLine((double)xList[i - 1], (double)yList[i - 1], (double)xList[i], (double)yList[i], z);
             }
         }

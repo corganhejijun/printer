@@ -245,8 +245,10 @@ namespace Wpf3DPrint.Viewer
                 {
                     Cpp2Managed.Shape3D.del(slice.slice);
                 }
+                shape.slice.sliceList.Clear();
             }
             Cpp2Managed.Shape3D.del(shape.getShape());
+            shape.setShape(IntPtr.Zero);
         }
 
         public void move(double x, double y, double z)

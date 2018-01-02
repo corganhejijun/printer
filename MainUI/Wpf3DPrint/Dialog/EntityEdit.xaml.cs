@@ -25,7 +25,7 @@ namespace Wpf3DPrint.Dialog
                 return double.Parse(textBoxX.Text);
             }
         }
-        
+
         public double Y
         {
             get

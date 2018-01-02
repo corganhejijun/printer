@@ -504,7 +504,7 @@ bool sortYInterSects(Point pt1, Point pt2) {
     else
         return pt1.y < pt2.y;
 }
-    
+
 int SliceDevice::drawLine(Line* line) {
     m_pRenderTarget->DrawLine(
         D2D1::Point2F((float)line->start.x, (float)line->start.y),
@@ -541,7 +541,7 @@ int SliceDevice::drawCircle(Circle* circle) {
         size = D2D1_ARC_SIZE_LARGE;
     pSink->BeginFigure(D2D1::Point2F(circle->start.x, circle->start.y), D2D1_FIGURE_BEGIN_HOLLOW);
     pSink->AddArc(D2D1::ArcSegment(
-        D2D1::Point2F(circle->end.x, circle->end.y), D2D1::SizeF(circle->radius, circle->radius), 0.0, 
+        D2D1::Point2F(circle->end.x, circle->end.y), D2D1::SizeF(circle->radius, circle->radius), 0.0,
         D2D1_SWEEP_DIRECTION_CLOCKWISE, size));
     pSink->EndFigure(D2D1_FIGURE_END_OPEN);
     pSink->Close();
@@ -567,7 +567,7 @@ int SliceDevice::drawBSpline(BSpline* spline) {
     pSink->BeginFigure(point, D2D1_FIGURE_BEGIN_HOLLOW);
     D2D1_POINT_2F point2 = point;
     for (int i = 0; i < spline->polesCnt; i++) {
-        point2 = D2D1::Point2F(spline->poles[i].x, spline->poles[i].y); 
+        point2 = D2D1::Point2F(spline->poles[i].x, spline->poles[i].y);
         float x = point2.x - point.x;
         float y = point2.y - point.y;
         pSink->AddLine(point2);
