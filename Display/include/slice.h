@@ -1,6 +1,9 @@
 #ifndef __SLICE_H__
 #define __SLICE_H__
 #define _EXTERN_C_  extern "C"  _declspec(dllexport)
+
+enum EdgeType { unknown, line, circle, bSplice };
+
 typedef struct {
     double x;
     double y;
@@ -27,6 +30,11 @@ typedef struct {
     int polesCnt;
 }BSpline;
 
-enum EdgeType { unknown, line, circle, bSplice };
+typedef struct Slice{
+    EdgeType type;
+    void* data;
+    Slice* next;
+}Slice;
+
 
 #endif

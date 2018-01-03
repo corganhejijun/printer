@@ -13,37 +13,30 @@ namespace Wpf3DPrint.Viewer
             public IntPtr slice;
             public double height;
             public bool isLocatePlane;
+            public ArrayList data;
             public OneSlice(IntPtr s, double h)
             {
                 slice = s;
                 height = h;
+                data = new ArrayList();
                 isLocatePlane = false;
             }
 
-            object data;
             public void getSliceData(Cpp2Managed.EdgeType type, double[] dataList, int length)
             {
                 switch (type)
                 {
                     case Cpp2Managed.EdgeType.bSplice:
-                        data = getBSplice(dataList, length);
+                        data.Add(getBSplice(dataList, length));
                         break;
                     case Cpp2Managed.EdgeType.circle:
-                        data = getCircle(dataList);
+                        data.Add(getCircle(dataList));
                         break;
                     case Cpp2Managed.EdgeType.line:
-                        data = getLine(dataList);
+                        data.Add(getLine(dataList));
                         break;
                     default:
                         break;
-                }
-            }
-
-            public object Data
-            {
-                get
-                {
-                    return data;
                 }
             }
 

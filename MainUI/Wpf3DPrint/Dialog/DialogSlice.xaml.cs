@@ -52,6 +52,22 @@ namespace Wpf3DPrint.Dialog
             }
         }
 
+        public double sliceThick
+        {
+            get
+            {
+                try
+                {
+                    double thick = double.Parse(textBoxThick.Text);
+                    return thick;
+                }
+                catch
+                {
+                    return 1;
+                }
+            }
+        }
+
         double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
         public DialogSlice(Viewer.Shape shape, string thick, string unit)
         {

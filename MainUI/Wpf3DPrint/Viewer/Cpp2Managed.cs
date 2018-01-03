@@ -80,7 +80,7 @@ namespace Wpf3DPrint.Viewer
             public static extern IntPtr create(IntPtr hWnd);
 
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern int displaySlice(IntPtr device2D, IntPtr slice, int sliceNum);
+            public static extern int displaySlice(IntPtr device2D, IntPtr type, IntPtr slice, int sliceNum);
 
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern void cleanScreen(IntPtr device2D);

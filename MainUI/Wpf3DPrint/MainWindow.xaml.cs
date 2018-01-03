@@ -124,6 +124,7 @@ namespace Wpf3DPrint
             if (dlSlice.ShowDialog() == false)
                 return;
             setSlicingView();
+            fileReader.Shape.slice.sliceThick = dlSlice.sliceThick;
             textBoxSliceThick.Text = fileReader.Shape.slice.sliceThick.ToString();
             fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, onAfterSlice, new SceneThread.onFunction(onSlice));
         }
@@ -145,14 +146,12 @@ namespace Wpf3DPrint
             ArrayList argList = (ArrayList)args;
             IntPtr slice = (IntPtr)argList[0];
             double height = (double)argList[1];
+            int totalSliceCnt = (int)argList[2];
             slicingScene.displaySlice(slice);
             scene.displaySliceCut(fileReader.Shape.getShape(), height);
-            /*
             Shape shape = fileReader.Shape;
-            int total = (int)((shape.Zmax - shape.Zmin) / shape.sliceThick);
-            if (shape.countLocate)
-                total += shape.locateCount;
-            labelStatus.Content = "总层数：" + total + " 当前层数：" + shape.sliceList.Count;
+            labelStatus.Content = "总层数：" + totalSliceCnt + " 当前层数：" + shape.slice.sliceList.Count;
+            /*
             if (shape.sliceList.Count == 1)
                 fileReader.resetView(shape.outputRatio);
                 */
@@ -316,7 +315,6 @@ namespace Wpf3DPrint
                 scene.displaySlice(slice.slice);
             }
             resetView(1);
-            //sliceScene.slice(fileReader.Shape.stepSlice, count);
             afterOpenFile();
             ArrayList list = new ArrayList();
             for (int i = 0; i < fileReader.Shape.slice.sliceList.Count; i++)
@@ -325,7 +323,7 @@ namespace Wpf3DPrint
             }
             comboBoxSliceList.ItemsSource = list;
             comboBoxSliceNumber.SelectedItem = 1;
-            sliceScene.drawSlice((int)comboBoxSliceNumber.SelectedItem - 1);
+            sliceScene.drawSlice((Slice.OneSlice)(fileReader.Shape.slice.sliceList[(int)comboBoxSliceNumber.SelectedItem - 1]));
             setSliceView();
             TreeViewItem root = new TreeViewItem();
             root.Header = fileReader.Shape.fileName.Substring(fileReader.Shape.fileName.LastIndexOf('\\') + 1);
@@ -407,7 +405,7 @@ namespace Wpf3DPrint
         private void PanelSlice_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
             if (comboBoxSliceNumber.SelectedItem != null)
-                sliceScene.drawSlice((int)comboBoxSliceNumber.SelectedItem - 1);
+                sliceScene.drawSlice((Slice.OneSlice)(fileReader.Shape.slice.sliceList[(int)comboBoxSliceNumber.SelectedItem - 1]));
         }
 
         private void PanelSlice_Resize(object sender, EventArgs e)
@@ -452,7 +450,7 @@ namespace Wpf3DPrint
 
         private void selectSlice(int index)
         {
-            sliceScene.drawSlice(index);
+            sliceScene.drawSlice((Slice.OneSlice)(fileReader.Shape.slice.sliceList[index]));
             scene.selectSlice(((Slice.OneSlice)fileReader.Shape.slice.sliceList[index]).slice);
         }
 
@@ -485,9 +483,9 @@ namespace Wpf3DPrint
 
         private void buttonRebuild_Click(object sender, RoutedEventArgs e)
         {
-            if (fileReader.Shape.IsEmpty)
+            if (fileReader.Shape.slice.sliceList.Count == 0)
             {
-                MessageBox.Show("未打开3D文件");
+                MessageBox.Show("未打开切片文件");
                 return;
             }
             Dialog.Rebuild rebuild = new Dialog.Rebuild();
@@ -692,14 +690,9 @@ namespace Wpf3DPrint
 
         private void buttonSaveDxf_Click(object sender, RoutedEventArgs e)
         {
-            if (fileReader.Shape.IsEmpty)
-            {
-                MessageBox.Show("未打开3D文件");
-                return;
-            }
             if (fileReader.Shape.slice.sliceList.Count == 0)
             {
-                MessageBox.Show("没有切片");
+                MessageBox.Show("未打开切片文件");
                 return;
             }
             SaveFileDialog saveFile = new SaveFileDialog();

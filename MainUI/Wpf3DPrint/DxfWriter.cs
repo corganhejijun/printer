@@ -51,28 +51,40 @@ namespace Wpf3DPrint
 
         public void writeSlice()
         {
-            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
-            Cpp2Managed.Shape3D.getBoundary(__shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
+            foreach (Slice.OneSlice slice in __shape.slice.sliceList)
+            {
+                double xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0;
+                Cpp2Managed.Shape3D.getBoundary(slice.slice, ref zmin, ref zmax, ref ymin, ref ymax, ref xmin, ref xmax);
+                if (Xmin > xmin) Xmin = xmin;
+                if (Ymin > ymin) Ymin = ymin;
+                if (Zmin > zmin) Zmin = zmin;
+                if (Xmax < xmax) Xmax = xmax;
+                if (Ymax < ymax) Ymax = ymax;
+                if (Zmax < zmax) Zmax = zmax;
+            }
             writeMinMax(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
             __file.WriteLine("  2");
             __file.WriteLine("ENTITIES");
             foreach (Slice.OneSlice slice in __shape.slice.sliceList)
             {
-                object data = slice.Data;
-                if (data is Cpp2Managed.Circle)
+                foreach (object data in slice.data)
                 {
-                    Cpp2Managed.Circle circle = (Cpp2Managed.Circle)data;
-                    getCircle(circle.center.x, circle.center.y, slice.height, circle.radius, circle.startAngle, circle.endAngle, circle.start.x, circle.start.y, circle.end.x, circle.end.y);
-                }
-                else if (data is Cpp2Managed.Line)
-                {
-                    Cpp2Managed.Line line = (Cpp2Managed.Line)data;
-                    writeLine(line.start.x, line.start.y, line.end.x, line.end.y, slice.height);
-                }
-                else if (data is Cpp2Managed.BSpline)
-                {
-                    Cpp2Managed.BSpline bs = (Cpp2Managed.BSpline)data;
-                    writeBSplice(bs.poles, bs.start.x, bs.start.y, slice.height, bs.end.x, bs.end.y);
+                    if (data is Cpp2Managed.Circle)
+                    {
+                        Cpp2Managed.Circle circle = (Cpp2Managed.Circle)data;
+                        getCircle(circle.center.x, circle.center.y, slice.height, circle.radius, circle.startAngle, circle.endAngle, circle.start.x, circle.start.y, circle.end.x, circle.end.y);
+                    }
+                    else if (data is Cpp2Managed.Line)
+                    {
+                        Cpp2Managed.Line line = (Cpp2Managed.Line)data;
+                        writeLine(line.start.x, line.start.y, line.end.x, line.end.y, slice.height);
+                    }
+                    else if (data is Cpp2Managed.BSpline)
+                    {
+                        Cpp2Managed.BSpline bs = (Cpp2Managed.BSpline)data;
+                        writeBSplice(bs.poles, bs.start.x, bs.start.y, slice.height, bs.end.x, bs.end.y);
+                    }
                 }
             }
             __file.WriteLine("  0");

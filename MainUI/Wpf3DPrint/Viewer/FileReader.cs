@@ -108,6 +108,14 @@ namespace Wpf3DPrint.Viewer
         void getSliceEdge(IntPtr shapePt, Cpp2Managed.EdgeType type, double[] data, int length)
         {
             double height = data[0];
+            foreach(Slice.OneSlice s in shape.slice.sliceList)
+            {
+                if (s.slice == shapePt)
+                {
+                    s.getSliceData(type, data, length);
+                    return;
+                }
+            }
             Slice.OneSlice slice = new Slice.OneSlice(shapePt, height);
             slice.getSliceData(type, data, length);
             shape.slice.sliceList.Add(slice);
@@ -124,6 +132,7 @@ namespace Wpf3DPrint.Viewer
                 result = Cpp2Managed.Shape3D.ImportSlice(fileNameSpace, deleGetEdge);
             }
             Marshal.FreeHGlobal(fileNameSpace);
+            shape.fileName = fileName;
             list.Add(result);
             return list;
         }
@@ -160,7 +169,7 @@ namespace Wpf3DPrint.Viewer
             sceneThread.addWork(sliceShapeWork, args, afterSlice);
         }
 
-        delegate bool DisplayOneShape(IntPtr shape, double height, SceneThread.onFunction onSlice);
+        delegate bool DisplayOneShape(IntPtr shape, double height, int locateCount, SceneThread.onFunction onSlice);
         Cpp2Managed.Shape3D.OnGetShape deleGetLocatePlane;
         void getLocatePlane(IntPtr locatePlanePt)
         {
@@ -184,6 +193,18 @@ namespace Wpf3DPrint.Viewer
             double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
             Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
             double height = Zmin;
+            int totalSliceCnt = 0;
+            if (locatePlane)
+                totalSliceCnt = locatePlaneList.Count;
+            // 计算总层数
+            totalSliceCnt += (int)(Math.Ceiling((Zmax - Zmin) / shape.slice.sliceThick));
+            foreach(Slice.OneSlice s in locatePlaneList)
+            {
+                // 与单位高度相除后，小数部分很小，则认为整除了，说明该定位面与切割面重合，重复计算
+                double value = (s.height - Zmin) / shape.slice.sliceThick;
+                if (Math.Abs(Math.Truncate(value) - value) < 0.001)
+                    totalSliceCnt--;
+            }
             for (int i = 1; height < Zmax; i++)
             {
                 // 从1开始，跳过0高度切割
@@ -195,13 +216,13 @@ namespace Wpf3DPrint.Viewer
                     if (Math.Abs(s.height - height) < 0.0001)
                     {
                         skip = true;
-                        onGetSlice(s.slice, s.height, control, onslice);
+                        onGetSlice(s.slice, s.height, totalSliceCnt, control, onslice);
                         shape.slice.sliceList.Add(s);
                     }
                     // 显示对应高度的定位面切割线
                     else if (locatePlane && s.height < height && s.height > height - shape.slice.sliceThick)
                     {
-                        onGetSlice(s.slice, s.height, control, onslice);
+                        onGetSlice(s.slice, s.height, totalSliceCnt, control, onslice);
                         shape.slice.sliceList.Add(s);
                     }
                 }
@@ -211,7 +232,7 @@ namespace Wpf3DPrint.Viewer
                 if (slice == IntPtr.Zero)
                     continue;
                 shape.slice.sliceList.Add(new Slice.OneSlice(slice, height));
-                onGetSlice(slice, height, control, onslice);
+                onGetSlice(slice, height, totalSliceCnt, control, onslice);
                 if (!noDelay)
                     System.Threading.Thread.Sleep(100);
             }
@@ -219,19 +240,20 @@ namespace Wpf3DPrint.Viewer
             return null;
         }
 
-        private void onGetSlice(IntPtr slice, double height, Control control, SceneThread.onFunction onSlice)
+        private void onGetSlice(IntPtr slice, double height, int totalSliceCnt, Control control, SceneThread.onFunction onSlice)
         {
             if (slice != IntPtr.Zero)
             {
-                control.Dispatcher.Invoke(new DisplayOneShape(displayOnSlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, height, onSlice});
+                control.Dispatcher.Invoke(new DisplayOneShape(displayOnSlice), System.Windows.Threading.DispatcherPriority.Normal, new object[] { slice, height, totalSliceCnt, onSlice});
             }
         }
 
-        private bool displayOnSlice(IntPtr slice, double height, SceneThread.onFunction onSlice)
+        private bool displayOnSlice(IntPtr slice, double height, int totalSliceCnt, SceneThread.onFunction onSlice)
         {
             ArrayList list = new ArrayList();
             list.Add(slice);
             list.Add(height);
+            list.Add(totalSliceCnt);
             onSlice(list);
             return true;
         }

@@ -110,8 +110,8 @@ int SliceDevice::drawSlice(EdgeType* type, void* slice, int count) {
     m_sceneScale = m_sceneScale > xScale ? m_sceneScale : xScale;
     m_sceneScale = m_sceneScale > yScale ? m_sceneScale : yScale;
     // objectCenter may be not at (0, 0)
-    float objCenterX = (abs(boundBox.left) - abs(boundBox.right)) / 2 / xLength * size.width;
-    float objCenterY = (abs(boundBox.top) - abs(boundBox.bottom)) / 2 / yLength * size.height;
+    float objCenterX = float((abs(boundBox.left) - abs(boundBox.right)) / 2 / xLength * size.width);
+    float objCenterY = float((abs(boundBox.top) - abs(boundBox.bottom)) / 2 / yLength * size.height);
     // Move object center to screen center
     D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(size.width / 2 + objCenterX, size.height / 2 + objCenterY);
     // 相同的比例保证缩放后不变形
@@ -401,10 +401,10 @@ double SliceDevice::atan2Pi(double atanValue) {
     return atanValue;
 }
 
-bool SliceDevice::angleInCircle(float angle, Circle* circle) {
-    float startAngle = circle->startAngle;
-    float endAngle = circle->endAngle;
-    float angleDiff = abs(startAngle - endAngle);
+bool SliceDevice::angleInCircle(double angle, Circle* circle) {
+    double startAngle = circle->startAngle;
+    double endAngle = circle->endAngle;
+    double angleDiff = abs(startAngle - endAngle);
     double yStart = circle->start.y - circle->center.y;
     double xStart = circle->start.x - circle->center.x;
     double yEnd = circle->end.y - circle->center.y;
@@ -440,7 +440,7 @@ bool SliceDevice::angleInCircle(float angle, Circle* circle) {
     }
     if ((angle < endAngle || EQU_FLOAT(angle, endAngle)) && (angle > startAngle || EQU_FLOAT(angle, startAngle)))
         return true;
-    float angle1 = angle;
+    double angle1 = angle;
     if (EQU_FLOAT(angle1, 2 * M_PI) && EQU_FLOAT(startAngle, 0))
         return true;
     if (EQU_FLOAT(angle1, 0) && EQU_FLOAT(endAngle, 2 * M_PI))
@@ -539,9 +539,9 @@ int SliceDevice::drawCircle(Circle* circle) {
     D2D1_ARC_SIZE size = D2D1_ARC_SIZE_SMALL;
     if (circle->endAngle - circle->startAngle > M_PI)
         size = D2D1_ARC_SIZE_LARGE;
-    pSink->BeginFigure(D2D1::Point2F(circle->start.x, circle->start.y), D2D1_FIGURE_BEGIN_HOLLOW);
+    pSink->BeginFigure(D2D1::Point2F((float)circle->start.x, (float)circle->start.y), D2D1_FIGURE_BEGIN_HOLLOW);
     pSink->AddArc(D2D1::ArcSegment(
-        D2D1::Point2F(circle->end.x, circle->end.y), D2D1::SizeF(circle->radius, circle->radius), 0.0,
+        D2D1::Point2F((float)circle->end.x, (float)circle->end.y), D2D1::SizeF((float)circle->radius, (float)circle->radius), 0.0,
         D2D1_SWEEP_DIRECTION_CLOCKWISE, size));
     pSink->EndFigure(D2D1_FIGURE_END_OPEN);
     pSink->Close();
@@ -563,17 +563,17 @@ int SliceDevice::drawBSpline(BSpline* spline) {
         return hr;
     }
     pSink->SetFillMode(D2D1_FILL_MODE_WINDING);
-    D2D1_POINT_2F point = D2D1::Point2F(spline->start.x, spline->start.y);
+    D2D1_POINT_2F point = D2D1::Point2F((float)spline->start.x, (float)spline->start.y);
     pSink->BeginFigure(point, D2D1_FIGURE_BEGIN_HOLLOW);
     D2D1_POINT_2F point2 = point;
     for (int i = 0; i < spline->polesCnt; i++) {
-        point2 = D2D1::Point2F(spline->poles[i].x, spline->poles[i].y);
+        point2 = D2D1::Point2F((float)spline->poles[i].x, (float)spline->poles[i].y);
         float x = point2.x - point.x;
         float y = point2.y - point.y;
         pSink->AddLine(point2);
         point = point2;
     }
-    pSink->AddLine(D2D1::Point2F(spline->end.x, spline->end.y));
+    pSink->AddLine(D2D1::Point2F((float)spline->end.x, (float)spline->end.y));
     pSink->EndFigure(D2D1_FIGURE_END_OPEN);
     pSink->Close();
     pSink->Release();
