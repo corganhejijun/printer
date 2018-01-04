@@ -78,17 +78,12 @@ int SliceDevice::clearScene() {
     return S_OK;
 }
 
-int SliceDevice::drawSlice(EdgeType* type, void* slice, int count) {
+int SliceDevice::drawSlice(BoundBox* boundBox, int count, GetSliceData getSlice) {
     if (m_pRenderTarget == NULL)
         return E_HANDLE;
     m_pRenderTarget->BeginDraw();
     m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
     m_pRenderTarget->Clear(CLEAR_COLOR);
-    BoundBox boundBox;
-    boundBox.left = boundBox.top = D2D1::FloatMax();
-    boundBox.right = boundBox.bottom = -D2D1::FloatMax();
-
-    getBoundBox(&boundBox, type, slice, count);
 
 	/*
     // 获取网格线与图形的交点列表
@@ -99,8 +94,8 @@ int SliceDevice::drawSlice(EdgeType* type, void* slice, int count) {
 
     // 通过变换调整图像比例，使图像放大居中
     D2D1_SIZE_F size = m_pRenderTarget->GetSize();
-    float xLength = (float)(boundBox.right - boundBox.left);
-    float yLength = (float)(boundBox.bottom - boundBox.top);
+    float xLength = (float)(boundBox->right - boundBox->left);
+    float yLength = (float)(boundBox->bottom - boundBox->top);
     float xScale = -1;
     if (size.width > 0)
         xScale = xLength * (1 + m_sceneMargin) / size.width;
@@ -110,8 +105,8 @@ int SliceDevice::drawSlice(EdgeType* type, void* slice, int count) {
     m_sceneScale = m_sceneScale > xScale ? m_sceneScale : xScale;
     m_sceneScale = m_sceneScale > yScale ? m_sceneScale : yScale;
     // objectCenter may be not at (0, 0)
-    float objCenterX = float((abs(boundBox.left) - abs(boundBox.right)) / 2 / xLength * size.width);
-    float objCenterY = float((abs(boundBox.top) - abs(boundBox.bottom)) / 2 / yLength * size.height);
+    float objCenterX = float((abs(boundBox->left) - abs(boundBox->right)) / 2 / xLength * size.width);
+    float objCenterY = float((abs(boundBox->top) - abs(boundBox->bottom)) / 2 / yLength * size.height);
     // Move object center to screen center
     D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(size.width / 2 + objCenterX, size.height / 2 + objCenterY);
     // 相同的比例保证缩放后不变形
@@ -121,19 +116,23 @@ int SliceDevice::drawSlice(EdgeType* type, void* slice, int count) {
     //D2D1_RECT_F rectangle = D2D1::Rect(boundBox.left, boundBox.top, boundBox.right, boundBox.bottom);
     //m_pRenderTarget->DrawRectangle(rectangle, m_pBlackBrush, m_curveWith * m_sceneScale);
     for (int i = 0; i < count; i++){
-        switch (type[i]) {
-        case EdgeType::bSplice:
-            return drawBSpline((BSpline*)((int*)slice + i));
-            break;
-        case EdgeType::circle:
-            return drawCircle((Circle*)((int*)slice + i));
-            break;
-        case EdgeType::line:
-            return drawLine((Line*)((int*)slice + i));
-            break;
-        default:
-            printf_s("unknow curve type\n");
+        int result = S_OK;
+        Slice* slice = getSlice(i);
+        switch (slice->type) {
+            case EdgeType::bSplice:
+                result = drawBSpline((BSpline*)(slice->data));
+                break;
+            case EdgeType::circle:
+                result = drawCircle((Circle*)(slice->data));
+                break;
+            case EdgeType::line:
+                result = drawLine((Line*)(slice->data));
+                break;
+            default:
+                printf_s("unknow curve type\n");
         }
+        if (result != S_OK)
+            return result;
     }
     //drawInterSec(listX, listY);
     m_pRenderTarget->EndDraw();
@@ -217,37 +216,6 @@ int SliceDevice::drawInterSec(vector<Point>* listX, vector<Point>* listY) {
             m_pBlackBrush, m_curveWith * m_sceneScale);
     }
     return S_OK;
-}
-
-void SliceDevice::getBSplineBoundBox(BoundBox* box, BSpline* spline) {
-    setBoundBox(box, spline->start.y, spline->end.y, spline->start.x, spline->end.x);
-    for (int i = 0; i < spline->polesCnt - 1; i+=2)
-        setBoundBox(box, spline->poles[i].y, spline->poles[i + 1].y, spline->poles[i].x, spline->poles[i + 1].x);
-}
-
-void SliceDevice::getBoundBox(BoundBox* box, EdgeType* type, void* slice, int count) {
-    BSpline* b = NULL;
-    Line* line = NULL;
-    Circle* circle = NULL;
-    for (int i = 0; i < count; i++){
-        switch (type[i])
-        {
-        case EdgeType::bSplice:
-            b = (BSpline*)((int*)slice + i);
-            getBSplineBoundBox(box, b);
-            break;
-        case EdgeType::line:
-            line = (Line*)((int*)slice + i);
-            setBoundBox(box, line->start.y, line->end.y, line->start.x, line->end.x);
-            break;
-        case EdgeType::circle:
-            circle = (Circle*)((int*)slice + i);
-            setBoundBox(box, circle->center.y - circle->radius, circle->center.y + circle->radius, circle->center.x - circle->radius, circle->center.x + circle->radius);
-            break;
-        default:
-            break;
-        }
-    }
 }
 
 void SliceDevice::getInterSect(vector<Point>* listX, vector<Point>* listY, EdgeType* type, void* slice, int count, BoundBox boundBox) {
@@ -580,21 +548,6 @@ int SliceDevice::drawBSpline(BSpline* spline) {
     m_pRenderTarget->DrawGeometry(pGeometry, m_pBlackBrush, m_curveWith * m_sceneScale);
     pGeometry->Release();
     return S_OK;
-}
-
-void SliceDevice::setBoundBox(SliceDevice::BoundBox* box, double top, double bottom, double left, double right) {
-    double t = top < bottom ? top : bottom;
-    double b = top < bottom ? bottom : top;
-    double l = left < right ? left : right;
-    double r = left < right ? right : left;
-    if (box->left > l)
-        box->left = l;
-    if (box->right < r)
-        box->right = r;
-    if (box->top > t)
-        box->top = t;
-    if (box->bottom < b)
-        box->bottom = b;
 }
 
 int SliceDevice::resizeWindow() {

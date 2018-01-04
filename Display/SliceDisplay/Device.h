@@ -15,12 +15,6 @@ bool sortXInterSects(Point pt1, Point pt2);
 bool sortYInterSects(Point pt1, Point pt2);
 
 class SliceDevice{
-    struct BoundBox {
-        double left;
-        double right;
-        double top;
-        double bottom;
-    };
     HWND m_hWnd;
     ID2D1Factory* m_pD2DFactory; // Direct2D factory
     ID2D1HwndRenderTarget* m_pRenderTarget; // Render target
@@ -56,7 +50,7 @@ public:
     int init();
     void resetScene();
     int clearScene();
-    int drawSlice(EdgeType* type, void* slice, int count);
+    int drawSlice(BoundBox* boundBox, int count, GetSliceData getSlice);
     int resizeWindow();
 };
 

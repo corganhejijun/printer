@@ -48,7 +48,7 @@ namespace Wpf3DPrint.Viewer
                 bSpline.end.x = dataList[3];
                 bSpline.end.y = dataList[4];
                 int poleCount = (length - 5) / 2;
-                bSpline.poles = new Cpp2Managed.Point[(length - 5)/2];
+                bSpline.poles = new Cpp2Managed.Point[(length - 5) / 2];
                 for (int i = 0; i < poleCount; i++)
                 {
                     bSpline.poles[i].x = dataList[4 + i * 2 + 1];
@@ -80,6 +80,51 @@ namespace Wpf3DPrint.Viewer
                 circle.end.x = dataList[8];
                 circle.end.y = dataList[9];
                 return circle;
+            }
+
+            void setBoundBox(ref Cpp2Managed.BoundBox box, double top, double bottom, double left, double right)
+            {
+                double t = top < bottom ? top : bottom;
+                double b = top < bottom ? bottom : top;
+                double l = left < right ? left : right;
+                double r = left < right ? right : left;
+                if (box.left > l)
+                    box.left = l;
+                if (box.right < r)
+                    box.right = r;
+                if (box.top > t)
+                    box.top = t;
+                if (box.bottom < b)
+                    box.bottom = b;
+            }
+
+            void getBSplineBoundBox(ref Cpp2Managed.BoundBox box, Cpp2Managed.BSpline spline)
+            {
+                setBoundBox(ref box, spline.start.y, spline.end.y, spline.start.x, spline.end.x);
+                for (int i = 0; i < spline.poles.Length - 1; i += 2)
+                    setBoundBox(ref box, spline.poles[i].y, spline.poles[i + 1].y, spline.poles[i].x, spline.poles[i + 1].x);
+            }
+
+            public void GetBound(ref Cpp2Managed.BoundBox box)
+            {
+                foreach(object d in data)
+                {
+                    if (d is Cpp2Managed.BSpline)
+                    {
+                        Cpp2Managed.BSpline b = (Cpp2Managed.BSpline)d;
+                        getBSplineBoundBox(ref box, b);
+                    }
+                    else if (d is Cpp2Managed.Line)
+                    {
+                        Cpp2Managed.Line line = (Cpp2Managed.Line)d;
+                        setBoundBox(ref box, line.start.y, line.end.y, line.start.x, line.end.x);
+                    }
+                    else if (d is Cpp2Managed.Circle)
+                    {
+                        Cpp2Managed.Circle circle = (Cpp2Managed.Circle)d;
+                        setBoundBox(ref box, circle.center.y - circle.radius, circle.center.y + circle.radius, circle.center.x - circle.radius, circle.center.x + circle.radius);
+                    }
+                }
             }
         }
 

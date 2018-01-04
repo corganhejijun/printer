@@ -11,13 +11,9 @@ void* create(void* hWnd){
     return device;
 }
 
-int displaySlice(void* device, EdgeType* type, void* slice, int sliceNum){
+int displaySlice(void* device, BoundBox* box, int sliceNum, GetSliceData getSlice){
     SliceDevice* cDevice = (SliceDevice*)device;
-    if (slice == NULL) {
-        cleanScreen(device);
-        return S_OK;
-    }
-    return cDevice->drawSlice(type, slice, sliceNum);
+    return cDevice->drawSlice(box, sliceNum, getSlice);
 }
 
 void cleanScreen(void* device) {

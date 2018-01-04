@@ -6,16 +6,25 @@ namespace Wpf3DPrint.Viewer
     public class Cpp2Managed
     {
         public enum EdgeType { unknown, line, circle, bSplice };
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Slice
+        {
+            public EdgeType type;
+            public IntPtr data;
+        }
+        [StructLayout(LayoutKind.Sequential)]
         public struct Point
         {
             public double x;
             public double y;
         }
+        [StructLayout(LayoutKind.Sequential)]
         public struct Line
         {
             public Point start;
             public Point end;
         }
+        [StructLayout(LayoutKind.Sequential)]
         public struct Circle
         {
             public Point center;
@@ -31,6 +40,22 @@ namespace Wpf3DPrint.Viewer
             public Point end;
             public Point[] poles;
         }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct BSpline4Dll
+        {
+            public Point start;
+            public Point end;
+            public int polesCnt;
+            public IntPtr polesPt;
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct BoundBox
+        {
+            public double left;
+            public double right;
+            public double top;
+            public double bottom;
+        };
 
         public class Shape3D
         {
@@ -76,11 +101,13 @@ namespace Wpf3DPrint.Viewer
 
         public class Slice2D
         {
+            public delegate IntPtr OnGetSliceData(int index);
+
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr create(IntPtr hWnd);
 
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern int displaySlice(IntPtr device2D, IntPtr type, IntPtr slice, int sliceNum);
+            public static extern int displaySlice(IntPtr device2D, BoundBox box, int sliceNum, OnGetSliceData getSlice);
 
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern void cleanScreen(IntPtr device2D);

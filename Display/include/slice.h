@@ -26,8 +26,8 @@ typedef struct {
 typedef struct {
     Point start;
     Point end;
-    Point* poles;
     int polesCnt;
+    Point* poles;
 }BSpline;
 
 typedef struct Slice{
@@ -36,5 +36,13 @@ typedef struct Slice{
     Slice* next;
 }Slice;
 
+struct BoundBox {
+    double left;
+    double right;
+    double top;
+    double bottom;
+};
+
+typedef Slice*(_stdcall *GetSliceData)(int index);
 
 #endif
