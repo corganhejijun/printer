@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="图形编辑" Height="443.103" Width="382.212" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
+        Title="新增图形" Height="443.103" Width="382.212" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
     <Grid>
         <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="234,346,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
         <Button x:Name="buttonOk" Content="下一步" HorizontalAlignment="Left" Margin="146,346,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOk_Click"/>

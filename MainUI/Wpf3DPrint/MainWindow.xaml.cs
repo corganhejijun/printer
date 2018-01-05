@@ -81,11 +81,6 @@ namespace Wpf3DPrint
             this.Dispatcher.Invoke(new SceneThread.afterFunction(displayStep), System.Windows.Threading.DispatcherPriority.Normal, new object[] { args });
         }
 
-        private void afterImportMoreStep(object args)
-        {
-            this.Dispatcher.Invoke(new SceneThread.afterFunction(displayImportMoreStep), System.Windows.Threading.DispatcherPriority.Normal, new object[] { args });
-        }
-
         string unit;
         private void displayStep(object workResult)
         {
@@ -96,15 +91,6 @@ namespace Wpf3DPrint
             unit.ShowDialog();
             this.unit = unit.Unit;
             afterOpenFile();
-        }
-
-        private void displayImportMoreStep(object workResult)
-        {
-            /*
-            fileReader.displayStep(workResult, dlgEntityEdit.Combine);
-            fileReader.resetView(1);
-            afterOpenFile();
-            */
         }
 
         private void buttonSave_Click(object sender, RoutedEventArgs e)
@@ -119,6 +105,11 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
+            if (fileReader.Shape.HasMoreShape)
+            {
+                MessageBox.Show("请先合并多个图形");
+                return;
+            }
             Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, textBoxSliceThick.Text, unit);
             dlSlice.Owner = this;
             if (dlSlice.ShowDialog() == false)
@@ -127,6 +118,9 @@ namespace Wpf3DPrint
             fileReader.Shape.slice.sliceThick = dlSlice.sliceThick;
             textBoxSliceThick.Text = fileReader.Shape.slice.sliceThick.ToString();
             fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, onAfterSlice, new SceneThread.onFunction(onSlice));
+            ToolBarOper.IsEnabled = false;
+            ToolBarReset.IsEnabled = false;
+            MenuMain.IsEnabled = false;
         }
 
         private string saveSlice()
@@ -164,12 +158,15 @@ namespace Wpf3DPrint
 
         private void afterSlice(object args)
         {
+            ToolBarOper.IsEnabled = true;
+            ToolBarReset.IsEnabled = true;
+            MenuMain.IsEnabled = true;
             Shape shape = fileReader.Shape;
             //fileReader.resetView(shape.outputRatio);
             string fileName = saveSlice();
             if (fileName.Length == 0)
                 return;
-            fileReader.releaseShape();
+            fileReader.Shape.release();
             scene.Proxy.removeObjects();
             slicingScene.Proxy.removeObjects();
             openSlice(fileName);
@@ -183,7 +180,7 @@ namespace Wpf3DPrint
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            fileReader.releaseShape();
+            fileReader.Shape.release();
             scene.Proxy.removeObjects();
             slicingScene.Proxy.removeObjects();
             fileReader.Dispose();
@@ -268,12 +265,12 @@ namespace Wpf3DPrint
 
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
-            fileReader.releaseShape();
             scene.Proxy.removeObjects();
             slicingScene.Proxy.removeObjects();
             sliceScene.closeSlice();
             sliceScene.clearWindow();
             TreeView_Slice.Items.Clear();
+            fileReader.Shape.release();
             set3DView();
             set3DFunction(true);
         }
@@ -344,7 +341,7 @@ namespace Wpf3DPrint
             ButtonRotate.IsEnabled = enable;
             ButtonMove.IsEnabled = enable;
             menuRotate.IsEnabled = enable;
-            menuPan.IsEnabled = enable;
+            menuMove.IsEnabled = enable;
             menuBase0.IsEnabled = enable;
             menuBase0xy.IsEnabled = enable;
             ButtonSlice.IsEnabled = enable;
@@ -514,21 +511,31 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
+            if (fileReader.Shape.HasMoreShape)
+            {
+                if (fileReader.Shape.selectList.Count != 1)
+                {
+                    MessageBox.Show("请选择一个实体操作");
+                    return;
+                }
+            }
             // TODO 切片之前的实体才能旋转，切片中和切片后不能旋转
             TransformPreview preview = new TransformPreview(rotatePreview);
             Dialog.Rotate rotate = new Dialog.Rotate(preview);
             rotate.Owner = this;
             if (rotate.ShowDialog() == false)
-                fileReader.releaseTransform();
+                fileReader.Shape.releaseTransform();
             else
-                fileReader.applyTransform();
+                fileReader.Shape.applyTransform();
             scene.displayAfterTransform(fileReader.Shape.getShape());
+            scene.displayShape(fileReader.Shape.getMoreShape());
         }
 
         void rotatePreview(double xAngle, double yAngle, double zAngle)
         {
-            fileReader.rotate(xAngle, yAngle, zAngle);
+            fileReader.Shape.rotate(xAngle, yAngle, zAngle);
             scene.displayAfterTransform(fileReader.Shape.transform);
+            scene.displayShape(fileReader.Shape.getNotTransformShape());
         }
 
         private void menuEntityEdit_Click(object sender, RoutedEventArgs e)
@@ -536,6 +543,11 @@ namespace Wpf3DPrint
             if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
+                return;
+            }
+            if (fileReader.Shape.HasMoreShape)
+            {
+                MessageBox.Show("已经打开大于一个图形，请先合并图形");
                 return;
             }
             if (dlgEntityEdit != null)
@@ -551,6 +563,18 @@ namespace Wpf3DPrint
             }
             onOpeningFile(dlgEntityEdit.FileName);
             set3DView();
+        }
+
+        private void afterImportMoreStep(object args)
+        {
+            this.Dispatcher.Invoke(new SceneThread.afterFunction(displayImportMoreStep), System.Windows.Threading.DispatcherPriority.Normal, new object[] { args });
+        }
+
+        private void displayImportMoreStep(object workResult)
+        {
+            scene.displayShape(fileReader.Shape.getMoreShape());
+            resetView(1);
+            afterOpenFile();
         }
 
         private void menuAbout_Click(object sender, RoutedEventArgs e)
@@ -585,27 +609,37 @@ namespace Wpf3DPrint
         {
         }
 
-        private void menuPan_Click(object sender, RoutedEventArgs e)
+        private void menuMove_Click(object sender, RoutedEventArgs e)
         {
             if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
                 return;
             }
+            if (fileReader.Shape.HasMoreShape)
+            {
+                if (fileReader.Shape.selectList.Count != 1)
+                {
+                    MessageBox.Show("请选择一个实体操作");
+                    return;
+                }
+            }
             TransformPreview preview = new TransformPreview(panPreview);
             Dialog.Pan pan = new Dialog.Pan(unit, preview);
             pan.Owner = this;
             if (pan.ShowDialog() == false)
-                fileReader.releaseTransform();
+                fileReader.Shape.releaseTransform();
             else
-                fileReader.applyTransform();
+                fileReader.Shape.applyTransform();
             scene.displayAfterTransform(fileReader.Shape.getShape());
+            scene.displayShape(fileReader.Shape.getMoreShape());
         }
 
         void panPreview(double x, double y, double z)
         {
-            fileReader.move(x, y, z);
+            fileReader.Shape.move(x, y, z);
             scene.displayAfterTransform(fileReader.Shape.transform);
+            scene.displayShape(fileReader.Shape.getNotTransformShape());
         }
 
         private void buttonSaveAs_Click(object sender, RoutedEventArgs e)
@@ -672,7 +706,7 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            fileReader.base0AllShapes();
+            fileReader.Shape.base0AllShapes();
             scene.displayAfterTransform(fileReader.Shape.getShape());
         }
 
@@ -684,7 +718,7 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            fileReader.base0XyCenter();
+            fileReader.Shape.base0XyCenter();
             scene.displayAfterTransform(fileReader.Shape.getShape());
         }
 

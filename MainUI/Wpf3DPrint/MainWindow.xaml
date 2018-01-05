@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Wpf3DPrint"
         xmlns:WinForms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="MainWindow" Height="686" Width="1043" Closed="Window_Closed" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        Title="3DLT" Height="686" Width="1043" Closed="Window_Closed" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Grid x:Name="GridMain">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -14,7 +14,7 @@
             <RowDefinition/>
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
-        <Menu DockPanel.Dock="Top" Grid.Row="0" FontSize="15" Height="25">
+        <Menu DockPanel.Dock="Top" Grid.Row="0" FontSize="15" Height="25" Name="MenuMain">
             <MenuItem Header="文件" HorizontalAlignment="Right" Width="48">
                 <MenuItem x:Name="menuOpenFile" Header="打开..." Click="buttonOpen_Click"></MenuItem>
                 <MenuItem x:Name="menuSaveAs" Header="保存实体..." Click="buttonSaveAs_Click"></MenuItem>
@@ -39,7 +39,7 @@
                 <MenuItem x:Name="menuEntityProp" Header="实体属性..." Click="menuEntityProp_Click"></MenuItem>
                 <MenuItem Header="图形变换">
                     <MenuItem Header="旋转..." x:Name="menuRotate" Click="menuRotate_Click"></MenuItem>
-                    <MenuItem Header="平移..." x:Name="menuPan" Click="menuPan_Click"></MenuItem>
+                    <MenuItem Header="平移..." x:Name="menuMove" Click="menuMove_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="图形编辑">
                     <MenuItem Header="图形最低点z轴置零" x:Name="menuBase0" Click="menuBase0_Click"></MenuItem>
@@ -66,7 +66,7 @@
         </Menu>
         <DockPanel Grid.Row="1">
             <ToolBarTray DockPanel.Dock="Top">
-                <ToolBar>
+                <ToolBar Name="ToolBarOper">
                     <Button ToolTip="打开实体" x:Name="ButtonOpen" Click="buttonOpen_Click">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="images/Open.ico" Width="16"></Image>
@@ -97,7 +97,7 @@
                             <TextBlock Margin="5,0,0,0">旋转</TextBlock>
                         </StackPanel>
                     </Button>
-                    <Button ToolTip="平移" x:Name="ButtonMove" Click="menuPan_Click">
+                    <Button ToolTip="平移" x:Name="ButtonMove" Click="menuMove_Click">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="images/Move.png" Width="16"></Image>
                             <TextBlock Margin="5,0,0,0">平移</TextBlock>
@@ -118,7 +118,7 @@
                 </ToolBar>
             </ToolBarTray>
             <ToolBarTray DockPanel.Dock="Top">
-                <ToolBar>
+                <ToolBar Name="ToolBarReset">
                     <Button x:Name="ButtonBase0" ToolTip="最低点置0" Click="menuBase0_Click">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="images/Base0.png" Width="16"></Image>
