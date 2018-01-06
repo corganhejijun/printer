@@ -169,5 +169,15 @@ namespace Wpf3DPrint.Viewer
             Cpp2Managed.Shape3D.del(shape);
             shape = move;
         }
+
+        public void combine()
+        {
+            IntPtr combine = Cpp2Managed.Shape3D.combine(shape, moreShape);
+            Cpp2Managed.Shape3D.del(shape);
+            Cpp2Managed.Shape3D.del(moreShape);
+            moreShape = IntPtr.Zero;
+            shape = combine;
+            selectList.Clear();
+        }
     }
 }

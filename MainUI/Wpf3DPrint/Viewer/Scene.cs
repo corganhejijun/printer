@@ -114,6 +114,8 @@ namespace Wpf3DPrint.Viewer
 
         public bool displayShape(IntPtr shape)
         {
+            if (shape == IntPtr.Zero)
+                return false;
             occtProxy.SetDisplayMode(1);
             occtProxy.displayShape(shape, 0, setting.entityColor.R, setting.entityColor.G, setting.entityColor.B);
             return true;
@@ -148,7 +150,7 @@ namespace Wpf3DPrint.Viewer
 
         public void displayAfterTransform(IntPtr shape)
         {
-            occtProxy.removeObjects();
+            occtProxy.cleanScene();
             occtProxy.displayShape(shape, 0, setting.entityColor.R, setting.entityColor.G, setting.entityColor.B);
             occtProxy.ZoomAllView();
         }

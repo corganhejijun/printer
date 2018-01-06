@@ -167,8 +167,8 @@ namespace Wpf3DPrint
             if (fileName.Length == 0)
                 return;
             fileReader.Shape.release();
-            scene.Proxy.removeObjects();
-            slicingScene.Proxy.removeObjects();
+            scene.Proxy.cleanScene();
+            slicingScene.Proxy.cleanScene();
             openSlice(fileName);
         }
 
@@ -181,8 +181,8 @@ namespace Wpf3DPrint
         private void Window_Closed(object sender, EventArgs e)
         {
             fileReader.Shape.release();
-            scene.Proxy.removeObjects();
-            slicingScene.Proxy.removeObjects();
+            scene.Proxy.cleanScene();
+            slicingScene.Proxy.cleanScene();
             fileReader.Dispose();
             sliceScene.Dispose();
         }
@@ -265,8 +265,8 @@ namespace Wpf3DPrint
 
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
-            scene.Proxy.removeObjects();
-            slicingScene.Proxy.removeObjects();
+            scene.Proxy.cleanScene();
+            slicingScene.Proxy.cleanScene();
             sliceScene.closeSlice();
             sliceScene.clearWindow();
             TreeView_Slice.Items.Clear();
@@ -459,7 +459,7 @@ namespace Wpf3DPrint
                 rebuildTimer = new System.Windows.Forms.Timer();
             rebuildTimer.Tick += RebuildTimer_Elapsed;
             rebuildTimer.Interval = 100;
-            slicingScene.Proxy.removeObjects();
+            slicingScene.Proxy.cleanScene();
             rebuildIndex = fileReader.Shape.slice.sliceList.Count;
             rebuildTimer.Start();
         }
@@ -572,7 +572,14 @@ namespace Wpf3DPrint
 
         private void displayImportMoreStep(object workResult)
         {
-            scene.displayShape(fileReader.Shape.getMoreShape());
+            if (dlgEntityEdit.Combine)
+            {
+                fileReader.Shape.combine();
+                scene.Proxy.cleanScene();
+                scene.displayShape(fileReader.Shape.getShape());
+            }
+            else
+                scene.displayShape(fileReader.Shape.getMoreShape());
             resetView(1);
             afterOpenFile();
         }
@@ -764,6 +771,23 @@ namespace Wpf3DPrint
                 scene.Proxy.getViewPoint(&x, &y, &z);
             }
             slicingScene.Proxy.setViewPoint(x * ratio, y * ratio, z * ratio);
+        }
+
+        private void menuEntityMerge_Click(object sender, RoutedEventArgs e)
+        {
+            if (fileReader.Shape.IsEmpty)
+            {
+                MessageBox.Show("未打开3D文件");
+                return;
+            }
+            if (!fileReader.Shape.HasMoreShape)
+            {
+                MessageBox.Show("没有可以合并的图形");
+                return;
+            }
+            fileReader.Shape.combine();
+            scene.Proxy.cleanScene();
+            scene.displayShape(fileReader.Shape.getShape());
         }
     }
 }

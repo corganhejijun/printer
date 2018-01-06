@@ -691,10 +691,6 @@ public:
         */
     }
 
-    void removeObjects() {
-        myAISContext()->RemoveAll();
-    }
-
     /// <summary>
     ///Get version
     /// </summary>

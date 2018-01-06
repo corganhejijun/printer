@@ -54,12 +54,20 @@ namespace Wpf3DPrint.Dialog
             {
                 testInput();
                 this.DialogResult = true;
-                preview(X, Y, Z);
             }
             catch
             {
                 e.Handled = false;
                 MessageBox.Show("请输入合法数字");
+            }
+            try
+            {
+                preview(X, Y, Z);
+            }
+            catch
+            {
+                e.Handled = false;
+                MessageBox.Show("平移失败");
             }
         }
 
@@ -68,12 +76,19 @@ namespace Wpf3DPrint.Dialog
             try
             {
                 testInput();
-                preview(X, Y, Z);
             }
             catch
             {
                 MessageBox.Show("请输入合法数字");
                 return;
+            }
+            try
+            {
+                preview(X, Y, Z);
+            }
+            catch
+            {
+                MessageBox.Show("预览失败");
             }
         }
     }
