@@ -5,7 +5,6 @@
 #include <OpenGl_FrameBuffer.hxx>
 
 #include <TopoDS_Shape.hxx>
-#include <TopTools_HSequenceOfShape.hxx>
 
 //! Implements bridge FBO for direct rendering to Direct3D surfaces.
 class BridgeFBO : public OpenGl_FrameBuffer

@@ -86,8 +86,8 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)..\src\OpenGl;$(ProjectDir)..\inc;$(ProjectDir)..\src\InterfaceGraphic;$(ProjectDir)..\src\Standard;$(ProjectDir)..\src\Aspect;$(ProjectDir)..\src\NCollection;$(ProjectDir)..\src\Graphic3d;$(ProjectDir)..\src\TCollection;$(ProjectDir)..\src\Image;$(ProjectDir)..\src\Message;$(ProjectDir)..\src\WNT;$(ProjectDir)..\src\BVH;$(ProjectDir)..\src\gp;$(ProjectDir)..\src\Bnd;$(ProjectDir)..\src\Precision;$(ProjectDir)..\src\V3d;$(ProjectDir)..\src\PrsMgr;$(ProjectDir)..\src\AIS;$(ProjectDir)..\src\TopLoc;$(ProjectDir)..\src\TopoDS;$(ProjectDir)..\src\SelectMgr;$(ProjectDir)..\src\Prs3d;$(ProjectDir)..\src\BRep;$(ProjectDir)..\src\FSD;$(ProjectDir)..\src\Storage;$(ProjectDir)..\src\IGESControl;$(ProjectDir)..\src\Interface;$(ProjectDir)..\src\MoniTool;$(ProjectDir)..\src\TopExp;$(ProjectDir)..\src\GeomAdaptor;$(SolutionDir)\Display\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\src\OpenGl;$(ProjectDir)..\inc;$(ProjectDir)..\src\InterfaceGraphic;$(ProjectDir)..\src\Standard;$(ProjectDir)..\src\Aspect;$(ProjectDir)..\src\NCollection;$(ProjectDir)..\src\Graphic3d;$(ProjectDir)..\src\TCollection;$(ProjectDir)..\src\Image;$(ProjectDir)..\src\Message;$(ProjectDir)..\src\WNT;$(ProjectDir)..\src\BVH;$(ProjectDir)..\src\gp;$(ProjectDir)..\src\Bnd;$(ProjectDir)..\src\Precision;$(ProjectDir)..\src\V3d;$(ProjectDir)..\src\PrsMgr;$(ProjectDir)..\src\AIS;$(ProjectDir)..\src\TopLoc;$(ProjectDir)..\src\TopoDS;$(ProjectDir)..\src\SelectMgr;$(ProjectDir)..\src\Prs3d;$(ProjectDir)..\src\BRep;$(ProjectDir)..\src\FSD;$(ProjectDir)..\src\Storage;$(ProjectDir)..\src\IGESControl;$(ProjectDir)..\src\Interface;$(ProjectDir)..\src\MoniTool;$(ProjectDir)..\src\TopExp;$(ProjectDir)..\src\GeomAdaptor;$(SolutionDir)\Display\include\;$(SolutionDir)\ReadFile\dxflib\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib\;$(SolutionDir)ReadFile\dxflib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)..\src\BRepSweep;$(ProjectDir)..\src\OpenGl;$(ProjectDir)..\inc;$(ProjectDir)..\src\InterfaceGraphic;$(ProjectDir)..\src\Standard;$(ProjectDir)..\src\Aspect;$(ProjectDir)..\src\NCollection;$(ProjectDir)..\src\Graphic3d;$(ProjectDir)..\src\TCollection;$(ProjectDir)..\src\Image;$(ProjectDir)..\src\Message;$(ProjectDir)..\src\WNT;$(ProjectDir)..\src\BVH;$(ProjectDir)..\src\gp;$(ProjectDir)..\src\Bnd;$(ProjectDir)..\src\Precision;$(ProjectDir)..\src\V3d;$(ProjectDir)..\src\PrsMgr;$(ProjectDir)..\src\AIS;$(ProjectDir)..\src\TopLoc;$(ProjectDir)..\src\TopoDS;$(ProjectDir)..\src\SelectMgr;$(ProjectDir)..\src\Prs3d;$(ProjectDir)..\src\BRep;$(ProjectDir)..\src\FSD;$(ProjectDir)..\src\Storage;$(ProjectDir)..\src\IGESControl;$(ProjectDir)..\src\Interface;$(ProjectDir)..\src\MoniTool;$(ProjectDir)..\src\TopExp;$(ProjectDir)..\src\GeomAdaptor;$(SolutionDir)\Display\include\;$(ProjectDir)..\src\Sweep;$(ProjectDir)..\src\ShapeAnalysis;$(IncludePath)</IncludePath>
@@ -153,7 +153,7 @@
       </DataExecutionPrevention>
       <ImportLibrary>$(OutDir)OCCTProxy_D3D.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>D3d9.lib;glu32.lib;opengl32.lib;freetype265d.lib;TKerneld.lib;TKMathd.lib;TKBRepd.lib;PTKerneld.lib;TKPShaped.lib;TKShapeSchemad.lib;TKXSBased.lib;TKServiced.lib;TKV3dd.lib;TKOpenGld.lib;TKIGESd.lib;TKSTEPd.lib;TKG2dd.lib;TKStld.lib;TKVrmld.lib;TKSTEPBased.lib;FWOSPlugind.lib;TKBOd.lib;TKCDFd.lib;TKGeomBased.lib;TKGeomAlgod.lib;TKFilletd.lib;TKHLRd.lib;TKG3dd.lib;TKMeshd.lib;TKOffsetd.lib;TKPrimd.lib;TKSTEPAttrd.lib;TKSTEP209d.lib;TKShHealingd.lib;TKBoold.lib;TKTopAlgod.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3d9.lib;glu32.lib;opengl32.lib;freetype265d.lib;TKerneld.lib;TKMathd.lib;TKBRepd.lib;PTKerneld.lib;TKPShaped.lib;TKShapeSchemad.lib;TKXSBased.lib;TKServiced.lib;TKV3dd.lib;TKOpenGld.lib;TKIGESd.lib;TKSTEPd.lib;TKG2dd.lib;TKStld.lib;TKVrmld.lib;TKSTEPBased.lib;FWOSPlugind.lib;TKBOd.lib;TKCDFd.lib;TKGeomBased.lib;TKGeomAlgod.lib;TKFilletd.lib;TKHLRd.lib;TKG3dd.lib;TKMeshd.lib;TKOffsetd.lib;TKPrimd.lib;TKSTEPAttrd.lib;TKSTEP209d.lib;TKShHealingd.lib;TKBoold.lib;TKTopAlgod.lib;dxflib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -212,11 +212,13 @@
   <ItemGroup>
     <ClCompile Include="BridgeFBO.cxx" />
     <ClCompile Include="Direct3DProxy.cpp" />
+    <ClCompile Include="DxfReader.cpp" />
     <ClCompile Include="FileRW.cpp" />
     <ClCompile Include="OCCTProxyD3D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BridgeFBO.hxx" />
+    <ClInclude Include="DxfReader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

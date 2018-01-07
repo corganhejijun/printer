@@ -62,6 +62,16 @@ namespace Wpf3DPrint.Viewer
             return nativeUtf8;
         }
 
+        public static IntPtr NativeUnicodeFromString(string managedString)
+        {
+            int len = Encoding.Unicode.GetByteCount(managedString);
+            byte[] buffer = new byte[len + 1];
+            Encoding.Unicode.GetBytes(managedString, 0, managedString.Length, buffer, 0);
+            IntPtr nativeUnicode = Marshal.AllocHGlobal(buffer.Length);
+            Marshal.Copy(buffer, 0, nativeUnicode, buffer.Length);
+            return nativeUnicode;
+        }
+
         Cpp2Managed.Shape3D.OnGetShape deleGetShape;
         void getShape(IntPtr shapePt)
         {
@@ -72,17 +82,19 @@ namespace Wpf3DPrint.Viewer
         {
             ArrayList list = (ArrayList)args;
             string fileName = (string)list[0];
-            IntPtr fileNameSpace = NativeUtf8FromString(fileName);
             bool result = false;
             list.Clear();
             if (fileName.EndsWith(".stp") || fileName.EndsWith(".step"))
             {
+                IntPtr fileNameSpace = NativeUtf8FromString(fileName);
                 result = Cpp2Managed.Shape3D.ImportStep(fileNameSpace, getShape);
                 if (result)
                     shape.fileName = fileName;
+                Marshal.FreeHGlobal(fileNameSpace);
             }
             else if (fileName.EndsWith(".stl") || fileName.EndsWith("ast"))
             {
+                IntPtr fileNameSpace = NativeUtf8FromString(fileName);
                 IntPtr shapePt = Cpp2Managed.Shape3D.ImportStl(fileNameSpace);
                 if (shapePt != IntPtr.Zero)
                 {
@@ -90,8 +102,20 @@ namespace Wpf3DPrint.Viewer
                     shape.fileName = fileName;
                     result = true;
                 }
+                Marshal.FreeHGlobal(fileNameSpace);
             }
-            Marshal.FreeHGlobal(fileNameSpace);
+            else if (fileName.EndsWith(".dxf"))
+            {
+                IntPtr fileNameSpace = NativeUnicodeFromString(fileName);
+                IntPtr shapePt = Cpp2Managed.Shape3D.ImportDxf(fileNameSpace);
+                if (shapePt != IntPtr.Zero)
+                {
+                    shape.setShape(shapePt);
+                    shape.fileName = fileName;
+                    result = true;
+                }
+                Marshal.FreeHGlobal(fileNameSpace);
+            }
             list.Add(result);
             return list;
         }
@@ -148,6 +172,7 @@ namespace Wpf3DPrint.Viewer
             IntPtr fileName = NativeUtf8FromString(path);
             Cpp2Managed.Shape3D.exportStep(fileName, slices, shape.slice.sliceList.Count);
             Marshal.FreeHGlobal(fileName);
+            shape.fileName = path;
         }
 
         public void saveStep(string path)
@@ -156,6 +181,7 @@ namespace Wpf3DPrint.Viewer
             IntPtr[] shapeList = new IntPtr[1];
             shapeList[0] = shape.getShape();
             Cpp2Managed.Shape3D.exportStep(fileName, shapeList, 1);
+            shape.fileName = path;
         }
 
         public void sliceShape(Control control, bool locatePlane, bool gradientShape, bool noDelay, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)

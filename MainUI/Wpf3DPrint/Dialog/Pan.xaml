@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="移动" Height="272.571" Width="303.429" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Icon="/Wpf3DPrint;component/images/CloseFile.ico">
+        Title="移动" Height="272.571" Width="303.429" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Icon="/Wpf3DPrint;component/images/CloseFile.ico" ShowInTaskbar="False">
     <Grid>
         <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="185,191,0,0" VerticalAlignment="Top" Width="75" IsCancel="True" Height="19"/>
         <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="87,191,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click" Height="19"/>

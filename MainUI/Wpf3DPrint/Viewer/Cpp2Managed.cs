@@ -97,6 +97,9 @@ namespace Wpf3DPrint.Viewer
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern bool exportStep(IntPtr fileName, IntPtr[] shapeList, int length);
+
+            [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr ImportDxf(IntPtr fileName);
         }
 
         public class Slice2D

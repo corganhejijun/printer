@@ -1,4 +1,6 @@
 #include "BridgeFBO.hxx"
+#include "slice.h"
+#include "DxfReader.h"
 
 // include required OCCT headers
 #include <Standard_Version.hxx>
@@ -25,27 +27,12 @@
 #include <BRepTools.hxx>
 #include <MgtBRep.hxx>
 #include <PTColStd_PersistentTransientMap.hxx>
-//csfdb I/E
-#include <FSD_File.hxx>
-#include <ShapeSchema.hxx>
-#include <Storage_Data.hxx>
-#include <Storage_HSeqOfRoot.hxx>
-#include <Storage_Root.hxx>
-// iges I/E
-#include <IGESControl_Reader.hxx>
-#include <IGESControl_Controller.hxx>
-#include <IGESControl_Writer.hxx>
-#include <IFSelect_ReturnStatus.hxx>
-#include <Interface_Static.hxx>
 //step I/E
 #include <STEPControl_Reader.hxx>
 #include <STEPControl_Writer.hxx>
 //for stl export
 #include <StlAPI_Writer.hxx>
-//for vrml export
-#include <VrmlAPI_Writer.hxx>
 //wrapper of pure C++ classes to ref classes
-#include <NCollection_Haft.h>
 
 #include <BRepAlgo_Section.hxx>
 #include <gp_Pln.hxx>
@@ -53,15 +40,11 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
-#include <sstream>
-#include <TopTools_HSequenceOfShape.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <gp_Circ.hxx>
 #include <Geom_BSplineCurve.hxx>
 #include <TColStd_Array1OfReal.hxx>
 #include <TColgp_Array1OfPnt.hxx>
-#include <BRepBuilderAPI_MakeWire.hxx>
-#include <ShapeAnalysis_FreeBounds.hxx>
 #include <BRep_Builder.hxx>
 #include <gp_Trsf.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
@@ -75,8 +58,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <math.h>
-#include "slice.h"
 
 #define EXPORT extern "C" __declspec( dllexport )
 #define MAX_SLICE_DATA_LENGTH 256
@@ -300,6 +283,12 @@ EXPORT bool ImportSlice(char* fileName, OnGetEdge getEdge) {
     return true;
 }
 
+EXPORT void* ImportDxf(wchar_t* fileName) {
+    DxfReader dxfReader(fileName);
+    TopoDS_Shape shape = dxfReader.GetShape();
+    return new ShapeContainer(shape);
+}
+
 EXPORT void del(void* pt)
 {
     ShapeContainer* container = (ShapeContainer*)pt;
@@ -339,19 +328,6 @@ EXPORT ShapeContainer* scale(ShapeContainer* shape, double ratio, double centerX
     BRepBuilderAPI_Transform myTrans(slice, xTrsf, true);
     TopoDS_Shape newSlice = myTrans.Shape();
     return new ShapeContainer(newSlice);
-}
-
-Handle_TopTools_HSequenceOfShape getWires(TopoDS_Shape shape) {
-    Handle(TopTools_HSequenceOfShape) Edges = new TopTools_HSequenceOfShape();
-    for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
-        for (TopExp_Explorer edgeExp(anIt.Value(), TopAbs_EDGE); edgeExp.More(); edgeExp.Next()) {
-            TopoDS_Edge edge = TopoDS::Edge(edgeExp.Current());
-            Edges->Append(edge);
-        }
-    }
-    Handle(TopTools_HSequenceOfShape) Wires = new TopTools_HSequenceOfShape();
-    ShapeAnalysis_FreeBounds::ConnectEdgesToWires(Edges, Precision::Confusion(), Standard_False, Wires);
-    return Wires;
 }
 
 EXPORT void* slice(ShapeContainer* shape, double height)

@@ -29,7 +29,7 @@ namespace Wpf3DPrint.Dialog
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            unit = comboBox.Text;
+            unit = comboBox.Text.Substring(0, comboBox.Text.IndexOf("("));
             this.DialogResult = true;
         }
     }

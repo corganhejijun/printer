@@ -140,6 +140,8 @@ namespace Wpf3DPrint.Viewer
 
         public IntPtr getNotTransformShape()
         {
+            if (selectList.Count == 0)
+                return IntPtr.Zero;
             IntPtr selectPt = (IntPtr)selectList[0];
             if (moreShape != selectPt)
                 return moreShape;

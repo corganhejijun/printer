@@ -53,6 +53,7 @@ namespace Wpf3DPrint
             textBoxZRange.Text = fileReader.Shape.Zmin.ToString("0.0000") + "," + fileReader.Shape.Zmax.ToString("0.0000");
             */
             labelStatus.Content = "";
+            this.Title = "3DLT  " + fileReader.Shape.fileName;
         }
 
         private void buttonOpen_Click(object sender, RoutedEventArgs e)
@@ -64,7 +65,7 @@ namespace Wpf3DPrint
             }
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.DefaultExt = ".stp";
-            openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step|STL Mesh(*.stl;*.ast)|*.stl;*.ast";
+            openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step|STL Mesh(*.stl;*.ast)|*.stl;*.ast|Dxf file|*.dxf";
             if (openFile.ShowDialog() == false)
                 return;
             if (!fileReader.openStep(openFile.FileName, afterOpenStep))
@@ -86,15 +87,22 @@ namespace Wpf3DPrint
         {
             scene.displayShape(fileReader.Shape.getShape());
             resetView(1);
+            /*
             Dialog.DialogUnit unit = new Dialog.DialogUnit(fileReader.Shape);
             unit.Owner = this;
             unit.ShowDialog();
             this.unit = unit.Unit;
+            */
             afterOpenFile();
         }
 
-        private void buttonSave_Click(object sender, RoutedEventArgs e)
+        private void buttonSaveSlice_Click(object sender, RoutedEventArgs e)
         {
+            if (fileReader.Shape.slice.sliceList.Count == 0)
+            {
+                MessageBox.Show("没有切片文件需要保存");
+                return;
+            }
             saveSlice();
         }
 
@@ -132,6 +140,7 @@ namespace Wpf3DPrint
             if (false == saveFile.ShowDialog(this))
                 return "";
             fileReader.saveSlice(saveFile.FileName);
+            this.Title = fileReader.Shape.fileName;
             return saveFile.FileName;
         }
 
@@ -580,7 +589,6 @@ namespace Wpf3DPrint
             }
             else
                 scene.displayShape(fileReader.Shape.getMoreShape());
-            resetView(1);
             afterOpenFile();
         }
 
@@ -651,6 +659,11 @@ namespace Wpf3DPrint
 
         private void buttonSaveAs_Click(object sender, RoutedEventArgs e)
         {
+            if (fileReader.Shape.IsEmpty)
+            {
+                MessageBox.Show("未打开3D文件");
+                return;
+            }
             SaveFileDialog saveFile = new SaveFileDialog();
             saveFile.FileName = "model";
             saveFile.DefaultExt = "step";
@@ -658,6 +671,7 @@ namespace Wpf3DPrint
             if (false == saveFile.ShowDialog(this))
                 return ;
             fileReader.saveStep(saveFile.FileName);
+            this.Title = saveFile.FileName;
         }
 
         private void ButtonRoll_Click(object sender, RoutedEventArgs e)
@@ -788,6 +802,12 @@ namespace Wpf3DPrint
             fileReader.Shape.combine();
             scene.Proxy.cleanScene();
             scene.displayShape(fileReader.Shape.getShape());
+        }
+
+        private void ButtonSetCenter_Click(object sender, RoutedEventArgs e)
+        {
+            scene.Proxy.ZoomAllView();
+            slicingScene.Proxy.ZoomAllView();
         }
     }
 }

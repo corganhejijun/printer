@@ -19,8 +19,8 @@
                 <MenuItem x:Name="menuOpenFile" Header="打开..." Click="buttonOpen_Click"></MenuItem>
                 <MenuItem x:Name="menuSaveAs" Header="保存实体..." Click="buttonSaveAs_Click"></MenuItem>
                 <MenuItem x:Name="menuOpenSlice" Header="导入切片..." Click="buttonOpenSlice_Click"></MenuItem>
-                <MenuItem x:Name="menuSaveSlice" Header="导出切片..." Click="buttonSave_Click"></MenuItem>
-                <MenuItem x:Name="menuDxfSlice" Header="导出切片到RP..." Click="buttonSaveDxf_Click"></MenuItem>
+                <MenuItem x:Name="menuSaveSlice" Header="导出切片..." Click="buttonSaveSlice_Click"></MenuItem>
+                <MenuItem x:Name="menuDxfSlice" Header="导出快速成型文件..." Click="buttonSaveDxf_Click"></MenuItem>
                 <MenuItem x:Name="menuCloseFile" Header="关闭" Click="buttonClose_Click"></MenuItem>
                 <MenuItem x:Name="menuQuit" Header="退出" Click="buttonQuit_Click"></MenuItem>
             </MenuItem>
@@ -156,7 +156,7 @@
                     <RibbonTextBox x:Name="textBoxSliceThick" Label="层厚" Text="1"></RibbonTextBox>
                 </RibbonGroup>
                 <RibbonGroup Header="保存文件">
-                    <RibbonButton Label="保存切片" LargeImageSource="images/SaveSlice.ico" Click="buttonSave_Click"></RibbonButton>
+                    <RibbonButton Label="保存切片" LargeImageSource="images/SaveSlice.ico" Click="buttonSaveSlice_Click"></RibbonButton>
                 </RibbonGroup>
                 <RibbonGroup Header="关闭文件">
                     <RibbonButton Label="关闭文件" LargeImageSource="images/CloseFile.ico" Click="buttonClose_Click"></RibbonButton>
@@ -221,6 +221,9 @@
                             <ToggleButton x:Name="ButtonRoll" ToolTip="旋转" IsChecked="True" Click="ButtonRoll_Click" Checked="ButtonRoll_Checked">
                                 <Image Source="images/Roll.png" Width="24"></Image>
                             </ToggleButton>
+                            <Button x:Name="ButtonSetCenter" ToolTip="视角置中" Click="ButtonSetCenter_Click">
+                                <Image Source="images/SetCenter.png" Width="24"></Image>
+                            </Button>
                         </ToolBar>
                     </ToolBarTray>
                 </DockPanel>

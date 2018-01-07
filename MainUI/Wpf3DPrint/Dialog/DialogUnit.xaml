@@ -8,10 +8,10 @@
         Title="请设置单位" Height="189.599" Width="244.053" ShowInTaskbar="False" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <Label x:Name="label" Content="单位：" HorizontalAlignment="Left" Margin="36,33,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="82,33,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="2">
-            <ComboBoxItem Content="米"/>
-            <ComboBoxItem Content="厘米"/>
-            <ComboBoxItem Content="毫米"/>
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="82,33,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="1">
+            <ComboBoxItem Content="米(m)"/>
+            <ComboBoxItem Content="毫米(mm)"/>
+            <ComboBoxItem Content="微米(um)"/>
         </ComboBox>
         <Button x:Name="button" Content="确定" HorizontalAlignment="Left" Margin="127,96,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="button_Click"/>
         <Label x:Name="labelX" Content="Label" HorizontalAlignment="Left" Margin="42,122,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
