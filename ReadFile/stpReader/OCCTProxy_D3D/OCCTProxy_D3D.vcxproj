@@ -94,8 +94,8 @@
     <LibraryPath>$(ProjectDir)..\lib_release\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir)..\src\OpenGl;$(ProjectDir)..\inc;$(ProjectDir)..\src\InterfaceGraphic;$(ProjectDir)..\src\Standard;$(ProjectDir)..\src\Aspect;$(ProjectDir)..\src\NCollection;$(ProjectDir)..\src\Graphic3d;$(ProjectDir)..\src\TCollection;$(ProjectDir)..\src\Image;$(ProjectDir)..\src\Message;$(ProjectDir)..\src\WNT;$(ProjectDir)..\src\BVH;$(ProjectDir)..\src\gp;$(ProjectDir)..\src\Bnd;$(ProjectDir)..\src\Precision;$(ProjectDir)..\src\V3d;$(ProjectDir)..\src\PrsMgr;$(ProjectDir)..\src\AIS;$(ProjectDir)..\src\TopLoc;$(ProjectDir)..\src\TopoDS;$(ProjectDir)..\src\SelectMgr;$(ProjectDir)..\src\Prs3d;$(ProjectDir)..\src\BRep;$(ProjectDir)..\src\FSD;$(ProjectDir)..\src\Storage;$(ProjectDir)..\src\IGESControl;$(ProjectDir)..\src\Interface;$(ProjectDir)..\src\MoniTool;$(ProjectDir)..\src\TopExp;$(ProjectDir)..\src\GeomAdaptor;$(SolutionDir)\Display\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib_win32\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\src\OpenGl;$(ProjectDir)..\inc;$(ProjectDir)..\src\InterfaceGraphic;$(ProjectDir)..\src\Standard;$(ProjectDir)..\src\Aspect;$(ProjectDir)..\src\NCollection;$(ProjectDir)..\src\Graphic3d;$(ProjectDir)..\src\TCollection;$(ProjectDir)..\src\Image;$(ProjectDir)..\src\Message;$(ProjectDir)..\src\WNT;$(ProjectDir)..\src\BVH;$(ProjectDir)..\src\gp;$(ProjectDir)..\src\Bnd;$(ProjectDir)..\src\Precision;$(ProjectDir)..\src\V3d;$(ProjectDir)..\src\PrsMgr;$(ProjectDir)..\src\AIS;$(ProjectDir)..\src\TopLoc;$(ProjectDir)..\src\TopoDS;$(ProjectDir)..\src\SelectMgr;$(ProjectDir)..\src\Prs3d;$(ProjectDir)..\src\BRep;$(ProjectDir)..\src\FSD;$(ProjectDir)..\src\Storage;$(ProjectDir)..\src\IGESControl;$(ProjectDir)..\src\Interface;$(ProjectDir)..\src\MoniTool;$(ProjectDir)..\src\TopExp;$(ProjectDir)..\src\GeomAdaptor;$(SolutionDir)\Display\include\;$(SolutionDir)\ReadFile\dxflib\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib_win32\;$(SolutionDir)ReadFile\dxflib\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -178,7 +178,7 @@
       </DataExecutionPrevention>
       <ImportLibrary>$(OutDir)OCCTProxy_D3D.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>D3d9.lib;glu32.lib;opengl32.lib;freetype265.lib;TKernel.lib;TKMath.lib;TKBRep.lib;PTKernel.lib;TKPShape.lib;TKShapeSchema.lib;TKXSBase.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKIGES.lib;TKSTEP.lib;TKG2d.lib;TKStl.lib;TKVrml.lib;TKSTEPBase.lib;FWOSPlugin.lib;TKBO.lib;TKCDF.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKFillet.lib;TKHLR.lib;TKG3d.lib;TKMesh.lib;TKOffset.lib;TKPrim.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKShHealing.lib;TKBool.lib;TKTopAlgo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3d9.lib;glu32.lib;opengl32.lib;freetype265.lib;TKernel.lib;TKMath.lib;TKBRep.lib;PTKernel.lib;TKPShape.lib;TKShapeSchema.lib;TKXSBase.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKIGES.lib;TKSTEP.lib;TKG2d.lib;TKStl.lib;TKVrml.lib;TKSTEPBase.lib;FWOSPlugin.lib;TKBO.lib;TKCDF.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKFillet.lib;TKHLR.lib;TKG3d.lib;TKMesh.lib;TKOffset.lib;TKPrim.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKShHealing.lib;TKBool.lib;TKTopAlgo.lib;dxflib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

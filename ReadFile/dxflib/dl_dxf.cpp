@@ -2504,7 +2504,7 @@ void DL_Dxf::writeMText(DL_WriterA& dw,
     // Creare text chunks of 250 characters each:
     size_t length = data.text.length();
     char chunk[251];
-    int i;
+    unsigned int i;
     for (i=250; i<length; i+=250) {
         strncpy_s(chunk, 250, &data.text.c_str()[i-250], 250);
         chunk[250]='\0';
