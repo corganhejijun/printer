@@ -157,6 +157,7 @@
       <DependentUpon>Rotate.xaml</DependentUpon>
     </Compile>
     <Compile Include="DxfWriter.cs" />
+    <Compile Include="RebuildSlice.cs" />
     <Compile Include="Themes\IndentConverter.cs" />
     <Compile Include="Themes\TreeViewItemExt.cs" />
     <Compile Include="Themes\VisualTreeEx.cs" />

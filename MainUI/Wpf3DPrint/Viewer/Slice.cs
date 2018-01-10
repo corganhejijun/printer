@@ -147,5 +147,27 @@ namespace Wpf3DPrint.Viewer
             sliceList.Sort(new SliceCompare());
             sliceList.Reverse();
         }
+
+        public void combine()
+        {
+            for (int i = 0; i < sliceList.Count; i++)
+            {
+                for (int j = i + 1; j < sliceList.Count; j++)
+                {
+                    Slice.OneSlice slice1 = (Slice.OneSlice)sliceList[i];
+                    Slice.OneSlice slice2 = (Slice.OneSlice)sliceList[j];
+                    if (Math.Abs(slice1.height - slice2.height) < 0.0001)
+                    {
+                        IntPtr result = Cpp2Managed.Shape3D.combine(slice1.slice, slice2.slice);
+                        Cpp2Managed.Shape3D.del(slice1.slice);
+                        Cpp2Managed.Shape3D.del(slice2.slice);
+                        slice1.slice = result;
+                        sliceList.RemoveAt(j);
+                        i--;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

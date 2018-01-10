@@ -156,6 +156,7 @@ namespace Wpf3DPrint.Viewer
                 result = Cpp2Managed.Shape3D.ImportSlice(fileNameSpace, deleGetEdge);
             }
             Marshal.FreeHGlobal(fileNameSpace);
+            shape.slice.combine();
             shape.fileName = fileName;
             list.Add(result);
             return list;

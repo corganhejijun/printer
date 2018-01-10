@@ -87,12 +87,10 @@ namespace Wpf3DPrint
         {
             scene.displayShape(fileReader.Shape.getShape());
             resetView(1);
-            /*
             Dialog.DialogUnit unit = new Dialog.DialogUnit(fileReader.Shape);
             unit.Owner = this;
             unit.ShowDialog();
             this.unit = unit.Unit;
-            */
             afterOpenFile();
         }
 
@@ -154,10 +152,6 @@ namespace Wpf3DPrint
             scene.displaySliceCut(fileReader.Shape.getShape(), height);
             Shape shape = fileReader.Shape;
             labelStatus.Content = "总层数：" + totalSliceCnt + " 当前层数：" + shape.slice.sliceList.Count;
-            /*
-            if (shape.sliceList.Count == 1)
-                fileReader.resetView(shape.outputRatio);
-                */
         }
 
         private void onAfterSlice(object args)
@@ -171,7 +165,6 @@ namespace Wpf3DPrint
             ToolBarReset.IsEnabled = true;
             MenuMain.IsEnabled = true;
             Shape shape = fileReader.Shape;
-            //fileReader.resetView(shape.outputRatio);
             string fileName = saveSlice();
             if (fileName.Length == 0)
                 return;
@@ -460,33 +453,6 @@ namespace Wpf3DPrint
             scene.selectSlice(((Slice.OneSlice)fileReader.Shape.slice.sliceList[index]).slice);
         }
 
-        System.Windows.Forms.Timer rebuildTimer;
-        int rebuildIndex;
-        public void rebuildSlice()
-        {
-            if (rebuildTimer == null)
-                rebuildTimer = new System.Windows.Forms.Timer();
-            rebuildTimer.Tick += RebuildTimer_Elapsed;
-            rebuildTimer.Interval = 100;
-            slicingScene.Proxy.cleanScene();
-            rebuildIndex = fileReader.Shape.slice.sliceList.Count;
-            rebuildTimer.Start();
-        }
-
-        private void RebuildTimer_Elapsed(object sender, EventArgs e)
-        {
-            if (rebuildIndex == 0)
-            {
-                rebuildTimer.Stop();
-                rebuildTimer.Dispose();
-                rebuildTimer = null;
-                return;
-            }
-            Slice.OneSlice slice = (Slice.OneSlice)fileReader.Shape.slice.sliceList[rebuildIndex - 1];
-            slicingScene.Proxy.strechSlice(slice.slice, fileReader.Shape.slice.sliceThick);
-            rebuildIndex--;
-        }
-
         private void buttonRebuild_Click(object sender, RoutedEventArgs e)
         {
             if (fileReader.Shape.slice.sliceList.Count == 0)
@@ -499,7 +465,8 @@ namespace Wpf3DPrint
             if (rebuild.ShowDialog() == false)
                 return;
             setSlicingView();
-            rebuildSlice();
+            RebuildSlice rebuildSlice = new RebuildSlice(fileReader.Shape.slice, slicingScene);
+            slicingScene.Proxy.cleanScene();
         }
 
         private void GridScene_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
