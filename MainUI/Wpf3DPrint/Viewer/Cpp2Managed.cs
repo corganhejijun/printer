@@ -100,6 +100,9 @@ namespace Wpf3DPrint.Viewer
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr ImportDxf(IntPtr fileName);
+
+            [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern bool ImportDxfSlice(IntPtr theFileName, OnGetEdge getEdge);
         }
 
         public class Slice2D

@@ -123,7 +123,7 @@ void showType(TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
                 double beginX, beginY, beginZ, endX, endY, endZ;
                 addVertex(child, beginX, beginY, beginZ, endX, endY, endZ);
                 double circleData[MAX_SLICE_DATA_LENGTH] = {center.Z(), center.X(), center.Y(), first, last, circle.Radius(), beginX, beginY, endX, endY};
-                getEdge(new ShapeContainer(shape), EdgeType::circle, circleData, 10);
+                getEdge(new ShapeContainer(child), EdgeType::circle, circleData, 10);
             } else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_BSplineCurve) {
                 Handle_Geom_BSplineCurve bSpline = adpCurve.BSpline();
                 for (int i = 0; i < layer; i++)
@@ -160,14 +160,14 @@ void showType(TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
                     file << "(" << pt.X() << "," << pt.Y() << "," << pt.Z() << ") ";
                 }
                 file << endl;
-                getEdge(new ShapeContainer(shape), EdgeType::bSplice, bSplineData, length);
+                getEdge(new ShapeContainer(child), EdgeType::bSplice, bSplineData, length);
                 delete bSplineData;
             }
             else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_Line) {
                 double beginX, beginY, beginZ, endX, endY, endZ;
                 addVertex(child, beginX, beginY, beginZ, endX, endY, endZ);
                 double lineData[MAX_SLICE_DATA_LENGTH] = {beginZ, beginX, beginY, endX, endY};
-                getEdge(new ShapeContainer(shape), EdgeType::line, lineData, 5);
+                getEdge(new ShapeContainer(child), EdgeType::line, lineData, 5);
             }
             else {
                 for (int i = 0; i < layer; i++)
@@ -283,6 +283,17 @@ EXPORT bool ImportSlice(char* fileName, OnGetEdge getEdge) {
     return true;
 }
 
+EXPORT bool ImportDxfSlice(wchar_t* fileName, OnGetEdge getEdge) {
+    DxfReader dxfReader(fileName);
+    TopoDS_Shape shape = dxfReader.GetShape();
+    ofstream file("logReadDxfSlice.txt");
+    file << "begin shape" << endl;
+    showType(shape, file, getEdge);
+    file << "end shape" << endl;
+    file.close();
+    return true;
+}
+
 EXPORT void* ImportDxf(wchar_t* fileName) {
     DxfReader dxfReader(fileName);
     TopoDS_Shape shape = dxfReader.GetShape();
@@ -297,6 +308,8 @@ EXPORT void del(void* pt)
 
 EXPORT void getBoundary(ShapeContainer* shape, double* Zmin, double* Zmax, double* Ymin, double* Ymax, double* Xmin, double* Xmax)
 {
+    if (shape == NULL)
+        return;
     Bnd_Box B;
     BRepBndLib::Add(shape->getShape(), B);
     B.Get(*Xmin, *Ymin, *Zmin, *Xmax, *Ymax, *Zmax);
