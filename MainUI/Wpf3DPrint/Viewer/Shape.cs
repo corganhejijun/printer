@@ -152,24 +152,30 @@ namespace Wpf3DPrint.Viewer
 
         public void base0AllShapes()
         {
-            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
-            Cpp2Managed.Shape3D.getBoundary(shape, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
-            if (Zmin < 0.0001 && Zmin > -0.0001)
-                return;
-            IntPtr move = Cpp2Managed.Shape3D.move(shape, 0, 0, -Zmin);
-            Cpp2Managed.Shape3D.del(shape);
-            shape = move;
+            if (shape != IntPtr.Zero)
+            {
+                double Xmin = double.MinValue, Xmax = double.MaxValue, Ymin = double.MinValue, Ymax = double.MaxValue, Zmin = double.MinValue, Zmax = double.MaxValue;
+                Cpp2Managed.Shape3D.getBoundary(shape, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+                if (Zmin < 0.0001 && Zmin > -0.0001)
+                    return;
+                IntPtr move = Cpp2Managed.Shape3D.move(shape, 0, 0, -Zmin);
+                Cpp2Managed.Shape3D.del(shape);
+                shape = move;
+            }
         }
 
         public void base0XyCenter()
         {
-            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
-            Cpp2Managed.Shape3D.getBoundary(shape, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
-            double centerX = Xmin + (Xmax - Xmin) / 2;
-            double centerY = Ymin + (Ymax - Ymin) / 2;
-            IntPtr move = Cpp2Managed.Shape3D.move(shape, -centerX, -centerY, 0);
-            Cpp2Managed.Shape3D.del(shape);
-            shape = move;
+            if (shape != IntPtr.Zero)
+            {
+                double Xmin = double.MinValue, Xmax = double.MaxValue, Ymin = double.MinValue, Ymax = double.MaxValue, Zmin = double.MinValue, Zmax = double.MaxValue;
+                Cpp2Managed.Shape3D.getBoundary(shape, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+                double centerX = Xmin + (Xmax - Xmin) / 2;
+                double centerY = Ymin + (Ymax - Ymin) / 2;
+                IntPtr move = Cpp2Managed.Shape3D.move(shape, -centerX, -centerY, 0);
+                Cpp2Managed.Shape3D.del(shape);
+                shape = move;
+            }
         }
 
         public void combine()

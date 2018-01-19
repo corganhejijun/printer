@@ -148,14 +148,20 @@ namespace Wpf3DPrint.Viewer
         {
             ArrayList list = (ArrayList)args;
             string fileName = (string)list[0];
-            IntPtr fileNameSpace = NativeUtf8FromString(fileName);
             bool result = false;
             list.Clear();
             if (fileName.EndsWith(".slc"))
             {
+                IntPtr fileNameSpace = NativeUtf8FromString(fileName);
                 result = Cpp2Managed.Shape3D.ImportSlice(fileNameSpace, deleGetEdge);
+                Marshal.FreeHGlobal(fileNameSpace);
             }
-            Marshal.FreeHGlobal(fileNameSpace);
+            else if (fileName.EndsWith(".dxf"))
+            {
+                IntPtr fileNameSpace = NativeUnicodeFromString(fileName);
+                result = Cpp2Managed.Shape3D.ImportDxfSlice(fileNameSpace, deleGetEdge);
+                Marshal.FreeHGlobal(fileNameSpace);
+            }
             shape.slice.combine();
             shape.fileName = fileName;
             list.Add(result);

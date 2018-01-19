@@ -169,5 +169,61 @@ namespace Wpf3DPrint.Viewer
                 }
             }
         }
+
+        public void base0SliceList()
+        {
+            double Xmin = double.MinValue, Xmax = double.MaxValue, Ymin = double.MinValue, Ymax = double.MaxValue, Zmin = double.MinValue, Zmax = double.MaxValue;
+            foreach (OneSlice slice in sliceList)
+            {
+                if (slice.slice == IntPtr.Zero)
+                    continue;
+                double xmin = double.MinValue, xmax = double.MaxValue, ymin = double.MinValue, ymax = double.MaxValue, zmin = double.MinValue, zmax = double.MaxValue;
+                Cpp2Managed.Shape3D.getBoundary(slice.slice, ref zmin, ref zmax, ref ymin, ref ymax, ref xmin, ref xmax);
+                if (zmin < Zmin) Zmin = zmin;
+                if (zmax > Zmax) Zmax = zmax;
+            }
+            if (Zmin < 0.0001 && Zmin > -0.0001)
+                return;
+            for (int i = 0; i < sliceList.Count; i++)
+            {
+                OneSlice slice = (OneSlice)sliceList[i];
+                if (slice.slice == IntPtr.Zero)
+                    continue;
+                /*
+                IntPtr move = Cpp2Managed.Shape3D.move(slice.slice, 0, 0, -Zmin);
+                Cpp2Managed.Shape3D.del(slice.slice);
+                slice.slice = move;
+                */
+            }
+        }
+
+        public void base0XyCenter()
+        {
+            double Xmin = double.MinValue, Xmax = double.MaxValue, Ymin = double.MinValue, Ymax = double.MaxValue, Zmin = double.MinValue, Zmax = double.MaxValue;
+            foreach (OneSlice slice in sliceList)
+            {
+                double xmin = double.MinValue, xmax = double.MaxValue, ymin = double.MinValue, ymax = double.MaxValue, zmin = double.MinValue, zmax = double.MaxValue;
+                Cpp2Managed.Shape3D.getBoundary(slice.slice, ref zmin, ref zmax, ref ymin, ref ymax, ref xmin, ref xmax);
+                if (zmin < Zmin) Zmin = zmin;
+                if (zmax > Zmax) Zmax = zmax;
+                if (xmin < Xmin) Xmin = xmin;
+                if (xmax > Xmax) Xmax = xmax;
+                if (ymin < Ymin) Ymin = ymin;
+                if (ymax > Ymax) Ymax = ymax;
+            }
+            double centerX = Xmin + (Xmax - Xmin) / 2;
+            double centerY = Ymin + (Ymax - Ymin) / 2;
+            for (int i = 0; i < sliceList.Count; i++)
+            {
+                OneSlice slice = (OneSlice)sliceList[i];
+                if (slice.slice == IntPtr.Zero)
+                    continue;
+                /*
+                IntPtr move = Cpp2Managed.Shape3D.move(slice.slice, -centerX, -centerY, 0);
+                Cpp2Managed.Shape3D.del(slice.slice);
+                slice.slice = move;
+                */
+            }
+        }
     }
 }

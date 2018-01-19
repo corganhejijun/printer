@@ -65,7 +65,7 @@ namespace Wpf3DPrint
             }
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.DefaultExt = ".stp";
-            openFile.Filter = "STEP file (*.stp;*.step)|*.stp;*.step|STL Mesh(*.stl;*.ast)|*.stl;*.ast|Dxf file|*.dxf";
+            openFile.Filter = "所有实体文件(STEP; STL; DXF)|*.stp;*.step;*.stl;*.ast;*dxf|STEP file (*.stp;*.step)|*.stp;*.step|STL Mesh(*.stl;*.ast)|*.stl;*.ast|Dxf file|*.dxf";
             if (openFile.ShowDialog() == false)
                 return;
             if (!fileReader.openStep(openFile.FileName, afterOpenStep))
@@ -286,7 +286,7 @@ namespace Wpf3DPrint
             }
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.DefaultExt = ".slc";
-            openFile.Filter = "Slice file (*.slc)|*.slc";
+            openFile.Filter = "所有切片文件|*.slc;*dxf|Slice file (*.slc)|*.slc|Dxf file (*.dxf)|*.dxf";
             if (openFile.ShowDialog() == false)
                 return;
             openSlice(openFile.FileName);
@@ -309,6 +309,9 @@ namespace Wpf3DPrint
 
         private void afterOpenSlice(object workResult)
         {
+            fileReader.Shape.slice.base0SliceList();
+            fileReader.Shape.slice.base0XyCenter();
+            scene.Proxy.cleanScene();
             foreach (Slice.OneSlice slice in fileReader.Shape.slice.sliceList)
             {
                 scene.displaySlice(slice.slice);
@@ -449,6 +452,8 @@ namespace Wpf3DPrint
 
         private void selectSlice(int index)
         {
+            if (fileReader.Shape.slice.sliceList.Count == 0 || fileReader.Shape.slice.sliceList.Count <= index)
+                return;
             sliceScene.drawSlice((Slice.OneSlice)(fileReader.Shape.slice.sliceList[index]));
             scene.selectSlice(((Slice.OneSlice)fileReader.Shape.slice.sliceList[index]).slice);
         }
