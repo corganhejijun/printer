@@ -298,6 +298,9 @@ EXPORT void del(void* pt)
 EXPORT void getBoundary(ShapeContainer* shape, double* Zmin, double* Zmax, double* Ymin, double* Ymax, double* Xmin, double* Xmax)
 {
     Bnd_Box B;
+    TopoDS_Shape topoShape = shape->getShape();
+    if (topoShape.IsNull())
+        return;
     BRepBndLib::Add(shape->getShape(), B);
     B.Get(*Xmin, *Ymin, *Zmin, *Xmax, *Ymax, *Zmax);
 }
