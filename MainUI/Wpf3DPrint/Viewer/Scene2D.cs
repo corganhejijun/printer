@@ -16,8 +16,15 @@ namespace Wpf3DPrint.Viewer
             toDelList = new ArrayList();
         }
 
-        public void onResize()
+        public void resetView(Cpp2Managed.BoundBox box)
         {
+            Cpp2Managed.Slice2D.move(device, (float)(box.right - box.left) / 2, (float)(box.bottom - box.top) / 2);
+            Cpp2Managed.Slice2D.fitScreen(device, (float)(box.right - box.left), (float)(box.bottom - box.top));
+        }
+
+        public void onResize(Cpp2Managed.BoundBox box)
+        {
+            Cpp2Managed.Slice2D.fitScreen(device, (float)(box.right - box.left), (float)(box.bottom - box.top));
             Cpp2Managed.Slice2D.resizeWindow(device);
         }
 
@@ -31,9 +38,7 @@ namespace Wpf3DPrint.Viewer
         public void drawSlice(Slice.OneSlice slice)
         {
             _slice = slice;
-            Cpp2Managed.BoundBox box = new Cpp2Managed.BoundBox();
-            slice.GetBound(ref box);
-            Cpp2Managed.Slice2D.displaySlice(device, box, slice.data.Count, deleGetSliceData);
+            Cpp2Managed.Slice2D.displaySlice(device, slice.data.Count, deleGetSliceData);
             foreach (IntPtr s in toDelList)
             {
                 Marshal.FreeHGlobal(s);

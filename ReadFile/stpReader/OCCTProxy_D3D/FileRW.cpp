@@ -55,6 +55,7 @@
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
+#include <TopTools_HSequenceOfShape.hxx>
 
 #include <iostream>
 #include <fstream>
@@ -106,7 +107,7 @@ void addVertex(TopoDS_Shape shape, double& beginX, double& beginY, double& begin
     }
 }
 
-void showType(TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
+void showType(ShapeContainer* container, TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
     layer++;
     for (TopoDS_Iterator anIt(shape); anIt.More(); anIt.Next()) {
         TopoDS_Shape child = anIt.Value();
@@ -123,7 +124,7 @@ void showType(TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
                 double beginX, beginY, beginZ, endX, endY, endZ;
                 addVertex(child, beginX, beginY, beginZ, endX, endY, endZ);
                 double circleData[MAX_SLICE_DATA_LENGTH] = {center.Z(), center.X(), center.Y(), first, last, circle.Radius(), beginX, beginY, endX, endY};
-                getEdge(new ShapeContainer(child), EdgeType::circle, circleData, 10);
+                getEdge(container, EdgeType::circle, circleData, 10);
             } else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_BSplineCurve) {
                 Handle_Geom_BSplineCurve bSpline = adpCurve.BSpline();
                 for (int i = 0; i < layer; i++)
@@ -160,14 +161,14 @@ void showType(TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
                     file << "(" << pt.X() << "," << pt.Y() << "," << pt.Z() << ") ";
                 }
                 file << endl;
-                getEdge(new ShapeContainer(child), EdgeType::bSplice, bSplineData, length);
+                getEdge(container, EdgeType::bSplice, bSplineData, length);
                 delete bSplineData;
             }
             else if (adpCurve.GetType() == GeomAbs_CurveType::GeomAbs_Line) {
                 double beginX, beginY, beginZ, endX, endY, endZ;
                 addVertex(child, beginX, beginY, beginZ, endX, endY, endZ);
                 double lineData[MAX_SLICE_DATA_LENGTH] = {beginZ, beginX, beginY, endX, endY};
-                getEdge(new ShapeContainer(child), EdgeType::line, lineData, 5);
+                getEdge(container, EdgeType::line, lineData, 5);
             }
             else {
                 for (int i = 0; i < layer; i++)
@@ -185,7 +186,7 @@ void showType(TopoDS_Shape shape, ofstream& file, OnGetEdge getEdge) {
                 file << '\t';
             file << "type is " << TopAbs_ShapeEnum_str[child.ShapeType()] << endl;
         }
-        showType(child, file, getEdge);
+        showType(container, child, file, getEdge);
     }
     --layer;
 }
@@ -274,7 +275,7 @@ EXPORT bool ImportSlice(char* fileName, OnGetEdge getEdge) {
         {
             TopoDS_Shape shape = aReader.Shape(aNbShap);
             file << "begin shape" << endl;
-            showType(shape, file, getEdge);
+            showType(new ShapeContainer(shape), shape, file, getEdge);
             file << "end shape" << endl;
         }
     }
@@ -285,18 +286,26 @@ EXPORT bool ImportSlice(char* fileName, OnGetEdge getEdge) {
 
 EXPORT bool ImportDxfSlice(wchar_t* fileName, OnGetEdge getEdge) {
     DxfReader dxfReader(fileName);
-    TopoDS_Shape shape = dxfReader.GetShape();
+    TopTools_HSequenceOfShape shapeList = dxfReader.GetShape();
     ofstream file("logReadDxfSlice.txt");
-    file << "begin shape" << endl;
-    showType(shape, file, getEdge);
-    file << "end shape" << endl;
+    for (int i = 1; i <= shapeList.Length(); i++) {
+        file << "begin shape" << endl;
+        TopoDS_Shape shape = shapeList.Value(i);
+        showType(new ShapeContainer(shape), shape, file, getEdge);
+        file << "end shape" << endl;
+    }
     file.close();
     return true;
 }
 
 EXPORT void* ImportDxf(wchar_t* fileName) {
     DxfReader dxfReader(fileName);
-    TopoDS_Shape shape = dxfReader.GetShape();
+    TopTools_HSequenceOfShape shapeList = dxfReader.GetShape();
+    TopoDS_Shape shape = shapeList.Value(1);
+    for (int i = 2; i <= shapeList.Length(); i++) {
+        TopoDS_Shape shape2 = shapeList.Value(i);
+        shape = BRepAlgoAPI_Fuse(shape, shape2);
+    }
     return new ShapeContainer(shape);
 }
 
@@ -306,16 +315,17 @@ EXPORT void del(void* pt)
     delete container;
 }
 
-EXPORT void getBoundary(ShapeContainer* shape, double* Zmin, double* Zmax, double* Ymin, double* Ymax, double* Xmin, double* Xmax)
+EXPORT bool getBoundary(ShapeContainer* shape, double* Zmin, double* Zmax, double* Ymin, double* Ymax, double* Xmin, double* Xmax)
 {
     if (shape == NULL)
-        return;
+        return false;
     Bnd_Box B;
     TopoDS_Shape topoShape = shape->getShape();
     if (topoShape.IsNull())
-        return;
+        return false;
     BRepBndLib::Add(shape->getShape(), B);
     B.Get(*Xmin, *Ymin, *Zmin, *Xmax, *Ymax, *Zmax);
+    return true;
 }
 
 EXPORT void* rotate(ShapeContainer* shape, double x, double y, double z) {

@@ -206,8 +206,11 @@ namespace Wpf3DPrint.Viewer
         Cpp2Managed.Shape3D.OnGetShape deleGetLocatePlane;
         void getLocatePlane(IntPtr locatePlanePt)
         {
-            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
-            Cpp2Managed.Shape3D.getBoundary(locatePlanePt, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
+            if(!Cpp2Managed.Shape3D.getBoundary(locatePlanePt, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax))
+            {
+                Xmin = 0; Xmax = 0; Ymin = 0; Ymax = 0; Zmin = 0; Zmax = 0;
+            }
             Slice.OneSlice slice = new Slice.OneSlice(locatePlanePt, Zmin);
             locatePlaneList.Add(slice);
         }
@@ -223,8 +226,11 @@ namespace Wpf3DPrint.Viewer
             locatePlaneList.Clear();
             // 确定定位面，与定位面等高的切割线要特殊处理
             Cpp2Managed.Shape3D.getLocatPlane(shape.getShape(), deleGetLocatePlane);
-            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
-            Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
+            if(!Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax))
+            {
+                Xmin = 0; Xmax = 0; Ymin = 0; Ymax = 0; Zmin = 0; Zmax = 0;
+            }
             double height = Zmin;
             int totalSliceCnt = 0;
             if (locatePlane)

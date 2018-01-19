@@ -62,8 +62,10 @@ void SliceDevice::resetScene() {
     m_curveWith = 1;
     m_manuStepX = 1;
     m_manuStepY = 1;
-    m_sceneScale = -1;
-    m_sceneMargin = 0.1f;
+    m_sceneScale = 1;
+    m_xMove = 0;
+    m_yMove = 0;
+    m_sceneMargin = 1;
     m_precise = 1.0f;
 }
 
@@ -78,7 +80,32 @@ int SliceDevice::clearScene() {
     return S_OK;
 }
 
-int SliceDevice::drawSlice(BoundBox* boundBox, int count, GetSliceData getSlice) {
+int SliceDevice::setScale(float scale) {
+    m_sceneScale = scale;
+    return S_OK;
+}
+
+int SliceDevice::move(float x, float y) {
+    m_xMove = x; m_yMove = y;
+    return S_OK;
+}
+
+int SliceDevice::fitScreen(float width, float height) {
+    RECT rc; // Render area
+    GetClientRect(m_hWnd, &rc);
+    float rcWidth = rc.right - rc.left;
+    float rcHeight = rc.bottom - rc.top;
+    float xScale = -1;
+    if (rcWidth > 0)
+        xScale = rcWidth / (width * (1 + m_sceneMargin));
+    float yScale = -1;
+    if (rcHeight > 0)
+        yScale = rcHeight / (height * (1 + m_sceneMargin));
+    m_sceneScale = xScale < yScale ? xScale : yScale;
+    return S_OK;
+}
+
+int SliceDevice::drawSlice(int count, GetSliceData getSlice) {
     if (m_pRenderTarget == NULL)
         return E_HANDLE;
     m_pRenderTarget->BeginDraw();
@@ -94,6 +121,7 @@ int SliceDevice::drawSlice(BoundBox* boundBox, int count, GetSliceData getSlice)
 
     // 通过变换调整图像比例，使图像放大居中
     D2D1_SIZE_F size = m_pRenderTarget->GetSize();
+    /*
     float xLength = (float)(boundBox->right - boundBox->left);
     float yLength = (float)(boundBox->bottom - boundBox->top);
     float xScale = -1;
@@ -111,6 +139,10 @@ int SliceDevice::drawSlice(BoundBox* boundBox, int count, GetSliceData getSlice)
     D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(size.width / 2 + objCenterX, size.height / 2 + objCenterY);
     // 相同的比例保证缩放后不变形
     D2D1_MATRIX_3X2_F scaleTrans = D2D1::Matrix3x2F::Scale(D2D1::SizeF(1 / m_sceneScale, 1 / m_sceneScale), D2D1::Point2F());
+    m_pRenderTarget->SetTransform(scaleTrans * moveTrans);
+    */
+    D2D1_MATRIX_3X2_F scaleTrans = D2D1::Matrix3x2F::Scale(D2D1::SizeF(m_sceneScale, m_sceneScale));
+    D2D1_MATRIX_3X2_F moveTrans = D2D1::Matrix3x2F::Translation(size.width / 2 + m_xMove, size.height / 2 + m_yMove);
     m_pRenderTarget->SetTransform(scaleTrans * moveTrans);
 
     //D2D1_RECT_F rectangle = D2D1::Rect(boundBox.left, boundBox.top, boundBox.right, boundBox.bottom);
@@ -187,7 +219,7 @@ int SliceDevice::drawInterSec(vector<Point>* listX, vector<Point>* listY) {
         if (!EQU_FLOAT(pt1.x, pt2.x))
             continue;
         m_pRenderTarget->DrawLine(D2D1::Point2F((float)pt1.x, (float)pt1.y), D2D1::Point2F((float)pt2.x, (float)pt2.y),
-            m_pBlackBrush, m_curveWith * m_sceneScale);
+            m_pBlackBrush, m_curveWith / m_sceneScale);
     }
     for (vector<Point>::iterator it = listY->begin(); it < listY->end(); it += 2) {
         if (!deleteDuplicatePt(listY, it))
@@ -213,7 +245,7 @@ int SliceDevice::drawInterSec(vector<Point>* listX, vector<Point>* listY) {
         if (!EQU_FLOAT(pt1.y, pt2.y))
             continue;
         m_pRenderTarget->DrawLine(D2D1::Point2F((float)pt1.x, (float)pt1.y), D2D1::Point2F((float)pt2.x, (float)pt2.y),
-            m_pBlackBrush, m_curveWith * m_sceneScale);
+            m_pBlackBrush, m_curveWith / m_sceneScale);
     }
     return S_OK;
 }
@@ -477,7 +509,7 @@ int SliceDevice::drawLine(Line* line) {
     m_pRenderTarget->DrawLine(
         D2D1::Point2F((float)line->start.x, (float)line->start.y),
         D2D1::Point2F((float)line->end.x, (float)line->end.y),
-        m_pBlackBrush, m_curveWith * m_sceneScale);
+        m_pBlackBrush, m_curveWith / m_sceneScale);
     return S_OK;
 }
 
@@ -486,7 +518,7 @@ int SliceDevice::drawCircle(Circle* circle) {
         m_pRenderTarget->DrawEllipse(
             D2D1::Ellipse(D2D1::Point2F((float)circle->center.x, (float)circle->center.y),
                 (float)circle->radius, (float)circle->radius),
-                m_pBlackBrush, m_curveWith * m_sceneScale);
+                m_pBlackBrush, m_curveWith / m_sceneScale);
         return S_OK;
     }
     ID2D1PathGeometry *pGeometry = NULL;
@@ -500,21 +532,24 @@ int SliceDevice::drawCircle(Circle* circle) {
         return hr;
     }
     pSink->SetFillMode(D2D1_FILL_MODE_WINDING);
-    double beginX = circle->center.x + circle->radius * cos(circle->startAngle);
-    double beginY = circle->center.y + circle->radius * sin(circle->startAngle);
-    double endX = circle->center.x + circle->radius * cos(circle->endAngle);
-    double endY = circle->center.y + circle->radius * sin(circle->endAngle);
+    double beginX = circle->start.x;
+    double beginY = circle->start.y;
+    double endX = circle->end.x;
+    double endY = circle->end.y;
     D2D1_ARC_SIZE size = D2D1_ARC_SIZE_SMALL;
+    D2D1_SWEEP_DIRECTION direction = D2D1_SWEEP_DIRECTION_COUNTER_CLOCKWISE;
     if (circle->endAngle - circle->startAngle > M_PI)
         size = D2D1_ARC_SIZE_LARGE;
+    if (circle->endAngle < circle->startAngle)
+        direction = D2D1_SWEEP_DIRECTION_CLOCKWISE;
     pSink->BeginFigure(D2D1::Point2F((float)circle->start.x, (float)circle->start.y), D2D1_FIGURE_BEGIN_HOLLOW);
     pSink->AddArc(D2D1::ArcSegment(
         D2D1::Point2F((float)circle->end.x, (float)circle->end.y), D2D1::SizeF((float)circle->radius, (float)circle->radius), 0.0,
-        D2D1_SWEEP_DIRECTION_CLOCKWISE, size));
+        direction, size));
     pSink->EndFigure(D2D1_FIGURE_END_OPEN);
     pSink->Close();
     pSink->Release();
-    m_pRenderTarget->DrawGeometry(pGeometry, m_pBlackBrush, m_curveWith * m_sceneScale);
+    m_pRenderTarget->DrawGeometry(pGeometry, m_pBlackBrush, m_curveWith / m_sceneScale);
     pGeometry->Release();
     return S_OK;
 }
@@ -545,7 +580,7 @@ int SliceDevice::drawBSpline(BSpline* spline) {
     pSink->EndFigure(D2D1_FIGURE_END_OPEN);
     pSink->Close();
     pSink->Release();
-    m_pRenderTarget->DrawGeometry(pGeometry, m_pBlackBrush, m_curveWith * m_sceneScale);
+    m_pRenderTarget->DrawGeometry(pGeometry, m_pBlackBrush, m_curveWith / m_sceneScale);
     pGeometry->Release();
     return S_OK;
 }
@@ -554,6 +589,5 @@ int SliceDevice::resizeWindow() {
     RECT rc;
     GetClientRect(m_hWnd, &rc);
     m_pRenderTarget->Resize(D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top));
-    resetScene();
     return S_OK;
 }

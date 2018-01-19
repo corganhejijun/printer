@@ -309,6 +309,7 @@ namespace Wpf3DPrint
 
         private void afterOpenSlice(object workResult)
         {
+            setSliceView();
             fileReader.Shape.slice.base0SliceList();
             fileReader.Shape.slice.base0XyCenter();
             scene.Proxy.cleanScene();
@@ -325,8 +326,6 @@ namespace Wpf3DPrint
             }
             comboBoxSliceList.ItemsSource = list;
             comboBoxSliceNumber.SelectedItem = 1;
-            sliceScene.drawSlice((Slice.OneSlice)(fileReader.Shape.slice.sliceList[(int)comboBoxSliceNumber.SelectedItem - 1]));
-            setSliceView();
             TreeViewItem root = new TreeViewItem();
             root.Header = fileReader.Shape.fileName.Substring(fileReader.Shape.fileName.LastIndexOf('\\') + 1);
             foreach (int i in list)
@@ -358,13 +357,11 @@ namespace Wpf3DPrint
         {
             try {
                 int value = (int)((TreeViewItem)e.NewValue).Header;
-                selectSlice(value - 1);
                 if ((int)comboBoxSliceNumber.SelectedItem != value)
                     comboBoxSliceNumber.SelectedItem = value;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex.Message);
                 return;
             }
         }
@@ -406,14 +403,14 @@ namespace Wpf3DPrint
 
         private void PanelSlice_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
-            if (comboBoxSliceNumber.SelectedItem != null)
+            if (comboBoxSliceNumber.SelectedItem != null && fileReader.Shape.slice.sliceList.Count > (int)comboBoxSliceNumber.SelectedItem)
                 sliceScene.drawSlice((Slice.OneSlice)(fileReader.Shape.slice.sliceList[(int)comboBoxSliceNumber.SelectedItem - 1]));
         }
 
         private void PanelSlice_Resize(object sender, EventArgs e)
         {
             if (sliceScene != null)
-                sliceScene.onResize();
+                sliceScene.onResize(fileReader.Shape.slice.getBound());
         }
 
         private void ribbonMenu_Loaded(object sender, RoutedEventArgs e)
@@ -454,8 +451,10 @@ namespace Wpf3DPrint
         {
             if (fileReader.Shape.slice.sliceList.Count == 0 || fileReader.Shape.slice.sliceList.Count <= index)
                 return;
-            sliceScene.drawSlice((Slice.OneSlice)(fileReader.Shape.slice.sliceList[index]));
-            scene.selectSlice(((Slice.OneSlice)fileReader.Shape.slice.sliceList[index]).slice);
+            Slice.OneSlice slice = (Slice.OneSlice)(fileReader.Shape.slice.sliceList[index]);
+            sliceScene.drawSlice(slice);
+            scene.selectSlice(slice.slice);
+            fileReader.Shape.selectList.Add(slice.slice);
         }
 
         private void buttonRebuild_Click(object sender, RoutedEventArgs e)
@@ -780,6 +779,11 @@ namespace Wpf3DPrint
         {
             scene.Proxy.ZoomAllView();
             slicingScene.Proxy.ZoomAllView();
+        }
+
+        private void WindowsFormsHost_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            Console.WriteLine("ok");
         }
     }
 }

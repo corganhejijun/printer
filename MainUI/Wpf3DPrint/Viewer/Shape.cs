@@ -60,14 +60,7 @@ namespace Wpf3DPrint.Viewer
         public void release()
         {
             releaseTransform();
-            if (slice.sliceList.Count > 0)
-            {
-                foreach (Slice.OneSlice slice in slice.sliceList)
-                {
-                    Cpp2Managed.Shape3D.del(slice.slice);
-                }
-                slice.sliceList.Clear();
-            }
+            slice.release();
             if (moreShape != IntPtr.Zero)
             {
                 Cpp2Managed.Shape3D.del(moreShape);
@@ -154,8 +147,11 @@ namespace Wpf3DPrint.Viewer
         {
             if (shape != IntPtr.Zero)
             {
-                double Xmin = double.MinValue, Xmax = double.MaxValue, Ymin = double.MinValue, Ymax = double.MaxValue, Zmin = double.MinValue, Zmax = double.MaxValue;
-                Cpp2Managed.Shape3D.getBoundary(shape, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+                double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
+                if(!Cpp2Managed.Shape3D.getBoundary(shape, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax))
+                {
+                    Xmin = 0; Xmax = 0; Ymin = 0; Ymax = 0; Zmin = 0; Zmax = 0;
+                }
                 if (Zmin < 0.0001 && Zmin > -0.0001)
                     return;
                 IntPtr move = Cpp2Managed.Shape3D.move(shape, 0, 0, -Zmin);
@@ -168,8 +164,11 @@ namespace Wpf3DPrint.Viewer
         {
             if (shape != IntPtr.Zero)
             {
-                double Xmin = double.MinValue, Xmax = double.MaxValue, Ymin = double.MinValue, Ymax = double.MaxValue, Zmin = double.MinValue, Zmax = double.MaxValue;
-                Cpp2Managed.Shape3D.getBoundary(shape, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+                double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
+                if(!Cpp2Managed.Shape3D.getBoundary(shape, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax))
+                {
+                    Xmin = 0; Xmax = 0; Ymin = 0; Ymax = 0; Zmin = 0; Zmax = 0;
+                }
                 double centerX = Xmin + (Xmax - Xmin) / 2;
                 double centerY = Ymin + (Ymax - Ymin) / 2;
                 IntPtr move = Cpp2Managed.Shape3D.move(shape, -centerX, -centerY, 0);

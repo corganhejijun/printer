@@ -162,6 +162,8 @@ namespace Wpf3DPrint.Viewer
                         Cpp2Managed.Shape3D.del(slice1.slice);
                         Cpp2Managed.Shape3D.del(slice2.slice);
                         slice1.slice = result;
+                        foreach (object obj in slice2.data)
+                            slice1.data.Add(obj);
                         sliceList.RemoveAt(j);
                         i--;
                         break;
@@ -172,12 +174,12 @@ namespace Wpf3DPrint.Viewer
 
         public void base0SliceList()
         {
-            double Xmin = double.MinValue, Xmax = double.MaxValue, Ymin = double.MinValue, Ymax = double.MaxValue, Zmin = double.MinValue, Zmax = double.MaxValue;
+            double Zmin = double.MaxValue, Zmax = double.MinValue;
             foreach (OneSlice slice in sliceList)
             {
                 if (slice.slice == IntPtr.Zero)
                     continue;
-                double xmin = double.MinValue, xmax = double.MaxValue, ymin = double.MinValue, ymax = double.MaxValue, zmin = double.MinValue, zmax = double.MaxValue;
+                double xmin = double.MaxValue, xmax = double.MinValue, ymin = double.MaxValue, ymax = double.MinValue, zmin = double.MaxValue, zmax = double.MinValue;
                 Cpp2Managed.Shape3D.getBoundary(slice.slice, ref zmin, ref zmax, ref ymin, ref ymax, ref xmin, ref xmax);
                 if (zmin < Zmin) Zmin = zmin;
                 if (zmax > Zmax) Zmax = zmax;
@@ -189,20 +191,18 @@ namespace Wpf3DPrint.Viewer
                 OneSlice slice = (OneSlice)sliceList[i];
                 if (slice.slice == IntPtr.Zero)
                     continue;
-                /*
                 IntPtr move = Cpp2Managed.Shape3D.move(slice.slice, 0, 0, -Zmin);
                 Cpp2Managed.Shape3D.del(slice.slice);
                 slice.slice = move;
-                */
             }
         }
 
         public void base0XyCenter()
         {
-            double Xmin = double.MinValue, Xmax = double.MaxValue, Ymin = double.MinValue, Ymax = double.MaxValue, Zmin = double.MinValue, Zmax = double.MaxValue;
+            double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
             foreach (OneSlice slice in sliceList)
             {
-                double xmin = double.MinValue, xmax = double.MaxValue, ymin = double.MinValue, ymax = double.MaxValue, zmin = double.MinValue, zmax = double.MaxValue;
+                double xmin = double.MaxValue, xmax = double.MinValue, ymin = double.MaxValue, ymax = double.MinValue, zmin = double.MaxValue, zmax = double.MinValue;
                 Cpp2Managed.Shape3D.getBoundary(slice.slice, ref zmin, ref zmax, ref ymin, ref ymax, ref xmin, ref xmax);
                 if (zmin < Zmin) Zmin = zmin;
                 if (zmax > Zmax) Zmax = zmax;
@@ -218,11 +218,40 @@ namespace Wpf3DPrint.Viewer
                 OneSlice slice = (OneSlice)sliceList[i];
                 if (slice.slice == IntPtr.Zero)
                     continue;
-                /*
                 IntPtr move = Cpp2Managed.Shape3D.move(slice.slice, -centerX, -centerY, 0);
                 Cpp2Managed.Shape3D.del(slice.slice);
                 slice.slice = move;
-                */
+            }
+        }
+
+        public Cpp2Managed.BoundBox getBound()
+        {
+            Cpp2Managed.BoundBox box = new Cpp2Managed.BoundBox();
+            box.left = double.MaxValue;
+            box.top = double.MaxValue;
+            box.right = double.MinValue;
+            box.bottom = double.MinValue;
+            foreach (OneSlice slice in sliceList)
+            {
+                Cpp2Managed.BoundBox oneBox = new Cpp2Managed.BoundBox();
+                slice.GetBound(ref oneBox);
+                if (oneBox.left < box.left) box.left = oneBox.left;
+                if (oneBox.top < box.top) box.top = oneBox.top;
+                if (oneBox.right > box.right) box.right = oneBox.right;
+                if (oneBox.bottom > box.bottom) box.bottom = oneBox.bottom;
+            }
+            return box;
+        }
+
+        public void release()
+        {
+            if (sliceList.Count > 0)
+            {
+                foreach (Slice.OneSlice slice in sliceList)
+                {
+                    Cpp2Managed.Shape3D.del(slice.slice);
+                }
+                sliceList.Clear();
             }
         }
     }

@@ -246,7 +246,7 @@
                             <ColumnDefinition x:Name="columnSlice3D" Width="100*"/>
                         </Grid.ColumnDefinitions>
                         <Grid x:Name="GridSlice2D" Background="White" Grid.Column="0">
-                            <WindowsFormsHost Margin="0,0,0,0" Panel.ZIndex="-1">
+                            <WindowsFormsHost Margin="0,0,0,0" Panel.ZIndex="-1" MouseWheel="WindowsFormsHost_MouseWheel">
                                 <WinForms:Panel x:Name="PanelSlice" BackColor="White" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
                             </WindowsFormsHost>
                         </Grid>

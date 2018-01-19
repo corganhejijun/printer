@@ -16,8 +16,8 @@
 #pragma once
 
 //#define WNT
-#include <TopoDS_Shape.hxx>
 #include <BRep_Builder.hxx>
+#include <TopTools_HSequenceOfShape.hxx>
 
 #include <memory>
 
@@ -41,7 +41,7 @@ public:
     * @brief Get the shape of the dxf.
     * @return OpenCascade topology shape.
     */
-    const TopoDS_Shape& GetShape(void) const;
+    const TopTools_HSequenceOfShape GetShape(void) const;
 
 public:
     virtual void addPoint(const DL_PointData&);
@@ -63,7 +63,6 @@ public:
 private:
     std::auto_ptr<DL_Dxf> mDxf;
 
-    TopoDS_Compound mShape;
-
+    TopTools_HSequenceOfShape mShapeList;
     BRep_Builder mBuilder;
 };

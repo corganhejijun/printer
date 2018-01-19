@@ -19,6 +19,7 @@ class SliceDevice{
     ID2D1Factory* m_pD2DFactory; // Direct2D factory
     ID2D1HwndRenderTarget* m_pRenderTarget; // Render target
     ID2D1SolidColorBrush* m_pBlackBrush; // A black brush, reflect the line color
+    float m_xMove, m_yMove;
     const D2D1::ColorF CLEAR_COLOR = D2D1::ColorF(D2D1::ColorF::White);
     float m_curveWith;
     float m_manuStepX;
@@ -50,8 +51,11 @@ public:
     int init();
     void resetScene();
     int clearScene();
-    int drawSlice(BoundBox* boundBox, int count, GetSliceData getSlice);
+    int drawSlice(int count, GetSliceData getSlice);
     int resizeWindow();
+    int setScale(float scale);
+    int move(float x, float y);
+    int fitScreen(float width, float height);
 };
 
 #endif

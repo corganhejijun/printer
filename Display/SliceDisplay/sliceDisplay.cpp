@@ -11,9 +11,24 @@ void* create(void* hWnd){
     return device;
 }
 
-int displaySlice(void* device, BoundBox* box, int sliceNum, GetSliceData getSlice){
+int displaySlice(void* device, int sliceNum, GetSliceData getSlice){
     SliceDevice* cDevice = (SliceDevice*)device;
-    return cDevice->drawSlice(box, sliceNum, getSlice);
+    return cDevice->drawSlice(sliceNum, getSlice);
+}
+
+void fitScreen(void* device, float width, float height) {
+    SliceDevice* cDevice = (SliceDevice*)device;
+    cDevice->fitScreen(width, height);
+}
+
+void setScale(void* device, float scale) {
+    SliceDevice* cDevice = (SliceDevice*)device;
+    cDevice->setScale(scale);
+}
+
+void move(void* device, float x, float y) {
+    SliceDevice* cDevice = (SliceDevice*)device;
+    cDevice->move(x, y);
 }
 
 void cleanScreen(void* device) {

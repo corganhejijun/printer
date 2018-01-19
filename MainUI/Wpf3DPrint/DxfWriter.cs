@@ -54,8 +54,12 @@ namespace Wpf3DPrint
             double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
             foreach (Slice.OneSlice slice in __shape.slice.sliceList)
             {
-                double xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0;
-                Cpp2Managed.Shape3D.getBoundary(slice.slice, ref zmin, ref zmax, ref ymin, ref ymax, ref xmin, ref xmax);
+                double xmin = double.MaxValue, xmax = double.MinValue, ymin = double.MaxValue, ymax = double.MinValue, zmin = double.MaxValue, zmax = double.MinValue;
+                if(!Cpp2Managed.Shape3D.getBoundary(slice.slice, ref zmin, ref zmax, ref ymin, ref ymax, ref xmin, ref xmax))
+                {
+                    xmin = 0; xmax = 0; ymin = 0; ymax = 0; zmin = 0; zmax = 0;
+
+                }
                 if (Xmin > xmin) Xmin = xmin;
                 if (Ymin > ymin) Ymin = ymin;
                 if (Zmin > zmin) Zmin = zmin;

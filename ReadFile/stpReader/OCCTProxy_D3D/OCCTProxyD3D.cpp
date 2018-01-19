@@ -106,6 +106,7 @@ public:
         }
         myAISContext() = new AIS_InteractiveContext(myViewer());
         myAISContext()->UpdateCurrentViewer();
+        myAISContext()->SelectionColor(Quantity_NOC_BLUE1);
         myView()->MustBeResized();
         myView()->ZBufferTriedronSetup(Quantity_NOC_RED, Quantity_NOC_GREEN, Quantity_NOC_BLUE1, 0.8, 0.05, 12);
         myView()->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_BLACK, 0.05, V3d_ZBUFFER);

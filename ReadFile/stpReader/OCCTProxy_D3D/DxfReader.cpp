@@ -18,6 +18,9 @@
 #include <gp_Circ.hxx>
 #include <gp_Elips.hxx>
 
+#include <TopoDS_Shape.hxx>
+#include <BRep_Builder.hxx>
+
 #include <GC_MakeSegment.hxx>
 #include <GC_MakeCircle.hxx>
 #include <GC_MakeArcOfCircle.hxx>
@@ -36,8 +39,6 @@
 DxfReader::DxfReader(const wchar_t* fileName)
     : mDxf(new DL_Dxf())
 {
-    mBuilder.MakeCompound(mShape);
-
     mDxf->in(fileName, this);
 }
 
@@ -45,21 +46,28 @@ DxfReader::~DxfReader(void)
 {
 }
 
-const TopoDS_Shape& DxfReader::GetShape() const
+const TopTools_HSequenceOfShape DxfReader::GetShape() const
 {
-    return mShape;
+    return mShapeList;
 }
 
 void DxfReader::addPoint(const DL_PointData& point)
 {
-    mBuilder.Add(mShape, BRepBuilderAPI_MakeVertex(gp_Pnt(point.x, point.y, point.z)));
+    /*
+    TopoDS_Compound shape;
+    mBuilder.MakeCompound(shape);
+    mBuilder.Add(shape, BRepBuilderAPI_MakeVertex(gp_Pnt(point.x, point.y, point.z)));
+    */
 }
 
 void DxfReader::addLine(const DL_LineData& line)
 {
     Handle_Geom_Curve theSegment = GC_MakeSegment(gp_Pnt(line.x1, line.y1, line.z1), gp_Pnt(line.x2, line.y2, line.z2));
 
-    mBuilder.Add(mShape, BRepBuilderAPI_MakeEdge(theSegment));
+    TopoDS_Compound shape;
+    mBuilder.MakeCompound(shape);
+    mBuilder.Add(shape, BRepBuilderAPI_MakeEdge(theSegment));
+    mShapeList.Append(shape);
 }
 
 void DxfReader::addArc(const DL_ArcData &arc)
@@ -70,7 +78,10 @@ void DxfReader::addArc(const DL_ArcData &arc)
 
     Handle_Geom_Curve theArc = GC_MakeArcOfCircle(theCircle, DEG(arc.angle1), DEG(arc.angle2), false);
 
-    mBuilder.Add(mShape, BRepBuilderAPI_MakeEdge(theArc));
+    TopoDS_Compound shape;
+    mBuilder.MakeCompound(shape);
+    mBuilder.Add(shape, BRepBuilderAPI_MakeEdge(theArc));
+    mShapeList.Append(shape);
 }
 
 void DxfReader::addCircle(const DL_CircleData& circle)
@@ -81,7 +92,10 @@ void DxfReader::addCircle(const DL_CircleData& circle)
 
     Handle_Geom_Curve theCircle = GC_MakeCircle(aCircle);
 
-    mBuilder.Add(mShape, BRepBuilderAPI_MakeEdge(theCircle));
+    TopoDS_Compound shape;
+    mBuilder.MakeCompound(shape);
+    mBuilder.Add(shape, BRepBuilderAPI_MakeEdge(theCircle));
+    mShapeList.Append(shape);
 }
 
 void DxfReader::addEllipse(const DL_EllipseData& ellipse)
@@ -120,7 +134,10 @@ void DxfReader::add3dFace(const DL_3dFaceData& face)
 
     if (makeFace.IsDone())
     {
-        mBuilder.Add(mShape, makeFace.Face());
+        TopoDS_Compound shape;
+        mBuilder.MakeCompound(shape);
+        mBuilder.Add(shape, makeFace.Face());
+        mShapeList.Append(shape);
     }
 
     //mBuilder.Add(mShape, polygon.Wire());

@@ -68,12 +68,15 @@ namespace Wpf3DPrint.Dialog
             }
         }
 
-        double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
+        double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
         public DialogSlice(Viewer.Shape shape, string thick, string unit)
         {
             this.shape = shape;
             InitializeComponent();
-            Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            if (!Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax))
+            {
+                Xmin = 0; Xmax = 0; Ymin = 0; Ymax = 0; Zmin = 0; Zmax = 0;
+            }
             textBoxX.Text = (Xmax - Xmin).ToString("0.00") + " " + unit;
             textBoxX2.Text = Xmin.ToString("0.00") + "~" + Xmax.ToString("0.00") + " " + unit;
             textBoxY.Text = (Ymax - Ymin).ToString("0.00") + " " + unit;

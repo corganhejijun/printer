@@ -18,8 +18,10 @@ namespace Wpf3DPrint.Dialog
         }
         public DialogUnit(Shape shape)
         {
-            double Xmin = 0, Xmax = 0, Ymin = 0, Ymax = 0, Zmin = 0, Zmax = 0;
-            Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax);
+            double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
+            if (!Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax)) {
+                Xmin = 0; Xmax = 0; Ymin = 0; Ymax = 0; Zmin = 0; Zmax = 0;
+            }
             InitializeComponent();
             labelX.Content = "X高度：" + (Xmax - Xmin).ToString("0.00") + "; 范围：[" + Xmin.ToString("0.00") + "," + Xmax.ToString("0.00") + "]";
             labelY.Content = "Y高度：" + (Ymax - Ymin).ToString("0.00") + "; 范围：[" + Ymin.ToString("0.00") + "," + Ymax.ToString("0.00") + "]";

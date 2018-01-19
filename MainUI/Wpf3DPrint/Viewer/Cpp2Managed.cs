@@ -75,7 +75,7 @@ namespace Wpf3DPrint.Viewer
             public static extern void del(IntPtr shape);
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void getBoundary(IntPtr shape, ref double Zmin, ref double Zmax, ref double Ymin, ref double Ymax, ref double Xmin, ref double Xmax);
+            public static extern bool getBoundary(IntPtr shape, ref double Zmin, ref double Zmax, ref double Ymin, ref double Ymax, ref double Xmin, ref double Xmax);
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr rotate(IntPtr shape, double x, double y, double z);
@@ -113,7 +113,16 @@ namespace Wpf3DPrint.Viewer
             public static extern IntPtr create(IntPtr hWnd);
 
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern int displaySlice(IntPtr device2D, BoundBox box, int sliceNum, OnGetSliceData getSlice);
+            public static extern int displaySlice(IntPtr device2D, int sliceNum, OnGetSliceData getSlice);
+
+            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void setScale(IntPtr device, float scale);
+
+            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void fitScreen(IntPtr device, float width, float height);
+
+            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void move(IntPtr device, float x, float y);
 
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern void cleanScreen(IntPtr device2D);
