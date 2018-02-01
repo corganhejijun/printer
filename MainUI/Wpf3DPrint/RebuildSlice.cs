@@ -15,20 +15,28 @@ namespace Wpf3DPrint
         Cpp2Managed.Shape3D.GetFaceHole deleOnGetHole;
         ArrayList outlineList;
         ArrayList toDel;
-        public RebuildSlice(Slice slice, Scene scene)
+        public RebuildSlice(Slice slice, Scene scene, int sliceIndex = -1)
         {
-            if (rebuildTimer == null)
-                rebuildTimer = new System.Windows.Forms.Timer();
-            rebuildTimer.Tick += RebuildTimer_Elapsed;
-            rebuildTimer.Interval = 100;
-            rebuildIndex = slice.sliceList.Count;
             this.slice = slice;
             this.scene = scene;
             deleOnGetEdge = new Cpp2Managed.Shape3D.GetNextEdge(onGetEdge);
             deleOnGetHole = new Cpp2Managed.Shape3D.GetFaceHole(onGetFaceHole);
             outlineList = new ArrayList();
             toDel = new ArrayList();
-            rebuildTimer.Start();
+
+            if (sliceIndex < 0)
+            {
+                if (rebuildTimer == null)
+                    rebuildTimer = new System.Windows.Forms.Timer();
+                rebuildTimer.Tick += RebuildTimer_Elapsed;
+                rebuildTimer.Interval = 100;
+                rebuildIndex = slice.sliceList.Count;
+                rebuildTimer.Start();
+            }
+            else
+            {
+                rebuild((Slice.OneSlice)slice.sliceList[sliceIndex]);
+            }
         }
 
         IntPtr onGetEdge(ref Cpp2Managed.EdgeType type, int index)
@@ -99,6 +107,7 @@ namespace Wpf3DPrint
         Slice.OneSlice.Outline currentOutline;
         void rebuild(Slice.OneSlice oneSlice)
         {
+            outlineList.Clear();
             ArrayList outlines = oneSlice.getOutlineList();
             foreach (Slice.OneSlice.Outline outline in outlines)
             {

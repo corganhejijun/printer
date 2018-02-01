@@ -385,6 +385,16 @@ namespace Wpf3DPrint
             sliceSplitter.Width = 5;
         }
 
+        private void setRebuildView()
+        {
+            column3D.Width = new GridLength(40, GridUnitType.Star);
+            column2D.Width = new GridLength(50, GridUnitType.Star);
+            columnTree.Width = new GridLength(10, GridUnitType.Star);
+            columnSlice2D.Width = new GridLength(0, GridUnitType.Star);
+            columnSlice3D.Width = new GridLength(100, GridUnitType.Star);
+            sliceSplitter.Width = 5;
+        }
+
         private void setSliceView()
         {
             column3D.Width = new GridLength(40, GridUnitType.Star);
@@ -455,6 +465,8 @@ namespace Wpf3DPrint
             sliceScene.drawSlice(slice);
             scene.selectSlice(slice.slice);
             fileReader.Shape.selectList.Add(slice.slice);
+            slicingScene.Proxy.cleanScene();
+            RebuildSlice rebuildSlice = new RebuildSlice(fileReader.Shape.slice, slicingScene, index);
         }
 
         private void buttonRebuild_Click(object sender, RoutedEventArgs e)
@@ -468,7 +480,7 @@ namespace Wpf3DPrint
             rebuild.Owner = this;
             if (rebuild.ShowDialog() == false)
                 return;
-            setSlicingView();
+            setRebuildView();
             RebuildSlice rebuildSlice = new RebuildSlice(fileReader.Shape.slice, slicingScene);
             slicingScene.Proxy.cleanScene();
         }

@@ -433,10 +433,17 @@ TopoDS_Edge getBspline(void* data, double height) {
 
 TopoDS_Edge getCircle(void* data, double height) {
     Circle* c = (Circle*)data;
-    gp_Circ circle;
-    circle.SetLocation(gp_Pnt(c->center.x, c->center.y, height));
-    circle.SetRadius(c->radius);
-    Handle(Geom_TrimmedCurve) aArcOfCircle = GC_MakeArcOfCircle(circle, c->startAngle, c->endAngle, Standard_True);
+    if (abs(c->endAngle - c->startAngle - M_PI * 2) < 0.0001) {
+        gp_Circ circle;
+        circle.SetLocation(gp_Pnt(c->center.x, c->center.y, height));
+        circle.SetRadius(c->radius);
+        TopoDS_Edge edge = BRepBuilderAPI_MakeEdge(circle);
+        return edge;
+    }
+    //Handle(Geom_TrimmedCurve) aArcOfCircle = GC_MakeArcOfCircle(circle, gp_Pnt(c->start.x, c->start.y, height), gp_Pnt(c->end.x, c->end.y, height), Standard_True);
+    double middleAngle = (c->startAngle + c->endAngle) / 2;
+    gp_Pnt middle(c->radius*cos(middleAngle) + c->center.x, c->radius*sin(middleAngle) + c->center.y, height);
+    Handle(Geom_TrimmedCurve) aArcOfCircle = GC_MakeArcOfCircle(gp_Pnt(c->start.x, c->start.y, height), middle, gp_Pnt(c->end.x, c->end.y, height));
     TopoDS_Edge edge = BRepBuilderAPI_MakeEdge(aArcOfCircle);
     return edge;
 }
@@ -468,9 +475,9 @@ EXPORT void* slice2Wires(double height, GetNextEdge onGetEdge, int edgeCount) {
         default:continue;
         }
     }
-    Handle(TopTools_HSequenceOfShape) wires = new TopTools_HSequenceOfShape();
-    ShapeAnalysis_FreeBounds::ConnectEdgesToWires(edges, Precision::Confusion(), Standard_False, wires);
-    SequenceContainer* sqContainer = new SequenceContainer(wires);
+    //Handle(TopTools_HSequenceOfShape) wires = new TopTools_HSequenceOfShape();
+    //ShapeAnalysis_FreeBounds::ConnectEdgesToWires(edges, Precision::Confusion(), Standard_False, wires);
+    SequenceContainer* sqContainer = new SequenceContainer(edges);
     return sqContainer;
 }
 
@@ -483,30 +490,40 @@ EXPORT void* makeFaceFromWire(void* wirePt, double height, int childCnt, GetFace
         return NULL;
     BRepBuilderAPI_MakeWire mkWire;
     for (int i = 1; i <= edges->Length(); i++) {
-        mkWire.Add(TopoDS::Wire(edges->Value(i)));
+        mkWire.Add(TopoDS::Edge(edges->Value(i)));
     }
     TopoDS_Wire myWireProfile = mkWire.Wire();
     TopoDS_Face face = BRepBuilderAPI_MakeFace(myWireProfile);
-    BRepBuilderAPI_MakeFace	MF(face);
-    for (int i = 0; i < childCnt; i++) {
-        SequenceContainer* sq = (SequenceContainer*)getHole(height, i);
-        Handle(TopTools_HSequenceOfShape) hs = sq->sequence;
-        BRepBuilderAPI_MakeWire mk;
-        for (int i = 1; i <= hs->Length(); i++) {
-            mk.Add(TopoDS::Wire(hs->Value(i)));
+    ShapeContainer* sc = NULL;
+    if (childCnt > 0)
+    {
+        BRepBuilderAPI_MakeFace	MF(face);
+        for (int i = 0; i < childCnt; i++) {
+            SequenceContainer* sq = (SequenceContainer*)getHole(height, i);
+            Handle(TopTools_HSequenceOfShape) hs = sq->sequence;
+            BRepBuilderAPI_MakeWire mk;
+            for (int i = 1; i <= hs->Length(); i++) {
+                mk.Add(TopoDS::Edge(hs->Value(i)));
+            }
+            TopoDS_Wire hole = mk.Wire();
+            MF.Add(hole);
+            delete sq;
         }
-        TopoDS_Wire hole = mk.Wire();
-        MF.Add(hole);
-        delete sq;
+        if (!MF.IsDone()) {
+            return NULL;
+        }
+        Handle(ShapeFix_Shape) sfs = new ShapeFix_Shape();
+        sfs->Init(MF.Shape());
+        sfs->Perform();
+        sc = new ShapeContainer(sfs->Shape());
     }
-    if (!MF.IsDone()) {
-        return NULL;
+    else
+    {
+        Handle(ShapeFix_Shape) sfs = new ShapeFix_Shape();
+        sfs->Init(face);
+        sfs->Perform();
+        sc = new ShapeContainer(sfs->Shape());
     }
-    Handle(ShapeFix_Shape) sfs = new ShapeFix_Shape();
-    sfs->Init(MF.Shape());
-    sfs->Perform();
-    TopoDS_Shape shape = sfs->Shape();
-    ShapeContainer* sc = new ShapeContainer(shape);
     delete seqContainer;
     return sc;
 }
