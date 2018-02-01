@@ -126,6 +126,334 @@ namespace Wpf3DPrint.Viewer
                     }
                 }
             }
+
+            public class Outline
+            {
+                public ArrayList edges; // 存储data index
+                public ArrayList child;
+                public Outline parent;
+                public bool close;  // 曲线是否闭合
+
+                public Outline()
+                {
+                    child = new ArrayList();
+                    parent = null;
+                    edges = new ArrayList();
+                    close = false;
+                }
+            }
+
+            public ArrayList getOutlineList()
+            {
+                ArrayList outlineList = new ArrayList();
+                int[] found = new int[data.Count];
+                for (int i = 0; i < found.Length; i++)
+                    found[i] = -1;
+                bool finish = false;
+                Cpp2Managed.Point startPoint = new Cpp2Managed.Point();
+                Cpp2Managed.Point endPoint = new Cpp2Managed.Point();
+                Outline currentOutline = null;
+                while (!finish)
+                {
+                    int index = 0;
+                    if (currentOutline == null)
+                    {
+                        for (int i = 0; i < found.Length; i++)
+                        {
+                            if (found[i] == -1)
+                            {
+                                index = i;
+                                break;
+                            }
+                        }
+                        object item = data[index];
+                        found[index] = 1;
+                        Outline outline = new Outline();
+                        currentOutline = outline;
+                        if (item is Cpp2Managed.BSpline)
+                        {
+                            Cpp2Managed.BSpline bs = (Cpp2Managed.BSpline)item;
+                            outline.edges.Add(bs);
+                            if (Cpp2Managed.Equal(bs.end.x, bs.start.x) && Cpp2Managed.Equal(bs.end.y, bs.start.y))
+                            {
+                                outline.close = true;
+                                currentOutline = null;
+                            }
+                            else
+                            {
+                                startPoint.x = bs.start.x;
+                                startPoint.y = bs.start.y;
+                                endPoint.x = bs.end.x;
+                                endPoint.y = bs.end.y;
+                            }
+                            outlineList.Add(outline);
+                        }
+                        else if (item is Cpp2Managed.Line)
+                        {
+                            Cpp2Managed.Line line = (Cpp2Managed.Line)item;
+                            startPoint.x = line.start.x;
+                            startPoint.y = line.start.y;
+                            endPoint.x = line.end.x;
+                            endPoint.y = line.end.y;
+                            outline.edges.Add(line);
+                            outlineList.Add(outline);
+                        }
+                        else if (item is Cpp2Managed.Circle)
+                        {
+                            Cpp2Managed.Circle c = (Cpp2Managed.Circle)item;
+                            outline.edges.Add(c);
+                            if (Cpp2Managed.Equal(c.end.x, c.start.x) && Cpp2Managed.Equal(c.end.y, c.start.y))
+                            {
+                                outline.close = true;
+                                currentOutline = null;
+                            }
+                            else
+                            {
+                                startPoint.x = c.start.x;
+                                startPoint.y = c.start.y;
+                                endPoint.x = c.end.x;
+                                endPoint.y = c.end.y;
+                            }
+                            outlineList.Add(outline);
+                        }
+                    }
+                    else
+                    {
+                        int i = 0;
+                        for (; i < found.Length; i++)
+                        {
+                            if (found[i] != -1)
+                                continue;
+                            object t = data[i];
+                            if (t is Cpp2Managed.BSpline)
+                            {
+                                Cpp2Managed.BSpline bs = (Cpp2Managed.BSpline)t;
+                                if ((Cpp2Managed.Equal(bs.end.x, endPoint.x) && Cpp2Managed.Equal(bs.end.y, endPoint.y))
+                                    || (Cpp2Managed.Equal(bs.start.x, startPoint.x) && Cpp2Managed.Equal(bs.start.y, startPoint.y)))
+                                {
+                                    bs = Cpp2Managed.reverse(bs);
+                                }
+                                if (Cpp2Managed.Equal(bs.start.x, endPoint.x) && Cpp2Managed.Equal(bs.start.y, endPoint.y))
+                                {
+                                    currentOutline.edges.Add(bs);
+                                    endPoint.x = bs.end.x;
+                                    endPoint.y = bs.end.y;
+                                    found[i] = 1;
+                                }
+                                else if (Cpp2Managed.Equal(bs.end.x, startPoint.x) && Cpp2Managed.Equal(bs.end.y, startPoint.y))
+                                {
+                                    currentOutline.edges.Insert(0, bs);
+                                    startPoint.x = bs.start.x;
+                                    startPoint.y = bs.start.y;
+                                    found[i] = 1;
+                                }
+                            }
+                            else if (t is Cpp2Managed.Line)
+                            {
+                                Cpp2Managed.Line line = (Cpp2Managed.Line)t;
+                                if ((Cpp2Managed.Equal(line.end.x, endPoint.x) && Cpp2Managed.Equal(line.end.y, endPoint.y))
+                                    || (Cpp2Managed.Equal(line.start.x, startPoint.x) && Cpp2Managed.Equal(line.start.y, startPoint.y)))
+                                {
+                                    line = Cpp2Managed.reverse(line);
+                                }
+                                if (Cpp2Managed.Equal(line.start.x, endPoint.x) && Cpp2Managed.Equal(line.start.y, endPoint.y))
+                                {
+                                    currentOutline.edges.Add(line);
+                                    endPoint.x = line.end.x;
+                                    endPoint.y = line.end.y;
+                                    found[i] = 1;
+                                }
+                                else if (Cpp2Managed.Equal(line.end.x, startPoint.x) && Cpp2Managed.Equal(line.end.y, startPoint.y))
+                                {
+                                    currentOutline.edges.Insert(0, line);
+                                    startPoint.x = line.start.x;
+                                    startPoint.y = line.start.y;
+                                    found[i] = 1;
+                                }
+                            }
+                            else if (t is Cpp2Managed.Circle)
+                            {
+                                Cpp2Managed.Circle c = (Cpp2Managed.Circle)t;
+                                if ((Cpp2Managed.Equal(c.end.x, endPoint.x) && Cpp2Managed.Equal(c.end.y, endPoint.y))
+                                    || (Cpp2Managed.Equal(c.start.x, startPoint.x) && Cpp2Managed.Equal(c.start.y, startPoint.y)))
+                                {
+                                    c = Cpp2Managed.reverse(c);
+                                }
+                                if (Cpp2Managed.Equal(c.start.x, endPoint.x) && Cpp2Managed.Equal(c.start.y, endPoint.y))
+                                {
+                                    currentOutline.edges.Add(c);
+                                    endPoint.x = c.end.x;
+                                    endPoint.y = c.end.y;
+                                    found[i] = 1;
+                                }
+                                else if (Cpp2Managed.Equal(c.end.x, startPoint.x) && Cpp2Managed.Equal(c.end.y, startPoint.y))
+                                {
+                                    currentOutline.edges.Insert(0, c);
+                                    startPoint.x = c.start.x;
+                                    startPoint.y = c.start.y;
+                                    found[i] = 1;
+                                }
+                            }
+                            if (found[i] != -1)
+                            {
+                                if (Cpp2Managed.Equal(endPoint.x, startPoint.x) && Cpp2Managed.Equal(endPoint.y, startPoint.y))
+                                {
+                                    currentOutline.close = true;
+                                    currentOutline = null;
+                                }
+                                break;
+                            }
+                        }
+                        if (i == found.Length)  // 未找到下一段曲线，轮廓未闭合
+                            currentOutline = null;
+                    }
+                    int count = 0;
+                    foreach (int i in found)
+                    {
+                        if (i == -1)
+                            break;
+                        else
+                            count++;
+                    }
+                    if (count == found.Length)
+                        finish = true;
+                }
+
+                // 建立outline之间的包含关系
+                for (int i = 0; i < outlineList.Count; i++)
+                {
+                    Outline outline = (Outline)outlineList[i];
+                    for (int j = i + 1; j < outlineList.Count; j++)
+                    {
+                        Outline o = (Outline)outlineList[j];
+                        if (contain(outline, o))
+                        {
+                            outline.child.Add(o);
+                            o.parent = outline;
+                            outlineList.RemoveAt(j);
+                            break;
+                        }
+                        if (contain(o, outline))
+                        {
+                            o.child.Add(outline);
+                            outline.parent = o;
+                            outlineList[i] = o;
+                            outlineList.RemoveAt(j);
+                            break;
+                        }
+                    }
+                }
+                return outlineList;
+            }
+
+            bool contain(Outline o1, Outline o2)
+            {
+                ArrayList intersercts = new ArrayList();
+                Cpp2Managed.Point o2Point;
+                object o2Obj = (object)o2.edges[0];
+                if (o2Obj is Cpp2Managed.BSpline)
+                    o2Point = ((Cpp2Managed.BSpline)o2Obj).start;
+                else if (o2Obj is Cpp2Managed.Line)
+                    o2Point = ((Cpp2Managed.Line)o2Obj).start;
+                else if (o2Obj is Cpp2Managed.Circle)
+                    o2Point = ((Cpp2Managed.Circle)o2Obj).start;
+                else
+                    return false;
+                foreach (object obj in o1.edges)
+                {
+                    Cpp2Managed.Point start, end;
+                    if (obj is Cpp2Managed.BSpline)
+                    {
+                        Cpp2Managed.BSpline bs = (Cpp2Managed.BSpline)obj;
+                        start = bs.start;
+                        end = bs.end;
+                        int i = 0;
+                        for (; i < bs.poles.Length; i++)
+                        {
+                            end = bs.poles[i];
+                            if (Cpp2Managed.Equal(start.x, o2Point.x))
+                                break;
+                            if (Cpp2Managed.Equal(end.x, o2Point.x))
+                                break;
+                            if ((start.x > o2Point.x && end.x < o2Point.x)
+                                || (start.x < o2Point.x && end.x > o2Point.x))
+                                break;
+                            start = end;
+                        }
+                        if (i == bs.poles.Length)
+                            end = bs.end;
+                    }
+                    else if (obj is Cpp2Managed.Line)
+                    {
+                        start = ((Cpp2Managed.Line)obj).start;
+                        end = ((Cpp2Managed.Line)obj).end;
+                    }
+                    else if (obj is Cpp2Managed.Circle)
+                    {
+                        Cpp2Managed.Circle c = (Cpp2Managed.Circle)obj;
+                        start = c.start;
+                        end = c.end;
+                        double yc = c.start.y - Math.Sin(c.startAngle) * c.radius;
+                        double xc = c.start.x - Math.Cos(c.startAngle) * c.radius;
+                        double insecAngle1 = Math.Acos((o2Point.x - xc) / c.radius) / 180 * Math.PI;
+                        double insecAngle2 = -insecAngle1;
+                        if (insecAngle1 < 0)
+                            insecAngle1 += Math.PI * 2;
+                        if (insecAngle2 < 0)
+                            insecAngle2 += Math.PI * 2;
+                        if ((insecAngle1 > c.startAngle && insecAngle1 < c.endAngle)
+                            || Cpp2Managed.Equal(insecAngle1, c.startAngle) || Cpp2Managed.Equal(insecAngle1, c.endAngle))
+                        {
+                            double y = Math.Sin(insecAngle1) * c.radius + yc;
+                            intersercts.Add(y);
+                        }
+                        if ((insecAngle2 > c.startAngle && insecAngle2 < c.endAngle)
+                            || Cpp2Managed.Equal(insecAngle2, c.startAngle) || Cpp2Managed.Equal(insecAngle2, c.endAngle))
+                        {
+                            double y = Math.Sin(insecAngle2) * c.radius + yc;
+                            intersercts.Add(y);
+                        }
+                        continue;
+                    }
+                    else
+                        continue;
+                    if (Cpp2Managed.Equal(start.x, o2Point.x))
+                        intersercts.Add(start.y);
+                    else if (Cpp2Managed.Equal(end.x, o2Point.x))
+                        intersercts.Add(end.y);
+                    else if (start.x < o2Point.x && end.x < o2Point.x)
+                        continue;
+                    else if (start.x > o2Point.x && end.x > o2Point.x)
+                        continue;
+                    else
+                    {
+                        double k = (end.y - start.y) / (end.x - start.x);
+                        double b = end.y - k * end.x;
+                        double y = k * o2Point.x + b;
+                        intersercts.Add(y);
+                    }
+                }
+
+                int result = 0;
+                foreach (double y in intersercts)
+                {
+                    if (Cpp2Managed.Equal(y, o2Point.y))        // 两轮廓相交
+                        return false;
+                    if (y < o2Point.y)
+                    {
+                        if (result == 1)                        // 简易处理，只要有一个点的左右均有交点，说明该点在轮廓内部，证明o1包含o2
+                            return true;
+                        result = -1;
+                    }
+                    if (y > o2Point.y)
+                    {
+                        if (result == -1)
+                            return true;
+                        result = 1;
+                    }
+                }
+                return false;
+            }
         }
 
         public Slice()

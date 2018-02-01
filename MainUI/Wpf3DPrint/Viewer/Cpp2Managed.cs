@@ -57,10 +57,56 @@ namespace Wpf3DPrint.Viewer
             public double bottom;
         };
 
+        public static bool Equal(double x, double y)
+        {
+            if (Math.Abs(x - y) < 0.0001)
+                return true;
+            return false;
+        }
+
+        public static Circle reverse(Circle c)
+        {
+            Circle result = new Circle();
+            result.center.x = c.center.x;
+            result.center.y = c.center.y;
+            result.end.x = c.start.x;
+            result.end.y = c.start.y;
+            result.endAngle = c.startAngle;
+            result.radius = c.radius;
+            result.start.x = c.end.x;
+            result.start.y = c.end.y;
+            result.startAngle = c.endAngle;
+            return result;
+        }
+
+        public static BSpline reverse(BSpline b)
+        {
+            BSpline result = new BSpline();
+            result.start.x = b.end.x;
+            result.start.y = b.end.y;
+            result.end.x = b.start.x;
+            result.end.y = b.start.y;
+            result.poles = b.poles;
+            Array.Reverse(result.poles);
+            return result;
+        }
+
+        public static Line reverse(Line l)
+        {
+            Line result = new Line();
+            result.end.x = l.start.x;
+            result.end.y = l.start.y;
+            result.start.x = l.end.x;
+            result.start.y = l.end.y;
+            return result;
+        }
+
         public class Shape3D
         {
             public delegate void OnGetShape(IntPtr shape);
             public delegate void OnGetEdge(IntPtr shape, EdgeType type, [MarshalAs(UnmanagedType.LPArray, SizeConst = 256)]double[] data, int length);
+            public delegate IntPtr GetNextEdge(ref EdgeType type, int index);
+            public delegate IntPtr GetFaceHole(double height, int index);
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr ImportStl(IntPtr theFileName);
@@ -103,6 +149,12 @@ namespace Wpf3DPrint.Viewer
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern bool ImportDxfSlice(IntPtr theFileName, OnGetEdge getEdge);
+
+            [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr slice2Wires(double height, GetNextEdge onGetEdge, int edgeCount);
+
+            [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr makeFaceFromWire(IntPtr wire, double height, int childCnt, GetFaceHole getHole);
         }
 
         public class Slice2D

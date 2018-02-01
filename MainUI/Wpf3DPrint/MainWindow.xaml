@@ -25,6 +25,7 @@
                 <MenuItem x:Name="menuQuit" Header="退出" Click="buttonQuit_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="编辑" Width="48">
+                <MenuItem x:Name="menuUnselect" Header="取消选择" Click="menuUnselect_Click"></MenuItem>
                 <MenuItem Header="撤销"></MenuItem>
                 <MenuItem Header="重做"></MenuItem>
                 <MenuItem Header="复制"></MenuItem>
@@ -35,7 +36,6 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="图形" Width="48">
-                <MenuItem x:Name="menuUnselect" Header="取消选择" Click="menuUnselect_Click"></MenuItem>
                 <MenuItem x:Name="menuEntityProp" Header="实体属性..." Click="menuEntityProp_Click"></MenuItem>
                 <MenuItem Header="图形变换">
                     <MenuItem Header="旋转..." x:Name="menuRotate" Click="menuRotate_Click"></MenuItem>

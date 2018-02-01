@@ -876,32 +876,16 @@ public:
         return true;
     }
 
-    bool strechSlice(System::IntPtr pt, double thickness) {
-        ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
-        Handle(TopTools_HSequenceOfShape) Edges = new TopTools_HSequenceOfShape();
-        TopoDS_Shape wireShape = shape->getShape();
-        BRepBuilderAPI_MakeWire mkWire;
-        for (TopExp_Explorer faceExp(wireShape, TopAbs_COMPOUND); faceExp.More(); faceExp.Next()) {
-            for (TopExp_Explorer edgeExp(faceExp.Current(), TopAbs_EDGE); edgeExp.More(); edgeExp.Next()) {
-                TopoDS_Edge edge = TopoDS::Edge(edgeExp.Current());
-                Edges->Append(edge);
-            }
-        }
-        Handle(TopTools_HSequenceOfShape) Wires = new TopTools_HSequenceOfShape();
-        ShapeAnalysis_FreeBounds::ConnectEdgesToWires(Edges, Precision::Confusion(), Standard_False, Wires);
-        if (Wires->Length() < 1)
+    bool strechSlice(double thickness, System::IntPtr ptShape) {
+        ShapeContainer* sc = (ShapeContainer*)ptShape.ToPointer();
+        if (sc == NULL)
             return false;
-        TopoDS_Face myFaceProfile = BRepBuilderAPI_MakeFace(TopoDS::Wire(Wires->Value(1)));
-        if (Wires->Length() > 1) {
-            for (int w = 2; w <= Wires->Length(); w++) {
-                myFaceProfile = BRepBuilderAPI_MakeFace(myFaceProfile, TopoDS::Wire(Wires->Value(w)));
-            }
-        }
         gp_Vec aPrismVec(0, 0, thickness);
-        TopoDS_Shape myBody = BRepPrimAPI_MakePrism(myFaceProfile, aPrismVec);
+        TopoDS_Shape myBody = BRepPrimAPI_MakePrism(sc->getShape(), aPrismVec);
         Handle(AIS_Shape) aisShape = new AIS_Shape(myBody);
         myAISContext()->SetDisplayMode(AIS_DisplayMode::AIS_Shaded);
         myAISContext()->Display(aisShape);
+        delete sc;
         return true;
     }
 

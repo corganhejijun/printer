@@ -93,8 +93,8 @@ int SliceDevice::move(float x, float y) {
 int SliceDevice::fitScreen(float width, float height) {
     RECT rc; // Render area
     GetClientRect(m_hWnd, &rc);
-    float rcWidth = rc.right - rc.left;
-    float rcHeight = rc.bottom - rc.top;
+    float rcWidth = (float)(rc.right - rc.left);
+    float rcHeight = (float)(rc.bottom - rc.top);
     float xScale = -1;
     if (rcWidth > 0)
         xScale = rcWidth / (width * (1 + m_sceneMargin));

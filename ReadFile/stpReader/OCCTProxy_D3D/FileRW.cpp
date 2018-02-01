@@ -56,6 +56,13 @@
 #include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <TopTools_HSequenceOfShape.hxx>
+#include <ShapeAnalysis_FreeBounds.hxx>
+#include <GeomAPI_PointsToBSpline.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <GC_MakeArcOfCircle.hxx>
+#include <GC_MakeSegment.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
+#include <ShapeFix_Shape.hxx>
 
 #include <iostream>
 #include <fstream>
@@ -67,6 +74,8 @@
 
 typedef void(_stdcall *OnGetShape)(void* shape);
 typedef void(_stdcall *OnGetEdge)(void* shape, EdgeType type, double* data, int length);
+typedef void*(_stdcall *GetNextEdge)(EdgeType* type, int index);
+typedef void*(_stdcall *GetFaceHole)(double height, int index);
 
 // ============================================
 // Import / export functionality
@@ -408,4 +417,96 @@ EXPORT bool exportStep(char* fileName, ShapeContainer** shapeList, int length) {
             return false;
     }
     return aWriter.Write(fileName) == IFSelect_RetDone;
+}
+
+TopoDS_Edge getBspline(void* data, double height) {
+    BSpline* bs = (BSpline*)data;
+    TColgp_Array1OfPnt array1(1, bs->polesCnt);
+    for (int i = 0; i < bs->polesCnt; i++) {
+        gp_Pnt P(bs->poles[i].x, bs->poles[i].y, height);
+        array1.SetValue(i, P);
+    }
+    Handle(Geom_BSplineCurve) bsc1 = GeomAPI_PointsToBSpline(array1).Curve();
+    TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(bsc1);
+    return E1;
+}
+
+TopoDS_Edge getCircle(void* data, double height) {
+    Circle* c = (Circle*)data;
+    gp_Circ circle;
+    circle.SetLocation(gp_Pnt(c->center.x, c->center.y, height));
+    circle.SetRadius(c->radius);
+    Handle(Geom_TrimmedCurve) aArcOfCircle = GC_MakeArcOfCircle(circle, c->startAngle, c->endAngle, Standard_True);
+    TopoDS_Edge edge = BRepBuilderAPI_MakeEdge(aArcOfCircle);
+    return edge;
+}
+
+TopoDS_Edge getLine(void* data, double height) {
+    Line* l = (Line*)data;
+    gp_Pnt pt1(l->start.x, l->start.y, height);
+    gp_Pnt pt2(l->end.x, l->end.y, height);
+    Handle(Geom_TrimmedCurve) segment = GC_MakeSegment(pt1, pt2);
+    TopoDS_Edge edge = BRepBuilderAPI_MakeEdge(segment);
+    return edge;
+}
+
+EXPORT void* slice2Wires(double height, GetNextEdge onGetEdge, int edgeCount) {
+    Handle(TopTools_HSequenceOfShape) edges = new TopTools_HSequenceOfShape();
+    EdgeType* type = new EdgeType();
+    for (int i = 0; i < edgeCount; i++){
+        void* edge = onGetEdge(type, i);
+        switch (*type) {
+        case EdgeType::bSplice:
+            edges->Append(getBspline(edge, height));
+            break;
+        case EdgeType::circle:
+            edges->Append(getCircle(edge, height));
+            break;
+        case EdgeType::line:
+            edges->Append(getLine(edge, height));
+            break;
+        default:continue;
+        }
+    }
+    Handle(TopTools_HSequenceOfShape) wires = new TopTools_HSequenceOfShape();
+    ShapeAnalysis_FreeBounds::ConnectEdgesToWires(edges, Precision::Confusion(), Standard_False, wires);
+    SequenceContainer* sqContainer = new SequenceContainer(wires);
+    return sqContainer;
+}
+
+EXPORT void* makeFaceFromWire(void* wirePt, double height, int childCnt, GetFaceHole getHole) {
+    if (wirePt == NULL)
+        return NULL;
+    SequenceContainer* seqContainer = (SequenceContainer*)wirePt;
+    Handle(TopTools_HSequenceOfShape) edges= seqContainer->sequence;
+    if (edges->Length() < 1)
+        return NULL;
+    BRepBuilderAPI_MakeWire mkWire;
+    for (int i = 1; i <= edges->Length(); i++) {
+        mkWire.Add(TopoDS::Wire(edges->Value(i)));
+    }
+    TopoDS_Wire myWireProfile = mkWire.Wire();
+    TopoDS_Face face = BRepBuilderAPI_MakeFace(myWireProfile);
+    BRepBuilderAPI_MakeFace	MF(face);
+    for (int i = 0; i < childCnt; i++) {
+        SequenceContainer* sq = (SequenceContainer*)getHole(height, i);
+        Handle(TopTools_HSequenceOfShape) hs = sq->sequence;
+        BRepBuilderAPI_MakeWire mk;
+        for (int i = 1; i <= hs->Length(); i++) {
+            mk.Add(TopoDS::Wire(hs->Value(i)));
+        }
+        TopoDS_Wire hole = mk.Wire();
+        MF.Add(hole);
+        delete sq;
+    }
+    if (!MF.IsDone()) {
+        return NULL;
+    }
+    Handle(ShapeFix_Shape) sfs = new ShapeFix_Shape();
+    sfs->Init(MF.Shape());
+    sfs->Perform();
+    TopoDS_Shape shape = sfs->Shape();
+    ShapeContainer* sc = new ShapeContainer(shape);
+    delete seqContainer;
+    return sc;
 }
