@@ -506,17 +506,19 @@ bool sortYInterSects(Point pt1, Point pt2) {
 }
 
 int SliceDevice::drawLine(Line* line) {
+    // 屏幕坐标系与绘图坐标系的y轴相反
     m_pRenderTarget->DrawLine(
-        D2D1::Point2F((float)line->start.x, (float)line->start.y),
-        D2D1::Point2F((float)line->end.x, (float)line->end.y),
+        D2D1::Point2F((float)line->start.x, -(float)line->start.y),
+        D2D1::Point2F((float)line->end.x, -(float)line->end.y),
         m_pBlackBrush, m_curveWith / m_sceneScale);
     return S_OK;
 }
 
 int SliceDevice::drawCircle(Circle* circle) {
-    if (circle->endAngle - circle->startAngle > M_PI * 2 - 0.1) {
+    // 屏幕坐标系与绘图坐标系的y轴相反
+    if (abs(circle->endAngle - circle->startAngle - M_PI * 2) < 0.0001) {
         m_pRenderTarget->DrawEllipse(
-            D2D1::Ellipse(D2D1::Point2F((float)circle->center.x, (float)circle->center.y),
+            D2D1::Ellipse(D2D1::Point2F((float)circle->center.x, -(float)circle->center.y),
                 (float)circle->radius, (float)circle->radius),
                 m_pBlackBrush, m_curveWith / m_sceneScale);
         return S_OK;
@@ -533,18 +535,18 @@ int SliceDevice::drawCircle(Circle* circle) {
     }
     pSink->SetFillMode(D2D1_FILL_MODE_WINDING);
     double beginX = circle->start.x;
-    double beginY = circle->start.y;
+    double beginY = -circle->start.y;
     double endX = circle->end.x;
-    double endY = circle->end.y;
+    double endY = -circle->end.y;
     D2D1_ARC_SIZE size = D2D1_ARC_SIZE_SMALL;
     D2D1_SWEEP_DIRECTION direction = D2D1_SWEEP_DIRECTION_COUNTER_CLOCKWISE;
     if (circle->endAngle - circle->startAngle > M_PI)
         size = D2D1_ARC_SIZE_LARGE;
     if (circle->endAngle < circle->startAngle)
         direction = D2D1_SWEEP_DIRECTION_CLOCKWISE;
-    pSink->BeginFigure(D2D1::Point2F((float)circle->start.x, (float)circle->start.y), D2D1_FIGURE_BEGIN_HOLLOW);
+    pSink->BeginFigure(D2D1::Point2F((float)circle->start.x, -(float)circle->start.y), D2D1_FIGURE_BEGIN_HOLLOW);
     pSink->AddArc(D2D1::ArcSegment(
-        D2D1::Point2F((float)circle->end.x, (float)circle->end.y), D2D1::SizeF((float)circle->radius, (float)circle->radius), 0.0,
+        D2D1::Point2F((float)circle->end.x, -(float)circle->end.y), D2D1::SizeF((float)circle->radius, (float)circle->radius), 0.0,
         direction, size));
     pSink->EndFigure(D2D1_FIGURE_END_OPEN);
     pSink->Close();
@@ -555,6 +557,7 @@ int SliceDevice::drawCircle(Circle* circle) {
 }
 
 int SliceDevice::drawBSpline(BSpline* spline) {
+    // 屏幕坐标系与绘图坐标系的y轴相反
     ID2D1PathGeometry *pGeometry = NULL;
     ID2D1GeometrySink *pSink = NULL;
     HRESULT hr = m_pD2DFactory->CreatePathGeometry(&pGeometry);
@@ -566,17 +569,17 @@ int SliceDevice::drawBSpline(BSpline* spline) {
         return hr;
     }
     pSink->SetFillMode(D2D1_FILL_MODE_WINDING);
-    D2D1_POINT_2F point = D2D1::Point2F((float)spline->start.x, (float)spline->start.y);
+    D2D1_POINT_2F point = D2D1::Point2F((float)spline->start.x, -(float)spline->start.y);
     pSink->BeginFigure(point, D2D1_FIGURE_BEGIN_HOLLOW);
     D2D1_POINT_2F point2 = point;
     for (int i = 0; i < spline->polesCnt; i++) {
-        point2 = D2D1::Point2F((float)spline->poles[i].x, (float)spline->poles[i].y);
+        point2 = D2D1::Point2F((float)spline->poles[i].x, -(float)spline->poles[i].y);
         float x = point2.x - point.x;
-        float y = point2.y - point.y;
+        float y = -(point2.y - point.y);
         pSink->AddLine(point2);
         point = point2;
     }
-    pSink->AddLine(D2D1::Point2F((float)spline->end.x, (float)spline->end.y));
+    pSink->AddLine(D2D1::Point2F((float)spline->end.x, -(float)spline->end.y));
     pSink->EndFigure(D2D1_FIGURE_END_OPEN);
     pSink->Close();
     pSink->Release();

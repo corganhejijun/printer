@@ -440,7 +440,6 @@ TopoDS_Edge getCircle(void* data, double height) {
         TopoDS_Edge edge = BRepBuilderAPI_MakeEdge(circle);
         return edge;
     }
-    //Handle(Geom_TrimmedCurve) aArcOfCircle = GC_MakeArcOfCircle(circle, gp_Pnt(c->start.x, c->start.y, height), gp_Pnt(c->end.x, c->end.y, height), Standard_True);
     double middleAngle = (c->startAngle + c->endAngle) / 2;
     gp_Pnt middle(c->radius*cos(middleAngle) + c->center.x, c->radius*sin(middleAngle) + c->center.y, height);
     Handle(Geom_TrimmedCurve) aArcOfCircle = GC_MakeArcOfCircle(gp_Pnt(c->start.x, c->start.y, height), middle, gp_Pnt(c->end.x, c->end.y, height));
