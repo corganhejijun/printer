@@ -12,24 +12,35 @@ namespace Wpf3DPrint.Viewer
         {
             _slice = null;
             device = Cpp2Managed.Slice2D.create(panel.Handle);
+            if (device == IntPtr.Zero)
+            {
+                MessageBox.Show("初始化二维切片显示界面失败");
+                return;
+            }
             deleGetSliceData = new Cpp2Managed.Slice2D.OnGetSliceData(onGetSliceData);
             toDelList = new ArrayList();
         }
 
         public void resetView(Cpp2Managed.BoundBox box)
         {
+            if (device == IntPtr.Zero)
+                return;
             Cpp2Managed.Slice2D.move(device, (float)(box.right - box.left) / 2, (float)(box.bottom - box.top) / 2);
             Cpp2Managed.Slice2D.fitScreen(device, (float)(box.right - box.left), (float)(box.bottom - box.top));
         }
 
         public void onResize(Cpp2Managed.BoundBox box)
         {
+            if (device == IntPtr.Zero)
+                return;
             Cpp2Managed.Slice2D.fitScreen(device, (float)(box.right - box.left), (float)(box.bottom - box.top));
             Cpp2Managed.Slice2D.resizeWindow(device);
         }
 
         public void clearWindow()
         {
+            if (device == IntPtr.Zero)
+                return;
             Cpp2Managed.Slice2D.cleanScreen(device);
         }
 
@@ -37,6 +48,8 @@ namespace Wpf3DPrint.Viewer
         Slice.OneSlice _slice;
         public void drawSlice(Slice.OneSlice slice)
         {
+            if (device == IntPtr.Zero)
+                return;
             _slice = slice;
             Cpp2Managed.Slice2D.displaySlice(device, slice.data.Count, deleGetSliceData);
             foreach (IntPtr s in toDelList)
@@ -49,6 +62,8 @@ namespace Wpf3DPrint.Viewer
         ArrayList toDelList;
         IntPtr onGetSliceData(int index)
         {
+            if (device == IntPtr.Zero)
+                return IntPtr.Zero;
             IntPtr slicePt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Cpp2Managed.Slice)));
             object obj = _slice.data[index];
             Cpp2Managed.Slice slice = new Cpp2Managed.Slice();
@@ -94,12 +109,16 @@ namespace Wpf3DPrint.Viewer
 
         public void Dispose()
         {
+            if (device == IntPtr.Zero)
+                return;
             closeSlice();
             Cpp2Managed.Slice2D.release(device);
         }
 
         public void closeSlice()
         {
+            if (device == IntPtr.Zero)
+                return;
             Cpp2Managed.Slice2D.reset(device);
         }
     }

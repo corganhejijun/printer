@@ -10,6 +10,7 @@
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+void* glParam;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -18,7 +19,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 extern "C" _declspec(dllimport)void* glInit(void* hWnd);
-extern "C" _declspec(dllimport)int paint(void* hWnd);
+extern "C" _declspec(dllimport)int paint(void* hWnd, void* param);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -107,7 +108,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
       return FALSE;
    }
-   glInit(hWnd);
+   glParam = glInit(hWnd);
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
@@ -149,7 +150,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
-            paint(hWnd);
+            paint(hWnd, glParam);
             // TODO: Add any drawing code that uses hdc here...
             EndPaint(hWnd, &ps);
         }

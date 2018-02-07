@@ -221,9 +221,11 @@
                             <ToggleButton x:Name="ButtonRoll" ToolTip="旋转" IsChecked="True" Click="ButtonRoll_Click" Checked="ButtonRoll_Checked">
                                 <Image Source="images/Roll.png" Width="24"></Image>
                             </ToggleButton>
+                            <!--
                             <Button x:Name="ButtonSetCenter" ToolTip="视角置中" Click="ButtonSetCenter_Click">
                                 <Image Source="images/SetCenter.png" Width="24"></Image>
                             </Button>
+                            -->
                         </ToolBar>
                     </ToolBarTray>
                 </DockPanel>
