@@ -35,6 +35,8 @@ namespace Wpf3DPrint
             GridScene.Background = brush;
             GridSlice3D.Background = slicingBrush;
             dlgEntityEdit = null;
+            Dialog.About about = new Dialog.About();
+            this.Title += "  " + about.Version;
         }
 
         private void onOpeningFile(string fileName)

@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="关于" Height="300" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
     <Grid>
-        
+        <Label x:Name="labelVersion" Content="Label" HorizontalAlignment="Left" Margin="30,58,0,0" VerticalAlignment="Top"/>
+
     </Grid>
 </Window>
