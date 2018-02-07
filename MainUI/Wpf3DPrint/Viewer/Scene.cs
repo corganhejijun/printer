@@ -152,7 +152,6 @@ namespace Wpf3DPrint.Viewer
         {
             occtProxy.cleanScene();
             occtProxy.displayShape(shape, 0, setting.entityColor.R, setting.entityColor.G, setting.entityColor.B);
-            //occtProxy.ZoomAllView();
         }
 
         public IntPtr select(double x, double y)

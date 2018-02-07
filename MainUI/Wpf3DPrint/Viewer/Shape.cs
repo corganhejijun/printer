@@ -177,6 +177,25 @@ namespace Wpf3DPrint.Viewer
             }
         }
 
+        public bool checkBase0(ref double x, ref double y, ref double z)
+        {
+            if (shape == IntPtr.Zero)
+            {
+                return false;
+            }
+            double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
+            if (!Cpp2Managed.Shape3D.getBoundary(shape, ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax))
+            {
+                return false;
+            }
+            double centerX = Xmin + (Xmax - Xmin) / 2;
+            double centerY = Ymin + (Ymax - Ymin) / 2;
+            x = centerX; y = centerY; z = Zmin;
+            if (Zmin > 0.0001 || Zmin < -0.0001 || centerX > 0.0001 || centerX < -0.0001 || centerY > 0.0001 || centerY < -0.0001)
+                return false;
+            return true;
+        }
+
         public void combine()
         {
             IntPtr combine = Cpp2Managed.Shape3D.combine(shape, moreShape);

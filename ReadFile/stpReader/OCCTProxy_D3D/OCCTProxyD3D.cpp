@@ -288,10 +288,11 @@ public:
     /// </summary>
     void Pan(int theX, int theY)
     {
-        if (!myView().IsNull())
+        if (myView().IsNull())
         {
-            myView()->Pan(theX, theY);
+            return;
         }
+        myView()->Pan(theX, theY);
     }
 
     /// <summary>
@@ -299,10 +300,11 @@ public:
     /// </summary>
     void Rotation(int theX, int theY)
     {
-        if (!myView().IsNull())
+        if (myView().IsNull())
         {
-            myView()->Rotation(theX, theY);
+            return;
         }
+        myView()->Rotation(theX, theY);
     }
 
     /// <summary>
