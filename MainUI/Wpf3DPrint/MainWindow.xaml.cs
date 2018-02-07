@@ -88,7 +88,6 @@ namespace Wpf3DPrint
         private void displayStep(object workResult)
         {
             scene.displayShape(fileReader.Shape.getShape());
-            resetView(1);
             Dialog.DialogUnit unit = new Dialog.DialogUnit(fileReader.Shape);
             unit.Owner = this;
             unit.ShowDialog();
@@ -118,11 +117,17 @@ namespace Wpf3DPrint
                 MessageBox.Show("请先合并多个图形");
                 return;
             }
+            double x0 = 0, y0 = 0, z0 = 0;
+            if (!fileReader.Shape.checkBase0(ref x0, ref y0, ref z0))
+            {
+                if (MessageBox.Show("图形底面中心坐标为(" + x0 + "," + y0 + "," + z0 + "),未置中，要继续分层吗？", "提示", MessageBoxButton.OKCancel) != MessageBoxResult.OK)
+                    return;
+            }
             Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, textBoxSliceThick.Text, unit);
             dlSlice.Owner = this;
             if (dlSlice.ShowDialog() == false)
                 return;
-            setSlicingView();
+            setRebuildView();
             fileReader.Shape.slice.sliceThick = dlSlice.sliceThick;
             textBoxSliceThick.Text = fileReader.Shape.slice.sliceThick.ToString();
             fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, onAfterSlice, new SceneThread.onFunction(onSlice));
@@ -178,8 +183,8 @@ namespace Wpf3DPrint
 
         private void GridScene_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            scene.Resize(Convert.ToInt32(e.NewSize.Width), Convert.ToInt32(e.NewSize.Height));
-            slicingScene.Resize(Convert.ToInt32(e.NewSize.Width), Convert.ToInt32(e.NewSize.Height));
+            scene.Resize(Convert.ToInt32(GridScene.ActualWidth), Convert.ToInt32(GridScene.ActualHeight));
+            slicingScene.Resize(Convert.ToInt32(GridSlice3D.ActualWidth), Convert.ToInt32(GridSlice3D.ActualHeight));
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -218,14 +223,22 @@ namespace Wpf3DPrint
                 float ratio = 1;
                 Point p = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
                 if ((bool)ButtonRoll.IsChecked)
+                {
                     scene.Proxy.Rotation((int)p.X, (int)p.Y);
-                if ((bool)ButtonPan.IsChecked)
-                    scene.Proxy.Pan(-(int)((mouseOrigin.X - p.X)/ratio), (int)((mouseOrigin.Y - p.Y)/ratio));
-                scene.Proxy.RedrawView();
-                if ((bool)ButtonRoll.IsChecked)
                     slicingScene.Proxy.Rotation((int)p.X, (int)p.Y);
+                }
                 if ((bool)ButtonPan.IsChecked)
-                    slicingScene.Proxy.Pan(-(int)((mouseOrigin.X - p.X)/ratio), (int)((mouseOrigin.Y - p.Y)/ratio));
+                {
+                    scene.Proxy.Pan(-(int)((mouseOrigin.X - p.X) / ratio), (int)((mouseOrigin.Y - p.Y) / ratio));
+                    //slicingScene.Proxy.Pan(-(int)((mouseOrigin.X - p.X) / ratio), (int)((mouseOrigin.Y - p.Y) / ratio));
+                    unsafe
+                    {
+                        double x = 0, y = 0, z = 0;
+                        scene.Proxy.getViewPoint(&x, &y, &z);
+                        slicingScene.Proxy.setViewPoint(x, y, z);
+                    }
+                }
+                scene.Proxy.RedrawView();
                 slicingScene.Proxy.RedrawView();
                 mouseOrigin = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
             }
@@ -311,7 +324,7 @@ namespace Wpf3DPrint
 
         private void afterOpenSlice(object workResult)
         {
-            setSliceView();
+            setRebuildView();
             fileReader.Shape.slice.base0SliceList();
             fileReader.Shape.slice.base0XyCenter();
             scene.Proxy.cleanScene();
@@ -319,7 +332,6 @@ namespace Wpf3DPrint
             {
                 scene.displaySlice(slice.slice);
             }
-            resetView(1);
             afterOpenFile();
             ArrayList list = new ArrayList();
             for (int i = 0; i < fileReader.Shape.slice.sliceList.Count; i++)
@@ -371,7 +383,6 @@ namespace Wpf3DPrint
         private void set3DView()
         {
             column3D.Width = new GridLength(100, GridUnitType.Star);
-            column2D.Width = new GridLength(0, GridUnitType.Star);
             columnTree.Width = new GridLength(0, GridUnitType.Star);
             treeViewSplitter.Width = 0;
             sliceSplitter.Width = 0;
@@ -757,19 +768,6 @@ namespace Wpf3DPrint
             Dialog.DisplaySetting dspSetDlg = new Dialog.DisplaySetting(scene.Setting);
             if (false == dspSetDlg.ShowDialog())
                 return;
-        }
-
-        public void resetView(double ratio)
-        {
-            scene.Proxy.ZoomAllView();
-            double scale = scene.Proxy.getZoomScale();
-            slicingScene.Proxy.setZoomScale(scale / ratio);
-            double x = 0, y = 0, z = 0;
-            unsafe
-            {
-                scene.Proxy.getViewPoint(&x, &y, &z);
-            }
-            slicingScene.Proxy.setViewPoint(x * ratio, y * ratio, z * ratio);
         }
 
         private void menuEntityMerge_Click(object sender, RoutedEventArgs e)
