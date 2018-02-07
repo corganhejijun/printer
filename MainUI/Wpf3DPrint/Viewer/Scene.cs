@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace Wpf3DPrint.Viewer
 {
-    class Scene
+    class Scene : IDisposable
     {
         IntPtr d3DRender;
         D3DImage d3DImage = new D3DImage();
@@ -80,6 +80,7 @@ namespace Wpf3DPrint.Viewer
             if (d3DRender != IntPtr.Zero)
                 Direct3DProxy.ReleaseRender(ref d3DRender);
             d3DColorSurface = IntPtr.Zero;
+            occtProxy.Dispose();
         }
 
         private WndSize proxyWndSize = new WndSize(1, 1);
@@ -157,6 +158,11 @@ namespace Wpf3DPrint.Viewer
         public IntPtr select(double x, double y)
         {
             return occtProxy.Select((int)x, (int)y);
+        }
+
+        public void Dispose()
+        {
+            stopRender();
         }
     }
 }

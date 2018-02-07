@@ -127,7 +127,7 @@ namespace Wpf3DPrint
             dlSlice.Owner = this;
             if (dlSlice.ShowDialog() == false)
                 return;
-            setRebuildView();
+            setSlicingView();
             fileReader.Shape.slice.sliceThick = dlSlice.sliceThick;
             textBoxSliceThick.Text = fileReader.Shape.slice.sliceThick.ToString();
             fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, onAfterSlice, new SceneThread.onFunction(onSlice));
@@ -143,7 +143,10 @@ namespace Wpf3DPrint
             saveFile.DefaultExt = "slc";
             saveFile.Filter = "Slice file (*.slc)|*.slc";
             if (false == saveFile.ShowDialog(this))
+            {
+                setSlicingView();
                 return "";
+            }
             fileReader.saveSlice(saveFile.FileName);
             this.Title = fileReader.Shape.fileName;
             return saveFile.FileName;
@@ -185,15 +188,6 @@ namespace Wpf3DPrint
         {
             scene.Resize(Convert.ToInt32(GridScene.ActualWidth), Convert.ToInt32(GridScene.ActualHeight));
             slicingScene.Resize(Convert.ToInt32(GridSlice3D.ActualWidth), Convert.ToInt32(GridSlice3D.ActualHeight));
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            fileReader.Shape.release();
-            scene.Proxy.cleanScene();
-            slicingScene.Proxy.cleanScene();
-            fileReader.Dispose();
-            sliceScene.Dispose();
         }
 
         bool beginRotate = false;
@@ -384,6 +378,7 @@ namespace Wpf3DPrint
         {
             column3D.Width = new GridLength(100, GridUnitType.Star);
             columnTree.Width = new GridLength(0, GridUnitType.Star);
+            column2D.Width = new GridLength(0, GridUnitType.Star);
             treeViewSplitter.Width = 0;
             sliceSplitter.Width = 0;
         }
@@ -618,6 +613,12 @@ namespace Wpf3DPrint
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            fileReader.Shape.release();
+            scene.Dispose();
+            slicingScene.Dispose();
+            fileReader.Dispose();
+            sliceScene.Dispose();
+            System.Environment.Exit(0);
         }
 
         private void menuMove_Click(object sender, RoutedEventArgs e)

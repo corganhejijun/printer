@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Wpf3DPrint"
         xmlns:WinForms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="3DLT" Height="686" Width="1043" Closed="Window_Closed" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        Title="3DLT" Height="686" Width="1043" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Grid x:Name="GridMain">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
