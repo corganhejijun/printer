@@ -249,7 +249,7 @@
                         </Grid.ColumnDefinitions>
                         <Grid x:Name="GridSlice2D" Background="White" Grid.Column="0">
                             <WindowsFormsHost Margin="0,0,0,0" Panel.ZIndex="-1" MouseWheel="WindowsFormsHost_MouseWheel">
-                                <WinForms:Panel x:Name="PanelSlice" BackColor="White" Paint="PanelSlice_Paint" Resize="PanelSlice_Resize" Margin="50,50,50,50"></WinForms:Panel>
+                                <WinForms:Panel x:Name="PanelSlice" BackColor="White" Resize="PanelSlice_Resize" Margin="50,50,50,50" Paint="PanelSlice_Paint"></WinForms:Panel>
                             </WindowsFormsHost>
                         </Grid>
                         <Grid x:Name="GridSlice3D" Grid.Column="1" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel"></Grid>

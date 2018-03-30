@@ -25,8 +25,8 @@
         <Label x:Name="label1" Content="图形排样" HorizontalAlignment="Left" Margin="14,262,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="checkBoxAuto" Content="自动" HorizontalAlignment="Left" Margin="77,268,0,0" VerticalAlignment="Top" IsChecked="True" Checked="checkBoxAuto_Checked" IsEnabled="False"/>
         <CheckBox x:Name="checkBoxManual" Content="手动" HorizontalAlignment="Left" Margin="138,268,0,0" VerticalAlignment="Top" Checked="checkBoxManual_Checked" IsEnabled="False"/>
-        <Label x:Name="label1_Copy" Content="图形边界处理(分区域中连续交界)" HorizontalAlignment="Left" Margin="14,292,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="213,296,0,0" VerticalAlignment="Top" Width="88" SelectedIndex="0" RenderTransformOrigin="0.511,0.444" IsEnabled="False">
+        <Label x:Name="label1_Copy" Content="图形边界处理(分区域中连续交界)" HorizontalAlignment="Left" Margin="14,292,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="213,296,0,0" VerticalAlignment="Top" Width="88" SelectedIndex="0" RenderTransformOrigin="0.511,0.444" IsEnabled="False" Visibility="Hidden">
             <ComboBoxItem Content="独立刀补"/>
             <ComboBoxItem Content="单边刀补"/>
             <ComboBoxItem Content="融合(无刀补)"/>

@@ -157,6 +157,7 @@ namespace Wpf3DPrint.Viewer
             public static extern IntPtr makeFaceFromWire(IntPtr wire, double height, int childCnt, GetFaceHole getHole);
         }
 
+        /*
         public class Slice2D
         {
             public delegate IntPtr OnGetSliceData(int index);
@@ -168,10 +169,7 @@ namespace Wpf3DPrint.Viewer
             public static extern int displaySlice(IntPtr device2D, int sliceNum, OnGetSliceData getSlice);
 
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void setScale(IntPtr device, float scale);
-
-            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void fitScreen(IntPtr device, float width, float height);
+            public static extern void fitScreen(IntPtr device, float left, float top, float width, float height);
 
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern void move(IntPtr device, float x, float y);
@@ -180,13 +178,11 @@ namespace Wpf3DPrint.Viewer
             public static extern void cleanScreen(IntPtr device2D);
 
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void resizeWindow(IntPtr device2D);
-
-            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern void release(IntPtr device2D);
 
             [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern void reset(IntPtr device);
         }
+        */
     }
 }

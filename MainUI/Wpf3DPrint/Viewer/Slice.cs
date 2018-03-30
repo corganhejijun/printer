@@ -84,17 +84,17 @@ namespace Wpf3DPrint.Viewer
 
             void setBoundBox(ref Cpp2Managed.BoundBox box, double top, double bottom, double left, double right)
             {
-                double t = top < bottom ? top : bottom;
-                double b = top < bottom ? bottom : top;
+                double t = top > bottom ? top : bottom;
+                double b = top > bottom ? bottom : top;
                 double l = left < right ? left : right;
                 double r = left < right ? right : left;
                 if (box.left > l)
                     box.left = l;
                 if (box.right < r)
                     box.right = r;
-                if (box.top > t)
+                if (box.top < t)
                     box.top = t;
-                if (box.bottom < b)
+                if (box.bottom > b)
                     box.bottom = b;
             }
 
@@ -556,17 +556,21 @@ namespace Wpf3DPrint.Viewer
         {
             Cpp2Managed.BoundBox box = new Cpp2Managed.BoundBox();
             box.left = double.MaxValue;
-            box.top = double.MaxValue;
             box.right = double.MinValue;
-            box.bottom = double.MinValue;
+            box.top = double.MinValue;
+            box.bottom = double.MaxValue;
             foreach (OneSlice slice in sliceList)
             {
                 Cpp2Managed.BoundBox oneBox = new Cpp2Managed.BoundBox();
+                oneBox.left = double.MaxValue;
+                oneBox.right = double.MinValue;
+                oneBox.top = double.MinValue;
+                oneBox.bottom = double.MaxValue;
                 slice.GetBound(ref oneBox);
                 if (oneBox.left < box.left) box.left = oneBox.left;
-                if (oneBox.top < box.top) box.top = oneBox.top;
                 if (oneBox.right > box.right) box.right = oneBox.right;
-                if (oneBox.bottom > box.bottom) box.bottom = oneBox.bottom;
+                if (oneBox.top > box.top) box.top = oneBox.top;
+                if (oneBox.bottom < box.bottom) box.bottom = oneBox.bottom;
             }
             return box;
         }

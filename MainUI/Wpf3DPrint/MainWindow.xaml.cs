@@ -120,7 +120,7 @@ namespace Wpf3DPrint
             double x0 = 0, y0 = 0, z0 = 0;
             if (!fileReader.Shape.checkBase0(ref x0, ref y0, ref z0))
             {
-                if (MessageBox.Show("图形底面中心坐标为(" + x0 + "," + y0 + "," + z0 + "),未置中，要继续分层吗？", "提示", MessageBoxButton.OKCancel) != MessageBoxResult.OK)
+                if (MessageBox.Show("图形底面中心坐标为(" + x0.ToString("0.000") + "," + y0.ToString("0.000") + "," + z0.ToString("0.000") + "),未居中，要继续分层吗？", "提示", MessageBoxButton.OKCancel) != MessageBoxResult.OK)
                     return;
             }
             Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, textBoxSliceThick.Text, unit);
@@ -278,7 +278,6 @@ namespace Wpf3DPrint
         {
             scene.Proxy.cleanScene();
             slicingScene.Proxy.cleanScene();
-            sliceScene.closeSlice();
             sliceScene.clearWindow();
             TreeView_Slice.Items.Clear();
             fileReader.Shape.release();
@@ -318,7 +317,7 @@ namespace Wpf3DPrint
 
         private void afterOpenSlice(object workResult)
         {
-            setRebuildView();
+            setSliceView();
             fileReader.Shape.slice.base0SliceList();
             fileReader.Shape.slice.base0XyCenter();
             scene.Proxy.cleanScene();
@@ -422,7 +421,7 @@ namespace Wpf3DPrint
         private void PanelSlice_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
             if (comboBoxSliceNumber.SelectedItem != null && fileReader.Shape.slice.sliceList.Count > (int)comboBoxSliceNumber.SelectedItem)
-                sliceScene.drawSlice((Slice.OneSlice)(fileReader.Shape.slice.sliceList[(int)comboBoxSliceNumber.SelectedItem - 1]));
+                sliceScene.drawSlice(e, (Slice.OneSlice)(fileReader.Shape.slice.sliceList[(int)comboBoxSliceNumber.SelectedItem - 1]));
         }
 
         private void PanelSlice_Resize(object sender, EventArgs e)
@@ -470,11 +469,11 @@ namespace Wpf3DPrint
             if (fileReader.Shape.slice.sliceList.Count == 0 || fileReader.Shape.slice.sliceList.Count <= index)
                 return;
             Slice.OneSlice slice = (Slice.OneSlice)(fileReader.Shape.slice.sliceList[index]);
-            sliceScene.drawSlice(slice);
             scene.selectSlice(slice.slice);
             fileReader.Shape.selectList.Add(slice.slice);
             slicingScene.Proxy.cleanScene();
-            RebuildSlice rebuildSlice = new RebuildSlice(fileReader.Shape.slice, slicingScene, index);
+            PanelSlice.Invalidate();
+            //RebuildSlice rebuildSlice = new RebuildSlice(fileReader.Shape.slice, slicingScene, index);
         }
 
         private void buttonRebuild_Click(object sender, RoutedEventArgs e)
