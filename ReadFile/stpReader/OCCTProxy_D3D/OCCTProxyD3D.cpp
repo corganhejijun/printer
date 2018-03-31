@@ -298,13 +298,22 @@ public:
     /// <summary>
     ///Rotation
     /// </summary>
-    void Rotation(int theX, int theY)
+    void Rotation(int theX, int theY, double* x, double* y, double* z)
     {
         if (myView().IsNull())
         {
             return;
         }
         myView()->Rotation(theX, theY);
+        myView()->Proj(*x, *y, *z);
+    }
+
+    void setProjection(double x, double y, double z) {
+        if (myView().IsNull())
+        {
+            return;
+        }
+        myView()->SetProj(x, y, z);
     }
 
     /// <summary>

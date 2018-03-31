@@ -12,6 +12,12 @@ namespace Wpf3DPrint.Viewer
         double m_scale;
         double m_top;
         double m_left;
+        bool EQUAL(double a, double b)
+        {
+            if (a > b - 0.001 && a < b + 0.001)
+                return true;
+            return false;
+        }
         public Scene2D(Panel panel)
         {
             m_panel = panel;
@@ -74,15 +80,35 @@ namespace Wpf3DPrint.Viewer
             }
             else if (obj is Cpp2Managed.Circle)
             {
+                Random ran = new Random();
                 Cpp2Managed.Circle circle = (Cpp2Managed.Circle)obj;
-                Pen pen = new Pen(Color.FromArgb(255, 0, 0, 0));
+                Pen pen = new Pen(Color.FromArgb(255, ran.Next(0, 255), ran.Next(0, 255), ran.Next(0, 255)));
                 double x = circle.center.x - circle.radius;
                 double y = circle.center.y + circle.radius;
                 double width = 2 * circle.radius * m_scale;
                 // DrawArc will draw clockwise but we defined arc angles anticlockwise
-                double startAngle = 360 - circle.startAngle / Math.PI * 180;
-                double sweepAngle = 360 - circle.endAngle / Math.PI * 180 - startAngle;
-                g.DrawArc(pen, (float)coordinateXTrans(x), (float)coordinateYTrans(y), (float)width, (float)width, (float)startAngle, (float)sweepAngle);
+                // start and end angle may be wrong, recalculate angles by start and end points
+                double dy = circle.start.y - circle.center.y;
+                double dx = circle.start.x - circle.center.x;
+                double startAngle = Math.Atan(dy / dx) / Math.PI * 180;
+                if (startAngle < 0)
+                    startAngle += 180;
+                if (dy < 0)
+                    startAngle += 180;
+                double dy1 = circle.end.y - circle.center.y;
+                double dx1 = circle.end.x - circle.center.x;
+                double endAngle = Math.Atan(dy1 / dx1) / Math.PI * 180;
+                if (endAngle < 0)
+                    endAngle += 180;
+                if (dy1 < 0)
+                    endAngle += 180;
+                if (EQUAL(endAngle, 0) && EQUAL(circle.endAngle, Math.PI * 2))
+                    endAngle = 360;
+                double sweepAngle = (circle.endAngle - circle.startAngle) / Math.PI * 180;
+                if (endAngle > startAngle)
+                    g.DrawArc(pen, (float)coordinateXTrans(x), (float)coordinateYTrans(y), (float)width, (float)width, (float)(360 - endAngle), (float)sweepAngle);
+                else
+                    g.DrawArc(pen, (float)coordinateXTrans(x), (float)coordinateYTrans(y), (float)width, (float)width, (float)(360 - startAngle), (float)sweepAngle);
             }
         }
 

@@ -156,33 +156,5 @@ namespace Wpf3DPrint.Viewer
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr makeFaceFromWire(IntPtr wire, double height, int childCnt, GetFaceHole getHole);
         }
-
-        /*
-        public class Slice2D
-        {
-            public delegate IntPtr OnGetSliceData(int index);
-
-            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern IntPtr create(IntPtr hWnd);
-
-            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern int displaySlice(IntPtr device2D, int sliceNum, OnGetSliceData getSlice);
-
-            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void fitScreen(IntPtr device, float left, float top, float width, float height);
-
-            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void move(IntPtr device, float x, float y);
-
-            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void cleanScreen(IntPtr device2D);
-
-            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void release(IntPtr device2D);
-
-            [DllImport("SliceDisplay.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void reset(IntPtr device);
-        }
-        */
     }
 }
