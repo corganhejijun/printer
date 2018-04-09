@@ -72,7 +72,7 @@ namespace Wpf3DPrint
             }
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.DefaultExt = ".stp";
-            openFile.Filter = "所有实体文件(STEP; STL; DXF)|*.stp;*.step;*.stl;*.ast;*dxf|STEP file (*.stp;*.step)|*.stp;*.step|STL Mesh(*.stl;*.ast)|*.stl;*.ast|Dxf file|*.dxf";
+            openFile.Filter = "所有实体文件(STEP; STL)|*.stp;*.step;*.stl;*.ast|STEP file (*.stp;*.step)|*.stp;*.step|STL Mesh(*.stl;*.ast)|*.stl;*.ast";
             if (openFile.ShowDialog() == false)
                 return;
             if (!fileReader.openStep(openFile.FileName, afterOpenStep))
@@ -484,6 +484,8 @@ namespace Wpf3DPrint
             if (fileReader.Shape.slice.sliceList.Count == 0 || fileReader.Shape.slice.sliceList.Count <= index)
                 return;
             Slice.OneSlice slice = (Slice.OneSlice)(fileReader.Shape.slice.sliceList[index]);
+            if (fileReader.Shape.selectList.IndexOf(slice) != -1)
+                return;
             scene.selectSlice(slice.slice);
             fileReader.Shape.selectList.Add(slice.slice);
             slicingScene.Proxy.cleanScene();

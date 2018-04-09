@@ -18,6 +18,7 @@ namespace Wpf3DPrint
         public RebuildSlice(Slice slice, Scene scene, int sliceIndex = -1)
         {
             this.slice = slice;
+            this.slice.sortSliceList();
             this.scene = scene;
             deleOnGetEdge = new Cpp2Managed.Shape3D.GetNextEdge(onGetEdge);
             deleOnGetHole = new Cpp2Managed.Shape3D.GetFaceHole(onGetFaceHole);
@@ -121,7 +122,7 @@ namespace Wpf3DPrint
                 // 由外轮廓wire生成面, 在面内根据内轮廓挖洞
                 IntPtr face = Cpp2Managed.Shape3D.makeFaceFromWire(wires, oneSlice.height, outline.child.Count, deleOnGetHole);
                 // 拉伸并显示
-                scene.Proxy.strechSlice(slice.sliceThick, face);
+                scene.Proxy.strechSlice(slice.sliceThick, face, scene.Setting.entityColor.R, scene.Setting.entityColor.G, scene.Setting.entityColor.B);
             }
             foreach (IntPtr pt in toDel)
                 Marshal.FreeHGlobal(pt);
