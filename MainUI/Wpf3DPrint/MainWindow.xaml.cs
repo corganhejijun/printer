@@ -567,7 +567,7 @@ namespace Wpf3DPrint
             }
             if (dlgEntityEdit != null)
                 dlgEntityEdit = null;
-            dlgEntityEdit = new Dialog.EntityEdit();
+            dlgEntityEdit = new Dialog.EntityEdit(fileReader.Shape, unit);
             dlgEntityEdit.Owner = this;
             if (dlgEntityEdit.ShowDialog() == false)
                 return;
