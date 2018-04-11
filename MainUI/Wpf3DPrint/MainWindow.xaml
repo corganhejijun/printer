@@ -42,7 +42,9 @@
             </MenuItem>
             <MenuItem Header="视图" Width="48">
                 <MenuItem x:Name="menuDisplaySetting" Header="显示设置..." Click="menuDisplaySetting_Click"></MenuItem>
-                <MenuItem Header="重置坐标"></MenuItem>
+                <MenuItem Header="实体视图"></MenuItem>
+                <MenuItem Header="切片视图"></MenuItem>
+                <MenuItem Header="重建视图"></MenuItem>
             </MenuItem>
             <MenuItem Header="帮助" Width="48">
                 <MenuItem x:Name="menuAbout" Header="关于..." Click="menuAbout_Click"></MenuItem>

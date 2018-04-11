@@ -293,6 +293,7 @@ namespace Wpf3DPrint.Viewer
             list.Add(height);
             list.Add(totalSliceCnt);
             onSlice(list);
+            Cpp2Managed.Shape3D.onGetSlice(slice, deleGetEdge);
             return true;
         }
 

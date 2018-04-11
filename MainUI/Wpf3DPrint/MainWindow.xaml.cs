@@ -176,15 +176,16 @@ namespace Wpf3DPrint
 
         private void afterSlice(object args)
         {
-            
             ToolBarOper.IsEnabled = true;
             ToolBarReset.IsEnabled = true;
             MenuMain.IsEnabled = true;
-            Shape shape = fileReader.Shape;
-            shape.slice.sortSliceList();
+            fileReader.Shape.slice.sortSliceList();
             string fileName = saveSlice();
             if (fileName.Length == 0)
+            {
+                afterSliceView();
                 return;
+            }
             fileReader.Shape.release();
             scene.Proxy.cleanScene();
             slicingScene.Proxy.cleanScene();
@@ -337,12 +338,18 @@ namespace Wpf3DPrint
             setSliceView();
             fileReader.Shape.slice.base0SliceList();
             fileReader.Shape.slice.base0XyCenter();
+            fileReader.Shape.slice.sortSliceList();
             scene.Proxy.cleanScene();
+            afterOpenFile();
+            afterSliceView();
+        }
+
+        void afterSliceView()
+        {
             foreach (Slice.OneSlice slice in fileReader.Shape.slice.sliceList)
             {
                 scene.displaySlice(slice.slice);
             }
-            afterOpenFile();
             ArrayList list = new ArrayList();
             for (int i = 0; i < fileReader.Shape.slice.sliceList.Count; i++)
             {

@@ -293,6 +293,13 @@ EXPORT bool ImportSlice(char* fileName, OnGetEdge getEdge) {
     return true;
 }
 
+EXPORT bool onGetSlice(ShapeContainer* shape, OnGetEdge getEdge) {
+    ofstream file("onGetSlice.txt");
+    showType(shape, shape->getShape(), file, getEdge);
+    file.close();
+    return true;
+}
+
 EXPORT bool ImportDxfSlice(wchar_t* fileName, OnGetEdge getEdge) {
     DxfReader dxfReader(fileName);
     TopTools_HSequenceOfShape shapeList = dxfReader.GetShape();
