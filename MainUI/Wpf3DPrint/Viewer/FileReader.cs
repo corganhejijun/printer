@@ -275,7 +275,6 @@ namespace Wpf3DPrint.Viewer
                 if (!noDelay)
                     System.Threading.Thread.Sleep(100);
             }
-            shape.slice.sortSliceList();
             return null;
         }
 

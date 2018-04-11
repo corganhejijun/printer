@@ -139,6 +139,8 @@ namespace Wpf3DPrint
                 return;
             }
             rebuildIndex--;
+            if (slice.sliceList.Count <= rebuildIndex)
+                return;
             Slice.OneSlice oneSlice = (Slice.OneSlice)slice.sliceList[rebuildIndex];
             rebuild(oneSlice);
         }

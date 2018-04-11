@@ -146,6 +146,8 @@ namespace Wpf3DPrint.Viewer
             public ArrayList getOutlineList()
             {
                 ArrayList outlineList = new ArrayList();
+                if (data.Count == 0)
+                    return outlineList;
                 int[] found = new int[data.Count];
                 for (int i = 0; i < found.Length; i++)
                     found[i] = -1;

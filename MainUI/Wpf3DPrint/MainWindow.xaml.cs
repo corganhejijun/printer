@@ -176,10 +176,12 @@ namespace Wpf3DPrint
 
         private void afterSlice(object args)
         {
+            
             ToolBarOper.IsEnabled = true;
             ToolBarReset.IsEnabled = true;
             MenuMain.IsEnabled = true;
             Shape shape = fileReader.Shape;
+            shape.slice.sortSliceList();
             string fileName = saveSlice();
             if (fileName.Length == 0)
                 return;
@@ -246,8 +248,8 @@ namespace Wpf3DPrint
                 slicingScene.Proxy.RedrawView();
                 mouseOrigin = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
             }
-            scene.Proxy.MoveTo((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
-            scene.Proxy.Select();
+            //scene.Proxy.MoveTo((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
+            //scene.Proxy.Select();
         }
 
         private void GridScene_MouseUp(object sender, MouseButtonEventArgs e)
@@ -739,6 +741,11 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
+            if (fileReader.Shape.HasMoreShape)
+            {
+                MessageBox.Show("请先合并多个图形");
+                return;
+            }
             fileReader.Shape.base0AllShapes();
             scene.displayAfterTransform(fileReader.Shape.getShape());
         }
@@ -749,6 +756,11 @@ namespace Wpf3DPrint
             if (fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("未打开3D文件");
+                return;
+            }
+            if (fileReader.Shape.HasMoreShape)
+            {
+                MessageBox.Show("请先合并多个图形");
                 return;
             }
             fileReader.Shape.base0XyCenter();
