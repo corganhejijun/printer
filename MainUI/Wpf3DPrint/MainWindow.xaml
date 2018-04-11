@@ -26,40 +26,23 @@
             </MenuItem>
             <MenuItem Header="编辑" Width="48">
                 <MenuItem x:Name="menuUnselect" Header="取消选择" Click="menuUnselect_Click"></MenuItem>
-                <MenuItem Header="撤销"></MenuItem>
-                <MenuItem Header="重做"></MenuItem>
-                <MenuItem Header="复制"></MenuItem>
-                <MenuItem Header="粘贴"></MenuItem>
-                <MenuItem Header="剪切"></MenuItem>
-                <MenuItem Header="对齐">
-                    <MenuItem Header="几何中心对齐"></MenuItem>
-                </MenuItem>
+                <MenuItem Header="图形最低点z轴置零" x:Name="menuBase0" Click="menuBase0_Click"></MenuItem>
+                <MenuItem Header="图形xy轴几何中心置零" x:Name="menuBase0xy" Click="menuBase0xy_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="图形" Width="48">
                 <MenuItem x:Name="menuEntityProp" Header="实体属性..." Click="menuEntityProp_Click"></MenuItem>
-                <MenuItem Header="图形变换">
-                    <MenuItem Header="旋转..." x:Name="menuRotate" Click="menuRotate_Click"></MenuItem>
-                    <MenuItem Header="平移..." x:Name="menuMove" Click="menuMove_Click"></MenuItem>
-                </MenuItem>
-                <MenuItem Header="图形编辑">
-                    <MenuItem Header="图形最低点z轴置零" x:Name="menuBase0" Click="menuBase0_Click"></MenuItem>
-                    <MenuItem Header="图形xy轴几何中心置零" x:Name="menuBase0xy" Click="menuBase0xy_Click"></MenuItem>
-                </MenuItem>
-                <MenuItem x:Name="menuEntityEdit" Header="新增图形..." Click="menuEntityEdit_Click"></MenuItem>
+                <MenuItem Header="图形旋转..." x:Name="menuRotate" Click="menuRotate_Click"></MenuItem>
+                <MenuItem Header="图形平移..." x:Name="menuMove" Click="menuMove_Click"></MenuItem>
+                <MenuItem x:Name="menuEntityEdit" Header="添加实体..." Click="menuEntityEdit_Click"></MenuItem>
                 <MenuItem x:Name="menuEntityMerge" Header="图形合并" Click="menuEntityMerge_Click"></MenuItem>
             </MenuItem>
-            <MenuItem Header="3D" Width="48">
-                <MenuItem x:Name="menuSlice" Header="3D分层..." Click="buttonSlice_Click"></MenuItem>
-                <MenuItem x:Name="menuRebuild" Header="3D重建..." Click="buttonRebuild_Click"></MenuItem>
+            <MenuItem Header="分层" Width="48">
+                <MenuItem x:Name="menuSlice" Header="实体分层..." Click="buttonSlice_Click"></MenuItem>
+                <MenuItem x:Name="menuRebuild" Header="分层重建..." Click="buttonRebuild_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="视图" Width="48">
                 <MenuItem x:Name="menuDisplaySetting" Header="显示设置..." Click="menuDisplaySetting_Click"></MenuItem>
                 <MenuItem Header="重置坐标"></MenuItem>
-                <MenuItem Header="层叠"></MenuItem>
-                <MenuItem Header="水平平铺"></MenuItem>
-                <MenuItem Header="垂直平铺"></MenuItem>
-                <MenuItem Header="排列"></MenuItem>
-                <MenuItem Header="显示"></MenuItem>
             </MenuItem>
             <MenuItem Header="帮助" Width="48">
                 <MenuItem x:Name="menuAbout" Header="关于..." Click="menuAbout_Click"></MenuItem>

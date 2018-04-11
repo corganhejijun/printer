@@ -65,9 +65,14 @@ namespace Wpf3DPrint
                 MessageBox.Show("请先关闭已打开的文件");
                 return;
             }
+            if (fileReader.Shape.hasSlice)
+            {
+                MessageBox.Show("请先关闭已打开的切片文件");
+                return;
+            }
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.DefaultExt = ".stp";
-            openFile.Filter = "所有实体文件(STEP; STL; DXF)|*.stp;*.step;*.stl;*.ast;*dxf|STEP file (*.stp;*.step)|*.stp;*.step|STL Mesh(*.stl;*.ast)|*.stl;*.ast|Dxf file|*.dxf";
+            openFile.Filter = "所有实体文件(STEP; STL)|*.stp;*.step;*.stl;*.ast|STEP file (*.stp;*.step)|*.stp;*.step|STL Mesh(*.stl;*.ast)|*.stl;*.ast";
             if (openFile.ShowDialog() == false)
                 return;
             if (!fileReader.openStep(openFile.FileName, afterOpenStep))
@@ -218,8 +223,13 @@ namespace Wpf3DPrint
                 Point p = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
                 if ((bool)ButtonRoll.IsChecked)
                 {
-                    scene.Proxy.Rotation((int)p.X, (int)p.Y);
-                    slicingScene.Proxy.Rotation((int)p.X, (int)p.Y);
+                    unsafe
+                    {
+                        double x = 0, y = 0, z = 0;
+                        scene.Proxy.Rotation((int)p.X, (int)p.Y, &x, &y, &z);
+                        //slicingScene.Proxy.Rotation((int)p.X, (int)p.Y);
+                        slicingScene.Proxy.setProjection(x, y, z);
+                    }
                 }
                 if ((bool)ButtonPan.IsChecked)
                 {
@@ -262,9 +272,9 @@ namespace Wpf3DPrint
 
         private void menuUnselect_Click(object sender, RoutedEventArgs e)
         {
-            foreach(IntPtr shape in fileReader.Shape.selectList)
+            foreach(Slice.OneSlice shape in fileReader.Shape.slice.sliceList)
             {
-                scene.displayShape(shape);
+                scene.displayShape(shape.slice);
             }
             fileReader.Shape.selectList.Clear();
         }
@@ -290,6 +300,11 @@ namespace Wpf3DPrint
             if (!fileReader.Shape.IsEmpty)
             {
                 MessageBox.Show("请先关闭已打开的文件");
+                return;
+            }
+            if (fileReader.Shape.hasSlice)
+            {
+                MessageBox.Show("请先关闭已打开的切片文件");
                 return;
             }
             OpenFileDialog openFile = new OpenFileDialog();
@@ -469,11 +484,12 @@ namespace Wpf3DPrint
             if (fileReader.Shape.slice.sliceList.Count == 0 || fileReader.Shape.slice.sliceList.Count <= index)
                 return;
             Slice.OneSlice slice = (Slice.OneSlice)(fileReader.Shape.slice.sliceList[index]);
+            if (fileReader.Shape.selectList.IndexOf(slice) != -1)
+                return;
             scene.selectSlice(slice.slice);
             fileReader.Shape.selectList.Add(slice.slice);
             slicingScene.Proxy.cleanScene();
             PanelSlice.Invalidate();
-            //RebuildSlice rebuildSlice = new RebuildSlice(fileReader.Shape.slice, slicingScene, index);
         }
 
         private void buttonRebuild_Click(object sender, RoutedEventArgs e)
@@ -551,7 +567,7 @@ namespace Wpf3DPrint
             }
             if (dlgEntityEdit != null)
                 dlgEntityEdit = null;
-            dlgEntityEdit = new Dialog.EntityEdit();
+            dlgEntityEdit = new Dialog.EntityEdit(fileReader.Shape, unit);
             dlgEntityEdit.Owner = this;
             if (dlgEntityEdit.ShowDialog() == false)
                 return;

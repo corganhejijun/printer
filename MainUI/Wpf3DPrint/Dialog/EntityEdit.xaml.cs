@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System.Windows;
+using Wpf3DPrint.Viewer;
 
 namespace Wpf3DPrint.Dialog
 {
@@ -12,10 +13,30 @@ namespace Wpf3DPrint.Dialog
             Postion, Entity, Edit
         }
         Phase phase;
-        public EntityEdit()
+        public EntityEdit(Shape shape, string unit)
         {
+            double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
+            if (!Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax))
+            {
+                Xmin = 0; Xmax = 0; Ymin = 0; Ymax = 0; Zmin = 0; Zmax = 0;
+            }
             InitializeComponent();
             phase = Phase.Postion;
+            labelUnitX.Content = unit;
+            labelUnitXCenter.Content = unit;
+            labelUnitXRange.Content = unit;
+            labelUnitY.Content = unit;
+            labelUnitYCenter.Content = unit;
+            labelUnitYRange.Content = unit;
+            labelUnitZ.Content = unit;
+            labelUnitZCenter.Content = unit;
+            labelUnitZRange.Content = unit;
+            TextBoxXCenter.Text = ((Xmax + Xmin) / 2).ToString("0.00");
+            TextBoxXRange.Text = Xmin.ToString("0.00") + "~" + Xmax.ToString("0.00");
+            TextBoxYCenter.Text = ((Ymax + Ymin) / 2).ToString("0.00");
+            TextBoxYRange.Text = Ymin.ToString("0.00") + "~" + Ymax.ToString("0.00");
+            TextBoxZCenter.Text = ((Zmax + Zmin) / 2).ToString("0.00");
+            TextBoxZRange.Text = Zmin.ToString("0.00") + "~" + Zmax.ToString("0.00");
         }
 
         public double X
@@ -175,6 +196,35 @@ namespace Wpf3DPrint.Dialog
             else if (phase == Phase.Edit)
             {
                 setEntityPhase();
+            }
+        }
+
+        private void checkBoxCenter_Checked(object sender, RoutedEventArgs e)
+        {
+            if (checkBoxCenter == null || CheckBoxCustomPos == null)
+                return;
+            CheckBoxCustomPos.IsChecked = !checkBoxCenter.IsChecked;
+            if (checkBoxCenter.IsChecked == true)
+            {
+                textBoxX.Text = "0";
+                textBoxX.IsEnabled = false;
+                textBoxY.Text = "0";
+                textBoxY.IsEnabled = false;
+                textBoxZ.Text = "0";
+                textBoxZ.IsEnabled = false;
+            }
+        }
+
+        private void CheckBoxCustomPos_Checked(object sender, RoutedEventArgs e)
+        {
+            if (checkBoxCenter == null || CheckBoxCustomPos == null)
+                return;
+            checkBoxCenter.IsChecked = !CheckBoxCustomPos.IsChecked;
+            if (checkBoxCenter.IsChecked == false)
+            {
+                textBoxX.IsEnabled = true;
+                textBoxY.IsEnabled = true;
+                textBoxZ.IsEnabled = true;
             }
         }
     }

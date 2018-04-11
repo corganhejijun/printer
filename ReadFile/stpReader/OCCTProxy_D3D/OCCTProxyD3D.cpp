@@ -298,13 +298,22 @@ public:
     /// <summary>
     ///Rotation
     /// </summary>
-    void Rotation(int theX, int theY)
+    void Rotation(int theX, int theY, double* x, double* y, double* z)
     {
         if (myView().IsNull())
         {
             return;
         }
         myView()->Rotation(theX, theY);
+        myView()->Proj(*x, *y, *z);
+    }
+
+    void setProjection(double x, double y, double z) {
+        if (myView().IsNull())
+        {
+            return;
+        }
+        myView()->SetProj(x, y, z);
     }
 
     /// <summary>
@@ -874,20 +883,22 @@ public:
     bool selectSlice(System::IntPtr pt) {
         ShapeContainer* shape = (ShapeContainer*)pt.ToPointer();
         Handle(AIS_Shape) aisShape = new AIS_Shape(shape->getShape());
+        if (myAISContext()->IsSelected(aisShape))
+            return false;
         myAISContext()->SetSelected(aisShape);
         return true;
     }
 
-    bool strechSlice(double thickness, System::IntPtr ptShape) {
+    bool strechSlice(double thickness, System::IntPtr ptShape, double r, double g, double b) {
         ShapeContainer* sc = (ShapeContainer*)ptShape.ToPointer();
         if (sc == NULL)
             return false;
         gp_Vec aPrismVec(0, 0, thickness);
-        TopoDS_Shape myBody = BRepPrimAPI_MakePrism(sc->getShape(), aPrismVec);
+        TopoDS_Shape myBody = BRepPrimAPI_MakePrism(sc->getShape(), aPrismVec, Standard_True);
         Handle(AIS_Shape) aisShape = new AIS_Shape(myBody);
+		aisShape->SetColor(Quantity_Color(r / 255.0, g / 255.0, b / 255.0, Quantity_TOC_RGB));
         myAISContext()->SetDisplayMode(AIS_DisplayMode::AIS_Shaded);
         myAISContext()->Display(aisShape);
-        delete sc;
         return true;
     }
 

@@ -5,35 +5,61 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="新增图形" Height="443.103" Width="382.212" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
+        Title="新增图形" Height="595.103" Width="382.212" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
     <Grid>
-        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="234,346,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
-        <Button x:Name="buttonOk" Content="下一步" HorizontalAlignment="Left" Margin="146,346,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOk_Click"/>
-        <CheckBox x:Name="checkBoxCenter" Content="以平面图形中心(X/Y)为原点" HorizontalAlignment="Left" Margin="13,140,0,0" VerticalAlignment="Top" IsChecked="True" IsEnabled="False"/>
-        <CheckBox x:Name="checkBoxCombine" Content="合并图形" HorizontalAlignment="Left" Margin="21,239,0,0" VerticalAlignment="Top" IsEnabled="False" IsChecked="True"/>
-        <GroupBox x:Name="groupBox" Header="平移(正数正向平移，负数反向平移)" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="119" Width="274">
+        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="246,518,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
+        <Button x:Name="buttonOk" Content="下一步" HorizontalAlignment="Left" Margin="158,518,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOk_Click"/>
+        <CheckBox x:Name="checkBoxCenter" Content="以平面图形中心(X/Y)为原点" HorizontalAlignment="Left" Margin="30,158,0,0" VerticalAlignment="Top" IsChecked="True" Checked="checkBoxCenter_Checked"/>
+        <CheckBox x:Name="checkBoxCombine" Content="合并图形" HorizontalAlignment="Left" Margin="33,411,0,0" VerticalAlignment="Top" IsEnabled="False" IsChecked="True"/>
+        <GroupBox x:Name="groupBox" Header="平移(正数正向平移，负数反向平移)" HorizontalAlignment="Left" Margin="25,198,0,0" VerticalAlignment="Top" Height="119" Width="274">
             <Grid>
-                <Label x:Name="label" Content="X轴平移" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                <Label x:Name="label2" Content="Y轴平移" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top"/>
-                <Label x:Name="label2_Copy" Content="Z轴平移" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top"/>
-                <TextBox x:Name="textBoxX" HorizontalAlignment="Left" Height="23" Margin="69,12,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="84"/>
-                <TextBox x:Name="textBoxY" HorizontalAlignment="Left" Height="23" Margin="69,40,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="84"/>
-                <TextBox x:Name="textBoxZ" HorizontalAlignment="Left" Height="23" Margin="69,68,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="84"/>
+                <Label x:Name="label" Content="X轴中心" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="label2" Content="Y轴中心" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="label2_Copy" Content="Z轴中心" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxX" HorizontalAlignment="Left" Height="23" Margin="69,12,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="84" IsEnabled="False"/>
+                <TextBox x:Name="textBoxY" HorizontalAlignment="Left" Height="23" Margin="69,40,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="84" IsEnabled="False"/>
+                <TextBox x:Name="textBoxZ" HorizontalAlignment="Left" Height="23" Margin="69,68,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="84" IsEnabled="False"/>
+                <Label Content="mm" x:Name="labelUnitX" HorizontalAlignment="Left" Margin="158,66,0,0" VerticalAlignment="Top"/>
+                <Label Content="mm" x:Name="labelUnitY" HorizontalAlignment="Left" Margin="158,38,0,0" VerticalAlignment="Top"/>
+                <Label Content="mm" x:Name="labelUnitZ" HorizontalAlignment="Left" Margin="158,13,0,0" VerticalAlignment="Top"/>
             </Grid>
         </GroupBox>
-        <CheckBox x:Name="checkBoxUncombine" Content="炸开图形" HorizontalAlignment="Left" Margin="115,239,0,0" VerticalAlignment="Top" IsEnabled="False"/>
-        <Label x:Name="label1" Content="图形排样" HorizontalAlignment="Left" Margin="14,262,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="checkBoxAuto" Content="自动" HorizontalAlignment="Left" Margin="77,268,0,0" VerticalAlignment="Top" IsChecked="True" Checked="checkBoxAuto_Checked" IsEnabled="False"/>
-        <CheckBox x:Name="checkBoxManual" Content="手动" HorizontalAlignment="Left" Margin="138,268,0,0" VerticalAlignment="Top" Checked="checkBoxManual_Checked" IsEnabled="False"/>
+        <CheckBox x:Name="checkBoxUncombine" Content="炸开图形" HorizontalAlignment="Left" Margin="127,411,0,0" VerticalAlignment="Top" IsEnabled="False"/>
+        <Label x:Name="label1" Content="图形排样" HorizontalAlignment="Left" Margin="26,434,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="checkBoxAuto" Content="自动" HorizontalAlignment="Left" Margin="89,440,0,0" VerticalAlignment="Top" IsChecked="True" Checked="checkBoxAuto_Checked" IsEnabled="False"/>
+        <CheckBox x:Name="checkBoxManual" Content="手动" HorizontalAlignment="Left" Margin="150,440,0,0" VerticalAlignment="Top" Checked="checkBoxManual_Checked" IsEnabled="False"/>
         <Label x:Name="label1_Copy" Content="图形边界处理(分区域中连续交界)" HorizontalAlignment="Left" Margin="14,292,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
         <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="213,296,0,0" VerticalAlignment="Top" Width="88" SelectedIndex="0" RenderTransformOrigin="0.511,0.444" IsEnabled="False" Visibility="Hidden">
             <ComboBoxItem Content="独立刀补"/>
             <ComboBoxItem Content="单边刀补"/>
             <ComboBoxItem Content="融合(无刀补)"/>
         </ComboBox>
-        <Button x:Name="buttonAdd" Content="添加图形..." HorizontalAlignment="Left" Margin="13,160,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click" IsEnabled="False"/>
-        <Label x:Name="labelAdd" Content="" HorizontalAlignment="Left" Margin="18,184,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="buttonPrev" Content="上一步" HorizontalAlignment="Left" Margin="57,346,0,0" VerticalAlignment="Top" Width="75" Visibility="Hidden" Click="buttonPrev_Click"/>
+        <Button x:Name="buttonAdd" Content="添加图形..." HorizontalAlignment="Left" Margin="25,332,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click" IsEnabled="False"/>
+        <Label x:Name="labelAdd" Content="" HorizontalAlignment="Left" Margin="30,356,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="buttonPrev" Content="上一步" HorizontalAlignment="Left" Margin="58,518,0,0" VerticalAlignment="Top" Width="75" Click="buttonPrev_Click" Visibility="Hidden"/>
+        <CheckBox x:Name="CheckBoxCustomPos" Content="自定义位置" HorizontalAlignment="Left" Margin="27,178,0,0" VerticalAlignment="Top" Checked="CheckBoxCustomPos_Checked"/>
+        <GroupBox Header="已有实体位置" HorizontalAlignment="Left" Height="143" Margin="25,10,0,0" VerticalAlignment="Top" Width="318">
+            <Grid>
+                <Label Content="X轴中心" HorizontalAlignment="Left" Margin="1,10,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelUnitXCenter" Content="mm" HorizontalAlignment="Left" Margin="109,10,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="TextBoxXCenter" HorizontalAlignment="Left" Height="23" Margin="60,12,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="44" IsEnabled="False"/>
+                <Label Content="X轴范围" HorizontalAlignment="Left" Margin="136,10,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelUnitXRange" Content="mm" HorizontalAlignment="Left" Margin="274,10,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="TextBoxXRange" HorizontalAlignment="Left" Height="23" Margin="190,12,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="84" IsEnabled="False"/>
+                <Label Content="Y轴中心" HorizontalAlignment="Left" Margin="1,38,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelUnitYCenter" Content="mm" HorizontalAlignment="Left" Margin="109,38,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="TextBoxYCenter" HorizontalAlignment="Left" Height="23" Margin="60,40,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="44" IsEnabled="False"/>
+                <Label Content="Y轴范围" HorizontalAlignment="Left" Margin="136,38,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelUnitYRange" Content="mm" HorizontalAlignment="Left" Margin="274,38,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="TextBoxYRange" HorizontalAlignment="Left" Height="23" Margin="190,40,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="84" IsEnabled="False"/>
+                <Label Content="Z轴中心" HorizontalAlignment="Left" Margin="1,66,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelUnitZCenter" Content="mm" HorizontalAlignment="Left" Margin="109,66,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="TextBoxZCenter" HorizontalAlignment="Left" Height="23" Margin="60,68,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="44" IsEnabled="False"/>
+                <Label Content="Z轴范围" HorizontalAlignment="Left" Margin="136,66,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelUnitZRange" Content="mm" HorizontalAlignment="Left" Margin="274,66,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="TextBoxZRange" HorizontalAlignment="Left" Height="23" Margin="189,68,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="85" IsEnabled="False"/>
+            </Grid>
+        </GroupBox>
 
     </Grid>
 </Window>

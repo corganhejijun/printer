@@ -57,6 +57,14 @@ namespace Wpf3DPrint.Viewer
             }
         }
 
+        public bool hasSlice
+        {
+            get
+            {
+                return slice.sliceList.Count > 0;
+            }
+        }
+
         public void release()
         {
             releaseTransform();
