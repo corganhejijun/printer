@@ -147,9 +147,6 @@
     <Compile Include="Dialog\Pan.xaml.cs">
       <DependentUpon>Pan.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialog\Param2D.xaml.cs">
-      <DependentUpon>Param2D.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialog\Rebuild.xaml.cs">
       <DependentUpon>Rebuild.xaml</DependentUpon>
     </Compile>
@@ -194,10 +191,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\Pan.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\Param2D.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

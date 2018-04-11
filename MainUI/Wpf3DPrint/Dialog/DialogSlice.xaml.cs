@@ -69,7 +69,7 @@ namespace Wpf3DPrint.Dialog
         }
 
         double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
-        public DialogSlice(Viewer.Shape shape, string thick, string unit)
+        public DialogSlice(Viewer.Shape shape, string unit)
         {
             this.shape = shape;
             InitializeComponent();
@@ -83,18 +83,8 @@ namespace Wpf3DPrint.Dialog
             textBoxY2.Text = Ymin.ToString("0.00") + "~" + Ymax.ToString("0.00") + " " + unit;
             textBoxZ.Text = (Zmax - Zmin).ToString("0.00") + " " + unit;
             textBoxZ2.Text = Zmin.ToString("0.00") + "~" + Zmax.ToString("0.00") + " " + unit;
-            try
-            {
-                thickness = double.Parse(thick);
-                textBoxThick.Text = thick;
-                int cnt = (int)((Zmax - Zmin) / thickness);
-                labelCnt.Content = "预计层数：" + cnt;
-            }
-            catch
-            {
-                textBoxThick.Text = "层厚数值错误";
-                buttonOK.IsEnabled = false;
-            }
+            int cnt = (int)((Zmax - Zmin) / double.Parse(textBoxThick.Text));
+            labelCnt.Content = "预计层数：" + cnt;
         }
 
         private void buttonOK_Click(object sender, RoutedEventArgs e)

@@ -46,14 +46,6 @@ namespace Wpf3DPrint
 
         private void afterOpenFile()
         {
-            /*
-            labelStatus.Content = "X:[" + fileReader.Shape.Xmin.ToString("0.000") + "," + fileReader.Shape.Xmax.ToString("0.000")
-                + "]; Y:[" + fileReader.Shape.Ymin.ToString("0.000") + "," + fileReader.Shape.Ymax.ToString("0.000")
-                + "]; Z:[" + fileReader.Shape.Zmin.ToString("0.000") + "," + fileReader.Shape.Zmax.ToString("0.000") + "]";
-            textBoxXRange.Text = fileReader.Shape.Xmin.ToString("0.0000") + "," + fileReader.Shape.Xmax.ToString("0.0000");
-            textBoxYRange.Text = fileReader.Shape.Ymin.ToString("0.0000") + "," + fileReader.Shape.Ymax.ToString("0.0000");
-            textBoxZRange.Text = fileReader.Shape.Zmin.ToString("0.0000") + "," + fileReader.Shape.Zmax.ToString("0.0000");
-            */
             labelStatus.Content = "";
             this.Title = "3DLT  " + fileReader.Shape.fileName;
         }
@@ -128,13 +120,12 @@ namespace Wpf3DPrint
                 if (MessageBox.Show("图形底面中心坐标为(" + x0.ToString("0.000") + "," + y0.ToString("0.000") + "," + z0.ToString("0.000") + "),未居中，要继续分层吗？", "提示", MessageBoxButton.OKCancel) != MessageBoxResult.OK)
                     return;
             }
-            Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, textBoxSliceThick.Text, unit);
+            Dialog.DialogSlice dlSlice = new Dialog.DialogSlice(fileReader.Shape, unit);
             dlSlice.Owner = this;
             if (dlSlice.ShowDialog() == false)
                 return;
             setSlicingView();
             fileReader.Shape.slice.sliceThick = dlSlice.sliceThick;
-            textBoxSliceThick.Text = fileReader.Shape.slice.sliceThick.ToString();
             fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, onAfterSlice, new SceneThread.onFunction(onSlice));
             ToolBarOper.IsEnabled = false;
             ToolBarReset.IsEnabled = false;
@@ -184,6 +175,7 @@ namespace Wpf3DPrint
             if (fileName.Length == 0)
             {
                 afterSliceView();
+                slicingScene.Proxy.cleanScene();
                 return;
             }
             fileReader.Shape.release();
@@ -230,14 +222,12 @@ namespace Wpf3DPrint
                     {
                         double x = 0, y = 0, z = 0;
                         scene.Proxy.Rotation((int)p.X, (int)p.Y, &x, &y, &z);
-                        //slicingScene.Proxy.Rotation((int)p.X, (int)p.Y);
                         slicingScene.Proxy.setProjection(x, y, z);
                     }
                 }
                 if ((bool)ButtonPan.IsChecked)
                 {
                     scene.Proxy.Pan(-(int)((mouseOrigin.X - p.X) / ratio), (int)((mouseOrigin.Y - p.Y) / ratio));
-                    //slicingScene.Proxy.Pan(-(int)((mouseOrigin.X - p.X) / ratio), (int)((mouseOrigin.Y - p.Y) / ratio));
                     unsafe
                     {
                         double x = 0, y = 0, z = 0;
@@ -249,8 +239,6 @@ namespace Wpf3DPrint
                 slicingScene.Proxy.RedrawView();
                 mouseOrigin = new Point((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
             }
-            //scene.Proxy.MoveTo((int)e.GetPosition(GridScene).X, (int)e.GetPosition(GridScene).Y);
-            //scene.Proxy.Select();
         }
 
         private void GridScene_MouseUp(object sender, MouseButtonEventArgs e)
@@ -292,7 +280,7 @@ namespace Wpf3DPrint
             scene.Proxy.cleanScene();
             slicingScene.Proxy.cleanScene();
             sliceScene.clearWindow();
-            TreeView_Slice.Items.Clear();
+            TreeViewSlice.Items.Clear();
             fileReader.Shape.release();
             set3DView();
             set3DFunction(true);
@@ -355,8 +343,6 @@ namespace Wpf3DPrint
             {
                 list.Add(i + 1);
             }
-            comboBoxSliceList.ItemsSource = list;
-            comboBoxSliceNumber.SelectedItem = 1;
             TreeViewItem root = new TreeViewItem();
             root.Header = fileReader.Shape.fileName.Substring(fileReader.Shape.fileName.LastIndexOf('\\') + 1);
             foreach (int i in list)
@@ -365,9 +351,9 @@ namespace Wpf3DPrint
                 item.Header = i;
                 root.Items.Add(item);
             }
-            TreeView_Slice.SelectedItemChanged += TreeView_Slice_SelectedItemChanged;
+            TreeViewSlice.SelectedItemChanged += TreeViewSlice_SelectedItemChanged;
             root.IsExpanded = true;
-            TreeView_Slice.Items.Add(root);
+            TreeViewSlice.Items.Add(root);
             set3DFunction(false);
         }
 
@@ -384,16 +370,16 @@ namespace Wpf3DPrint
             menuSlice.IsEnabled = enable;
         }
 
-        private void TreeView_Slice_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void TreeViewSlice_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            try {
-                int value = (int)((TreeViewItem)e.NewValue).Header;
-                if ((int)comboBoxSliceNumber.SelectedItem != value)
-                    comboBoxSliceNumber.SelectedItem = value;
-            }
-            catch
-            {
+            if (e.NewValue == null)
                 return;
+            object header = ((TreeViewItem)e.NewValue).Header;
+            if (header is int)
+            {
+                int value = (int)header;
+                setSliceView();
+                selectSlice(value - 1);
             }
         }
 
@@ -444,48 +430,21 @@ namespace Wpf3DPrint
 
         private void PanelSlice_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
-            if (comboBoxSliceNumber.SelectedItem != null && fileReader.Shape.slice.sliceList.Count > (int)comboBoxSliceNumber.SelectedItem)
-                sliceScene.drawSlice(e, (Slice.OneSlice)(fileReader.Shape.slice.sliceList[(int)comboBoxSliceNumber.SelectedItem - 1]));
+            if (TreeViewSlice.SelectedValue == null)
+                return;
+            object header = ((TreeViewItem)TreeViewSlice.SelectedValue).Header;
+            if (header is int)
+            {
+                int selectIndex = (int)header;
+                if (fileReader.Shape.slice.sliceList.Count > selectIndex)
+                    sliceScene.drawSlice(e, (Slice.OneSlice)(fileReader.Shape.slice.sliceList[selectIndex - 1]));
+            }
         }
 
         private void PanelSlice_Resize(object sender, EventArgs e)
         {
             if (sliceScene != null)
                 sliceScene.onResize(fileReader.Shape.slice.getBound());
-        }
-
-        private void ribbonMenu_Loaded(object sender, RoutedEventArgs e)
-        {
-            try {
-                Grid child = VisualTreeHelper.GetChild((DependencyObject)sender, 0) as Grid;
-                if (child != null)
-                {
-                    child.RowDefinitions[0].Height = new GridLength(0);
-                }
-            }
-            catch
-            {
-                return;
-            }
-        }
-
-        private void comboBoxSliceNumber_SelectionChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            int index = (int)comboBoxSliceNumber.SelectedItem;
-            if (TreeView_Slice.Items.Count > 0)
-            {
-                TreeViewItem root = (TreeViewItem)TreeView_Slice.Items[0];
-                foreach (TreeViewItem item in root.Items)
-                {
-                    if ((int)item.Header == index)
-                    {
-                        if (!item.IsSelected)
-                            item.IsSelected = true;
-                        break;
-                    }
-                }
-            }
-            selectSlice(index - 1);
         }
 
         private void selectSlice(int index)
@@ -624,14 +583,6 @@ namespace Wpf3DPrint
             Dialog.EntityProp entity = new Dialog.EntityProp(fileReader.Shape, unit);
             entity.Owner = this;
             if (entity.ShowDialog() == false)
-                return;
-        }
-
-        private void menu2DProc_Click(object sender, RoutedEventArgs e)
-        {
-            Dialog.Param2D d2 = new Dialog.Param2D();
-            d2.Owner = this;
-            if (d2.ShowDialog() == false)
                 return;
         }
 
@@ -828,9 +779,19 @@ namespace Wpf3DPrint
             slicingScene.Proxy.ZoomAllView();
         }
 
-        private void WindowsFormsHost_MouseWheel(object sender, MouseWheelEventArgs e)
+        private void menuDisplayRebuildView_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("ok");
+            setRebuildView();
+        }
+
+        private void menuDisplaySliceView_Click(object sender, RoutedEventArgs e)
+        {
+            setSliceView();
+        }
+
+        private void menuDisplay3DView_Click(object sender, RoutedEventArgs e)
+        {
+            set3DView();
         }
     }
 }
