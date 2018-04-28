@@ -13,13 +13,17 @@ namespace Wpf3DPrint.Dialog
             Postion, Entity, Edit
         }
         Phase phase;
-        public EntityEdit(Shape shape, string unit)
+        MainWindow.TransformPreview preview;
+        public bool isPreview;
+        public EntityEdit(Shape shape, string unit, MainWindow.TransformPreview preview)
         {
             double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
             if (!Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax))
             {
                 Xmin = 0; Xmax = 0; Ymin = 0; Ymax = 0; Zmin = 0; Zmax = 0;
             }
+            this.preview = preview;
+            isPreview = false;
             InitializeComponent();
             phase = Phase.Postion;
             labelUnitX.Content = unit;
@@ -122,9 +126,12 @@ namespace Wpf3DPrint.Dialog
 
         void setPostionPhase()
         {
-            textBoxX.IsEnabled = true;
-            textBoxY.IsEnabled = true;
-            textBoxZ.IsEnabled = true;
+            if ((bool)CheckBoxCustomPos.IsChecked)
+            {
+                textBoxX.IsEnabled = true;
+                textBoxY.IsEnabled = true;
+                textBoxZ.IsEnabled = true;
+            }
             buttonPrev.Visibility = Visibility.Hidden;
             checkBoxCenter.IsEnabled = true;
             CheckBoxCustomPos.IsEnabled = true;
@@ -234,6 +241,16 @@ namespace Wpf3DPrint.Dialog
                 textBoxY.IsEnabled = true;
                 textBoxZ.IsEnabled = true;
             }
+        }
+
+        private void ButtonPreview_Click(object sender, RoutedEventArgs e)
+        {
+            if (labelAdd.Content.ToString().Length == 0)
+            {
+                MessageBox.Show("请先选择要添加的图形文件, 再点击预览");
+                return;
+            }
+            preview(X, Y, Z);
         }
     }
 }

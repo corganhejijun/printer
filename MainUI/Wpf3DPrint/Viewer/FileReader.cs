@@ -12,7 +12,7 @@ namespace Wpf3DPrint.Viewer
         SceneThread sceneThread;
         public FileReader()
         {
-            deleGetShape = new Cpp2Managed.Shape3D.OnGetShape(getShape);
+            deleGetShape = new Cpp2Managed.Shape3D.OnGetShape(onGetShape);
             deleGetEdge = new Cpp2Managed.Shape3D.OnGetEdge(getSliceEdge);
             deleGetLocatePlane = new Cpp2Managed.Shape3D.OnGetShape(getLocatePlane);
             locatePlaneList = new ArrayList();
@@ -73,7 +73,7 @@ namespace Wpf3DPrint.Viewer
         }
 
         Cpp2Managed.Shape3D.OnGetShape deleGetShape;
-        void getShape(IntPtr shapePt)
+        void onGetShape(IntPtr shapePt)
         {
             shape.setShape(shapePt);
         }
@@ -87,7 +87,7 @@ namespace Wpf3DPrint.Viewer
             if (fileName.EndsWith(".stp") || fileName.EndsWith(".step"))
             {
                 IntPtr fileNameSpace = NativeUtf8FromString(fileName);
-                result = Cpp2Managed.Shape3D.ImportStep(fileNameSpace, getShape);
+                result = Cpp2Managed.Shape3D.ImportStep(fileNameSpace, deleGetShape);
                 if (result)
                     shape.fileName = fileName;
                 Marshal.FreeHGlobal(fileNameSpace);

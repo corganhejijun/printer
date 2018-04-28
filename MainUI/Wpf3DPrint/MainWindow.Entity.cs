@@ -59,10 +59,21 @@ namespace Wpf3DPrint
             }
             if (dlgEntityEdit != null)
                 dlgEntityEdit = null;
-            dlgEntityEdit = new Dialog.EntityEdit(fileReader.Shape, unit);
+            TransformPreview preview = new TransformPreview(addEntityPreview);
+            dlgEntityEdit = new Dialog.EntityEdit(fileReader.Shape, unit, preview);
             dlgEntityEdit.Owner = this;
             if (dlgEntityEdit.ShowDialog() == false)
+            {
+                fileReader.Shape.releaseMoreShape();
+                scene.Proxy.cleanScene();
+                scene.displayShape(fileReader.Shape.getShape());
                 return;
+            }
+            importStep();
+        }
+
+        void importStep()
+        {
             if (!fileReader.importMoreStep(dlgEntityEdit.FileName, afterImportMoreStep))
             {
                 MessageBox.Show("Open file Failed!");
@@ -70,6 +81,12 @@ namespace Wpf3DPrint
             }
             onOpeningFile(dlgEntityEdit.FileName);
             set3DView();
+        }
+
+        void addEntityPreview(double x, double y, double z)
+        {
+            dlgEntityEdit.isPreview = true;
+            importStep();
         }
 
         private void afterImportMoreStep(object args)
@@ -83,7 +100,7 @@ namespace Wpf3DPrint
             {
                 fileReader.Shape.setMoreShapePos(dlgEntityEdit.X, dlgEntityEdit.Y, dlgEntityEdit.Z);
             }
-            if (dlgEntityEdit.Combine)
+            if (dlgEntityEdit.Combine && !dlgEntityEdit.isPreview)
             {
                 fileReader.Shape.combine();
                 scene.Proxy.cleanScene();
@@ -92,9 +109,17 @@ namespace Wpf3DPrint
             else
                 scene.displayShape(fileReader.Shape.getMoreShape());
             afterOpenFile();
-            if (MessageBox.Show("是否保存当前所有实体？", "提醒", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            if (!dlgEntityEdit.isPreview)
             {
-                saveAsStep();
+                if (MessageBox.Show("是否保存当前所有实体？", "提醒", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                {
+                    saveAsStep();
+                }
+            }
+            else
+            {
+                dlgEntityEdit.isPreview = false;
+                fileReader.Shape.releaseMoreShape();
             }
         }
 

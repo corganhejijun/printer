@@ -220,5 +220,11 @@ namespace Wpf3DPrint.Viewer
             Cpp2Managed.Shape3D.del(moreShape);
             moreShape = more;
         }
+
+        public void releaseMoreShape()
+        {
+            Cpp2Managed.Shape3D.del(moreShape);
+            moreShape = IntPtr.Zero;
+        }
     }
 }
