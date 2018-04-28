@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -158,9 +158,11 @@
     <ClInclude Include="..\include\slice.h" />
     <ClInclude Include="..\include\sliceDisplay.h" />
     <ClInclude Include="Device.h" />
+    <ClInclude Include="GdiDevice.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp" />
+    <ClCompile Include="GdiDevcie.cpp" />
     <ClCompile Include="sliceDisplay.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

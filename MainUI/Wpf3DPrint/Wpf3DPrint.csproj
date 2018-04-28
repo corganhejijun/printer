@@ -74,7 +74,7 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -154,6 +154,9 @@
       <DependentUpon>Rotate.xaml</DependentUpon>
     </Compile>
     <Compile Include="DxfWriter.cs" />
+    <Compile Include="MainWindow.Entity.cs" />
+    <Compile Include="MainWindow.File.cs" />
+    <Compile Include="MainWindow.View.cs" />
     <Compile Include="RebuildSlice.cs" />
     <Compile Include="Themes\IndentConverter.cs" />
     <Compile Include="Themes\TreeViewItemExt.cs" />
