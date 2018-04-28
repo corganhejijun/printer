@@ -63,6 +63,14 @@ namespace Wpf3DPrint.Dialog
             }
         }
 
+        public bool CenterPos
+        {
+            get
+            {
+                return (bool)checkBoxCenter.IsChecked;
+            }
+        }
+
         public bool Combine
         {
             get
@@ -102,13 +110,13 @@ namespace Wpf3DPrint.Dialog
             textBoxY.IsEnabled = false;
             textBoxZ.IsEnabled = false;
             buttonPrev.Visibility = Visibility.Visible;
-            checkBoxCenter.IsEnabled = true;
+            checkBoxCenter.IsEnabled = false;
+            CheckBoxCustomPos.IsEnabled = false;
             buttonAdd.IsEnabled = true;
             checkBoxAuto.IsEnabled = false;
             checkBoxManual.IsEnabled = false;
             checkBoxCombine.IsEnabled = false;
             checkBoxUncombine.IsEnabled = false;
-            comboBox.IsEnabled = false;
             phase = Phase.Entity;
         }
 
@@ -118,7 +126,8 @@ namespace Wpf3DPrint.Dialog
             textBoxY.IsEnabled = true;
             textBoxZ.IsEnabled = true;
             buttonPrev.Visibility = Visibility.Hidden;
-            checkBoxCenter.IsEnabled = false;
+            checkBoxCenter.IsEnabled = true;
+            CheckBoxCustomPos.IsEnabled = true;
             buttonAdd.IsEnabled = false;
             phase = Phase.Postion;
         }
@@ -131,7 +140,6 @@ namespace Wpf3DPrint.Dialog
             checkBoxManual.IsEnabled = true;
             checkBoxCombine.IsEnabled = true;
             checkBoxUncombine.IsEnabled = true;
-            comboBox.IsEnabled = true;
             phase = Phase.Edit;
         }
 

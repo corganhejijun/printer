@@ -213,5 +213,12 @@ namespace Wpf3DPrint.Viewer
             shape = combine;
             selectList.Clear();
         }
+
+        public void setMoreShapePos(double x, double y, double z)
+        {
+            IntPtr more = Cpp2Managed.Shape3D.move(moreShape, x, y, z);
+            Cpp2Managed.Shape3D.del(moreShape);
+            moreShape = more;
+        }
     }
 }

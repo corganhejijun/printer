@@ -79,6 +79,10 @@ namespace Wpf3DPrint
 
         private void onAfterImportMoreStep(object workResult)
         {
+            if (!dlgEntityEdit.CenterPos)
+            {
+                fileReader.Shape.setMoreShapePos(dlgEntityEdit.X, dlgEntityEdit.Y, dlgEntityEdit.Z);
+            }
             if (dlgEntityEdit.Combine)
             {
                 fileReader.Shape.combine();

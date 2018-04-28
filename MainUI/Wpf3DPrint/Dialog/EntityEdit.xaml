@@ -29,11 +29,6 @@
         <CheckBox x:Name="checkBoxAuto" Content="自动" HorizontalAlignment="Left" Margin="89,440,0,0" VerticalAlignment="Top" IsChecked="True" Checked="checkBoxAuto_Checked" IsEnabled="False"/>
         <CheckBox x:Name="checkBoxManual" Content="手动" HorizontalAlignment="Left" Margin="150,440,0,0" VerticalAlignment="Top" Checked="checkBoxManual_Checked" IsEnabled="False"/>
         <Label x:Name="label1_Copy" Content="图形边界处理(分区域中连续交界)" HorizontalAlignment="Left" Margin="14,292,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
-        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="213,296,0,0" VerticalAlignment="Top" Width="88" SelectedIndex="0" RenderTransformOrigin="0.511,0.444" IsEnabled="False" Visibility="Hidden">
-            <ComboBoxItem Content="独立刀补"/>
-            <ComboBoxItem Content="单边刀补"/>
-            <ComboBoxItem Content="融合(无刀补)"/>
-        </ComboBox>
         <Button x:Name="buttonAdd" Content="添加图形..." HorizontalAlignment="Left" Margin="25,332,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click" IsEnabled="False"/>
         <Label x:Name="labelAdd" Content="" HorizontalAlignment="Left" Margin="30,356,0,0" VerticalAlignment="Top"/>
         <Button x:Name="buttonPrev" Content="上一步" HorizontalAlignment="Left" Margin="58,518,0,0" VerticalAlignment="Top" Width="75" Click="buttonPrev_Click" Visibility="Hidden"/>
