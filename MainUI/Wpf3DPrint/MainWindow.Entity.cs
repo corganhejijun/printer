@@ -23,7 +23,6 @@ namespace Wpf3DPrint
                     return;
                 }
             }
-            // TODO 切片之前的实体才能旋转，切片中和切片后不能旋转
             TransformPreview preview = new TransformPreview(rotatePreview);
             Dialog.Rotate rotate = new Dialog.Rotate(preview);
             rotate.Owner = this;
@@ -33,6 +32,10 @@ namespace Wpf3DPrint
                 fileReader.Shape.applyTransform();
             scene.displayAfterTransform(fileReader.Shape.getShape());
             scene.displayShape(fileReader.Shape.getMoreShape());
+            if (MessageBox.Show("是否保存当前实体？", "提醒", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                saveAsStep();
+            }
         }
 
         void rotatePreview(double xAngle, double yAngle, double zAngle)
@@ -85,15 +88,14 @@ namespace Wpf3DPrint
             else
                 scene.displayShape(fileReader.Shape.getMoreShape());
             afterOpenFile();
+            if (MessageBox.Show("是否保存当前所有实体？", "提醒", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                saveAsStep();
+            }
         }
 
         private void menuEntityProp_Click(object sender, RoutedEventArgs e)
         {
-            if (fileReader.Shape.IsEmpty)
-            {
-                MessageBox.Show("未打开3D文件");
-                return;
-            }
             Dialog.EntityProp entity = new Dialog.EntityProp(fileReader.Shape, unit);
             entity.Owner = this;
             if (entity.ShowDialog() == false)
@@ -141,6 +143,10 @@ namespace Wpf3DPrint
                 fileReader.Shape.applyTransform();
             scene.displayAfterTransform(fileReader.Shape.getShape());
             scene.displayShape(fileReader.Shape.getMoreShape());
+            if (MessageBox.Show("是否保存当前实体？", "提醒", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                saveAsStep();
+            }
         }
 
         void movePreview(double x, double y, double z)

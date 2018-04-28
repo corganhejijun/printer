@@ -137,6 +137,10 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
+        }
+
+        public void saveAsStep()
+        {
             SaveFileDialog saveFile = new SaveFileDialog();
             saveFile.FileName = "model";
             saveFile.DefaultExt = "step";
@@ -144,7 +148,7 @@ namespace Wpf3DPrint
             if (false == saveFile.ShowDialog(this))
                 return;
             fileReader.saveStep(saveFile.FileName);
-            this.Title = saveFile.FileName;
+            afterOpenFile();
         }
 
         private void buttonSaveDxf_Click(object sender, RoutedEventArgs e)
