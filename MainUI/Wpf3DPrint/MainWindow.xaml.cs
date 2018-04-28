@@ -60,6 +60,19 @@ namespace Wpf3DPrint
             dlSlice.Owner = this;
             if (dlSlice.ShowDialog() == false)
                 return;
+            bool reDisplay = false;
+            if (dlSlice.setZ0)
+            {
+                fileReader.Shape.base0AllShapes();
+                reDisplay = true;
+            }
+            if (dlSlice.setXY0)
+            {
+                fileReader.Shape.base0XyCenter();
+                reDisplay = true;
+            }
+            if (reDisplay)
+                scene.displayAfterTransform(fileReader.Shape.getShape());
             setSlicingView();
             fileReader.Shape.slice.sliceThick = dlSlice.sliceThick;
             fileReader.sliceShape((Control)this, dlSlice.locatePlane, dlSlice.gradientShape, dlSlice.quickSlice, afterSlice, new SceneThread.onFunction(onSlice));

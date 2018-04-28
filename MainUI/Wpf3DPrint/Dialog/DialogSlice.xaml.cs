@@ -36,6 +36,22 @@ namespace Wpf3DPrint.Dialog
             }
         }
 
+        public bool setZ0
+        {
+            get
+            {
+                return (bool)checkBoxZ0Base.IsChecked;
+            }
+        }
+
+        public bool setXY0
+        {
+            get
+            {
+                return (bool)CheckBoxXY0Base.IsChecked;
+            }
+        }
+
         public double outputRatio {
             get
             {
@@ -85,6 +101,7 @@ namespace Wpf3DPrint.Dialog
             textBoxZ2.Text = Zmin.ToString("0.00") + "~" + Zmax.ToString("0.00") + " " + unit;
             int cnt = (int)((Zmax - Zmin) / double.Parse(textBoxThick.Text));
             labelCnt.Content = "预计层数：" + cnt;
+            LabelUnit.Content = unit;
         }
 
         private void buttonOK_Click(object sender, RoutedEventArgs e)
@@ -125,6 +142,7 @@ namespace Wpf3DPrint.Dialog
         private void textBoxThick_LostFocus(object sender, RoutedEventArgs e)
         {
             calculateLayerNum();
+            textBoxThick.Text = thickness.ToString("0.000");
         }
 
         private void textBoxThick_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)

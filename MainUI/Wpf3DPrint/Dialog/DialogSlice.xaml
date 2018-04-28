@@ -11,12 +11,12 @@
         <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="251,283,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
         <Label x:Name="labelThickness" Content="分层厚度:" HorizontalAlignment="Left" Margin="10,205,0,0" VerticalAlignment="Top"/>
         <Label x:Name="labelCnt" Content="Label" HorizontalAlignment="Left" Margin="212,205,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBoxThick" HorizontalAlignment="Left" Height="23" Margin="76,207,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120" LostFocus="textBoxThick_LostFocus" KeyUp="textBoxThick_KeyUp"/>
+        <TextBox x:Name="textBoxThick" HorizontalAlignment="Left" Height="23" Margin="76,207,0,0" TextWrapping="Wrap" Text="1.000" VerticalAlignment="Top" Width="90" LostFocus="textBoxThick_LostFocus" KeyUp="textBoxThick_KeyUp"/>
         <CheckBox x:Name="checkBoxLocatePlane" Content="突变形体处理" HorizontalAlignment="Left" Margin="10,139,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="checkBoxGradient" Content="渐变形体处理" HorizontalAlignment="Left" Margin="107,139,0,0" VerticalAlignment="Top"/>
         <Label x:Name="labelThickness_Copy" Content="输出比例:" HorizontalAlignment="Left" Margin="10,170,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBoxRatio" HorizontalAlignment="Left" Height="23" Margin="76,174,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="54"/>
-        <CheckBox x:Name="checkBox_Copy1" Content="模型最低点置零" HorizontalAlignment="Left" Margin="204,139,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <TextBox x:Name="textBoxRatio" HorizontalAlignment="Left" Height="23" Margin="76,174,0,0" TextWrapping="Wrap" Text="1.0" VerticalAlignment="Top" Width="54"/>
+        <CheckBox x:Name="checkBoxZ0Base" Content="模型最低点置零" HorizontalAlignment="Left" Margin="92,248,0,0" VerticalAlignment="Top" IsChecked="True"/>
         <GroupBox Header="实体属性" Height="121" VerticalAlignment="Top">
             <Grid>
                 <Label x:Name="labelMaxMinInfo" Content="X轴长度" HorizontalAlignment="Left" Margin="10,6,0,0" VerticalAlignment="Top"/>
@@ -34,5 +34,7 @@
             </Grid>
         </GroupBox>
         <CheckBox x:Name="checkBoxQuikSlice" Content="快速切割" HorizontalAlignment="Left" Margin="10,248,0,0" VerticalAlignment="Top" ToolTip="每层切割之间停留时间为0"/>
+        <CheckBox x:Name="CheckBoxXY0Base" Content="XY几何中心置零" HorizontalAlignment="Left" Margin="212,248,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <Label x:Name="LabelUnit" Content="" HorizontalAlignment="Left" Margin="166,207,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>
