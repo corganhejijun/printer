@@ -141,8 +141,8 @@
     <Compile Include="Dialog\EntityProp.xaml.cs">
       <DependentUpon>EntityProp.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialog\EntityEdit.xaml.cs">
-      <DependentUpon>EntityEdit.xaml</DependentUpon>
+    <Compile Include="Dialog\EntityAdd.xaml.cs">
+      <DependentUpon>EntityAdd.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialog\Pan.xaml.cs">
       <DependentUpon>Pan.xaml</DependentUpon>
@@ -189,7 +189,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialog\EntityEdit.xaml">
+    <Page Include="Dialog\EntityAdd.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
