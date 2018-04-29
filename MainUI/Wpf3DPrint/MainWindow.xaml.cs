@@ -17,7 +17,7 @@ namespace Wpf3DPrint
         private Scene2D sliceScene;
         private FileReader fileReader;
 
-        Dialog.EntityEdit dlgEntityEdit;
+        Dialog.EntityAdd dlgEntityAdd;
         string unit;
 
         public MainWindow()
@@ -33,7 +33,7 @@ namespace Wpf3DPrint
             slicingBrush.RelativeTransform = new ScaleTransform(1.0, -1.0, 0.5, 0.5);
             GridScene.Background = brush;
             GridSlice3D.Background = slicingBrush;
-            dlgEntityEdit = null;
+            dlgEntityAdd = null;
             Dialog.About about = new Dialog.About();
             this.Title += "  " + about.Version;
         }

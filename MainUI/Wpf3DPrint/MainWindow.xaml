@@ -33,7 +33,8 @@
                 <MenuItem x:Name="menuEntityProp" Header="实体属性..." Click="menuEntityProp_Click"></MenuItem>
                 <MenuItem Header="图形旋转..." x:Name="menuRotate" Click="menuRotate_Click"></MenuItem>
                 <MenuItem Header="图形平移..." x:Name="menuMove" Click="menuMove_Click"></MenuItem>
-                <MenuItem x:Name="menuEntityEdit" Header="添加实体..." Click="menuEntityEdit_Click"></MenuItem>
+                <MenuItem x:Name="menuEntityAdd" Header="添加实体..." Click="menuEntityAdd_Click"></MenuItem>
+                <MenuItem x:Name="menuEntityEdit" Header="图形编辑..." Click="menuEntityEdit_Click"></MenuItem>
                 <MenuItem x:Name="menuEntityMerge" Header="图形合并" Click="menuEntityMerge_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="分层" Width="48">

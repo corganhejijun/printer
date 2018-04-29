@@ -5,9 +5,9 @@ using Wpf3DPrint.Viewer;
 namespace Wpf3DPrint.Dialog
 {
     /// <summary>
-    /// Interaction logic for EntityEdit.xaml
+    /// Interaction logic for EntityAdd.xaml
     /// </summary>
-    public partial class EntityEdit : Window
+    public partial class EntityAdd : Window
     {
         enum Phase {
             Postion, Entity, Edit
@@ -15,7 +15,7 @@ namespace Wpf3DPrint.Dialog
         Phase phase;
         MainWindow.TransformPreview preview;
         public bool isPreview;
-        public EntityEdit(Shape shape, string unit, MainWindow.TransformPreview preview)
+        public EntityAdd(Shape shape, string unit, MainWindow.TransformPreview preview)
         {
             double Xmin = double.MaxValue, Xmax = double.MinValue, Ymin = double.MaxValue, Ymax = double.MinValue, Zmin = double.MaxValue, Zmax = double.MinValue;
             if (!Cpp2Managed.Shape3D.getBoundary(shape.getShape(), ref Zmin, ref Zmax, ref Ymin, ref Ymax, ref Xmin, ref Xmax))

@@ -113,7 +113,7 @@ namespace Wpf3DPrint
             menuBase0.IsEnabled = enable;
             menuBase0xy.IsEnabled = enable;
             ButtonSlice.IsEnabled = enable;
-            menuEntityEdit.IsEnabled = enable;
+            menuEntityAdd.IsEnabled = enable;
             menuSlice.IsEnabled = enable;
         }
 

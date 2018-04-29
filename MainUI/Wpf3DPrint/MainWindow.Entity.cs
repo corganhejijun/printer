@@ -45,7 +45,7 @@ namespace Wpf3DPrint
             scene.displayShape(fileReader.Shape.getNotTransformShape());
         }
 
-        private void menuEntityEdit_Click(object sender, RoutedEventArgs e)
+        private void menuEntityAdd_Click(object sender, RoutedEventArgs e)
         {
             if (fileReader.Shape.IsEmpty)
             {
@@ -57,12 +57,12 @@ namespace Wpf3DPrint
                 MessageBox.Show("已经打开大于一个图形，请先合并图形");
                 return;
             }
-            if (dlgEntityEdit != null)
-                dlgEntityEdit = null;
+            if (dlgEntityAdd != null)
+                dlgEntityAdd = null;
             TransformPreview preview = new TransformPreview(addEntityPreview);
-            dlgEntityEdit = new Dialog.EntityEdit(fileReader.Shape, unit, preview);
-            dlgEntityEdit.Owner = this;
-            if (dlgEntityEdit.ShowDialog() == false)
+            dlgEntityAdd = new Dialog.EntityAdd(fileReader.Shape, unit, preview);
+            dlgEntityAdd.Owner = this;
+            if (dlgEntityAdd.ShowDialog() == false)
             {
                 fileReader.Shape.releaseMoreShape();
                 scene.Proxy.cleanScene();
@@ -74,18 +74,18 @@ namespace Wpf3DPrint
 
         void importStep()
         {
-            if (!fileReader.importMoreStep(dlgEntityEdit.FileName, afterImportMoreStep))
+            if (!fileReader.importMoreStep(dlgEntityAdd.FileName, afterImportMoreStep))
             {
                 MessageBox.Show("Open file Failed!");
                 return;
             }
-            onOpeningFile(dlgEntityEdit.FileName);
+            onOpeningFile(dlgEntityAdd.FileName);
             set3DView();
         }
 
         void addEntityPreview(double x, double y, double z)
         {
-            dlgEntityEdit.isPreview = true;
+            dlgEntityAdd.isPreview = true;
             importStep();
         }
 
@@ -96,11 +96,11 @@ namespace Wpf3DPrint
 
         private void onAfterImportMoreStep(object workResult)
         {
-            if (!dlgEntityEdit.CenterPos)
+            if (!dlgEntityAdd.CenterPos)
             {
-                fileReader.Shape.setMoreShapePos(dlgEntityEdit.X, dlgEntityEdit.Y, dlgEntityEdit.Z);
+                fileReader.Shape.setMoreShapePos(dlgEntityAdd.X, dlgEntityAdd.Y, dlgEntityAdd.Z);
             }
-            if (dlgEntityEdit.Combine && !dlgEntityEdit.isPreview)
+            if (dlgEntityAdd.Combine && !dlgEntityAdd.isPreview)
             {
                 fileReader.Shape.combine();
                 scene.Proxy.cleanScene();
@@ -109,7 +109,7 @@ namespace Wpf3DPrint
             else
                 scene.displayShape(fileReader.Shape.getMoreShape());
             afterOpenFile();
-            if (!dlgEntityEdit.isPreview)
+            if (!dlgEntityAdd.isPreview)
             {
                 if (MessageBox.Show("是否保存当前所有实体？", "提醒", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
@@ -118,7 +118,7 @@ namespace Wpf3DPrint
             }
             else
             {
-                dlgEntityEdit.isPreview = false;
+                dlgEntityAdd.isPreview = false;
                 fileReader.Shape.releaseMoreShape();
             }
         }
@@ -183,6 +183,16 @@ namespace Wpf3DPrint
             fileReader.Shape.move(x, y, z);
             scene.displayAfterTransform(fileReader.Shape.transform);
             scene.displayShape(fileReader.Shape.getNotTransformShape());
+        }
+
+        private void menuEntityEdit_Click(object sender, RoutedEventArgs e)
+        {
+            if (fileReader.Shape.IsEmpty)
+            {
+                MessageBox.Show("未打开3D文件");
+                return;
+            }
+
         }
     }
 }
