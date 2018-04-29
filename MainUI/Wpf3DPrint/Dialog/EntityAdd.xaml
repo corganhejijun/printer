@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="新增图形" Height="595.103" Width="382.212" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
+        Title="新增图形" Height="595.103" Width="382.212" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
     <Grid>
         <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="246,518,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
         <Button x:Name="buttonOk" Content="下一步" HorizontalAlignment="Left" Margin="158,518,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOk_Click"/>
@@ -24,10 +24,6 @@
                 <Label Content="mm" x:Name="labelUnitZ" HorizontalAlignment="Left" Margin="158,13,0,0" VerticalAlignment="Top"/>
             </Grid>
         </GroupBox>
-        <CheckBox x:Name="checkBoxUncombine" Content="炸开图形" HorizontalAlignment="Left" Margin="127,411,0,0" VerticalAlignment="Top" IsEnabled="False"/>
-        <Label x:Name="label1" Content="图形排样" HorizontalAlignment="Left" Margin="26,434,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="checkBoxAuto" Content="自动" HorizontalAlignment="Left" Margin="89,440,0,0" VerticalAlignment="Top" IsChecked="True" Checked="checkBoxAuto_Checked" IsEnabled="False"/>
-        <CheckBox x:Name="checkBoxManual" Content="手动" HorizontalAlignment="Left" Margin="150,440,0,0" VerticalAlignment="Top" Checked="checkBoxManual_Checked" IsEnabled="False"/>
         <Label x:Name="label1_Copy" Content="图形边界处理(分区域中连续交界)" HorizontalAlignment="Left" Margin="14,292,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
         <Button x:Name="buttonAdd" Content="添加图形..." HorizontalAlignment="Left" Margin="25,332,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click" IsEnabled="False"/>
         <Label x:Name="labelAdd" Content="" HorizontalAlignment="Left" Margin="30,356,0,0" VerticalAlignment="Top"/>

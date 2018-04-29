@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
         mc:Ignorable="d"
-        Title="显示设置" Height="300" Width="300">
+        Title="显示设置" Height="300" Width="300" ResizeMode="NoResize">
     <Grid>
         <TextBox x:Name="textBoxEntityColor" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="(156, 156, 156)" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
         <Button x:Name="buttonEntityColor" Content="3D实体颜色..." HorizontalAlignment="Left" Margin="135,10,0,0" VerticalAlignment="Top" Width="75" Click="buttonEntityColor_Click"/>

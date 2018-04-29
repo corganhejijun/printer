@@ -5,35 +5,56 @@ namespace Wpf3DPrint.Viewer
 {
     public class Shape
     {
-        public string fileName;
+        string fileName;
+        string moreFileName;
         IntPtr shape;
+        IntPtr moreShape;
+
         public IntPtr transform;
         public Slice slice;
         public ArrayList selectList;
-        IntPtr moreShape;
 
         public Shape()
         {
             fileName = "";
+            moreFileName = "";
             shape = IntPtr.Zero;
             transform = IntPtr.Zero;
             slice = new Slice();
             selectList = new ArrayList();
         }
 
-        public void setShape(IntPtr shape)
+        public void setShape(IntPtr shape, string fileName)
         {
             if (this.shape != IntPtr.Zero)
             {
                 this.moreShape = shape;
+                this.moreFileName = fileName;
                 return;
             }
             this.shape = shape;
+            this.fileName = fileName;
         }
 
         public IntPtr getShape()
         {
             return shape;
+        }
+
+        public string FileName
+        {
+            get
+            {
+                return fileName;
+            }
+        }
+
+        public string MoreFileName
+        {
+            get
+            {
+                return moreFileName;
+            }
         }
 
         public IntPtr getMoreShape()
@@ -210,6 +231,7 @@ namespace Wpf3DPrint.Viewer
             Cpp2Managed.Shape3D.del(shape);
             Cpp2Managed.Shape3D.del(moreShape);
             moreShape = IntPtr.Zero;
+            moreFileName = "";
             shape = combine;
             selectList.Clear();
         }
@@ -225,6 +247,12 @@ namespace Wpf3DPrint.Viewer
         {
             Cpp2Managed.Shape3D.del(moreShape);
             moreShape = IntPtr.Zero;
+            moreFileName = "";
+        }
+
+        public void saveAs(string fileName)
+        {
+            this.fileName = fileName;
         }
     }
 }

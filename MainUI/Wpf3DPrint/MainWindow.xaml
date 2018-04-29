@@ -17,7 +17,7 @@
         <Menu DockPanel.Dock="Top" Grid.Row="0" FontSize="15" Height="25" Name="MenuMain">
             <MenuItem Header="文件" HorizontalAlignment="Right" Width="48">
                 <MenuItem x:Name="menuOpenFile" Header="打开..." Click="buttonOpen_Click"></MenuItem>
-                <MenuItem x:Name="menuSaveAs" Header="保存实体..." Click="buttonSaveAs_Click"></MenuItem>
+                <MenuItem x:Name="menuSaveAs" Header="实体另存为..." Click="buttonSaveAs_Click"></MenuItem>
                 <MenuItem x:Name="menuOpenSlice" Header="导入切片..." Click="buttonOpenSlice_Click"></MenuItem>
                 <MenuItem x:Name="menuSaveSlice" Header="导出切片..." Click="buttonSaveSlice_Click"></MenuItem>
                 <MenuItem x:Name="menuDxfSlice" Header="导出快速成型文件..." Click="buttonSaveDxf_Click"></MenuItem>

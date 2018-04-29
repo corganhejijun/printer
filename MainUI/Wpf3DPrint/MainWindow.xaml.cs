@@ -129,7 +129,7 @@ namespace Wpf3DPrint
                 list.Add(i + 1);
             }
             TreeViewItem root = new TreeViewItem();
-            root.Header = fileReader.Shape.fileName.Substring(fileReader.Shape.fileName.LastIndexOf('\\') + 1);
+            root.Header = fileReader.Shape.FileName.Substring(fileReader.Shape.FileName.LastIndexOf('\\') + 1);
             foreach (int i in list)
             {
                 TreeViewItem item = new TreeViewItem();

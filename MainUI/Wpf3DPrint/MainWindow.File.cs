@@ -14,7 +14,7 @@ namespace Wpf3DPrint
         private void afterOpenFile()
         {
             labelStatus.Content = "";
-            this.Title = "3DLT  " + fileReader.Shape.fileName;
+            this.Title = "3DLT  " + fileReader.Shape.FileName;
         }
 
         private void buttonOpen_Click(object sender, RoutedEventArgs e)
@@ -80,7 +80,7 @@ namespace Wpf3DPrint
                 return "";
             }
             fileReader.saveSlice(saveFile.FileName);
-            this.Title = fileReader.Shape.fileName;
+            this.Title = fileReader.Shape.FileName;
             return saveFile.FileName;
         }
 
@@ -137,6 +137,7 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
+            saveAsStep();
         }
 
         public void saveAsStep()

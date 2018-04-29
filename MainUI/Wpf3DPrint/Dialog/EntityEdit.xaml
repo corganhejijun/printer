@@ -1,0 +1,37 @@
+﻿<Window x:Class="Wpf3DPrint.Dialog.EntityEdit"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wpf3DPrint.Dialog"
+        mc:Ignorable="d"
+        Title="图形编辑" Height="453" Width="518" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="319,378,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
+        <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="414,378,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
+        <GroupBox Header="图形排样" HorizontalAlignment="Left" Height="212" Margin="10,10,0,0" VerticalAlignment="Top" Width="492">
+            <Grid>
+                <RadioButton x:Name="RadioButtonAutoArrange" Content="自动排样" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True"/>
+                <RadioButton x:Name="RadioButtonManualArrange" Content="自定义排样" HorizontalAlignment="Left" Margin="10,29,0,0" VerticalAlignment="Top" Checked="RadioButtonManualArrange_Checked" Unchecked="RadioButtonManualArrange_Unchecked"/>
+                <Label Content="X轴平移: " HorizontalAlignment="Left" Margin="27,48,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="TextBoxX" HorizontalAlignment="Left" Height="23" Margin="92,50,0,0" TextWrapping="Wrap" Text="0.000" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="LabelUnitX" Content="" HorizontalAlignment="Left" Margin="217,48,0,0" VerticalAlignment="Top"/>
+                <Label Content="Y轴平移: " HorizontalAlignment="Left" Margin="27,76,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="TextBoxY" HorizontalAlignment="Left" Height="23" Margin="92,78,0,0" TextWrapping="Wrap" Text="0.000" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="LabelUnitY" Content="" HorizontalAlignment="Left" Margin="217,76,0,0" VerticalAlignment="Top"/>
+                <Label Content="Z轴平移: " HorizontalAlignment="Left" Margin="27,106,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="TextBoxZ" HorizontalAlignment="Left" Height="23" Margin="92,106,0,0" TextWrapping="Wrap" Text="0.000" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                <Label x:Name="LabelUnitZ" Content="" HorizontalAlignment="Left" Margin="217,101,0,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="ComboBoxSelectEntity" HorizontalAlignment="Left" Margin="257,80,0,0" VerticalAlignment="Top" Width="213" IsEnabled="False"/>
+                <Label Content="请选择要操作的实体: " HorizontalAlignment="Left" Margin="257,50,0,0" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
+        <CheckBox x:Name="CheckBoxCombine" Content="合并图形" HorizontalAlignment="Left" Margin="10,227,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="CheckBox0Z" Content="模型最低点置零(Z=0)" HorizontalAlignment="Left" Margin="10,247,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="CheckBox0XY" Content="模型几何中心置零(X=0,Y=0)" HorizontalAlignment="Left" Margin="150,247,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="ButtonPreview" Content="预览" HorizontalAlignment="Left" Margin="414,335,0,0" VerticalAlignment="Top" Width="75"/>
+        <Label Content="模型间距: " HorizontalAlignment="Left" Margin="10,267,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBoxModelDistance" HorizontalAlignment="Left" Height="23" Margin="79,269,0,0" TextWrapping="Wrap" Text="5.000" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="LabelUnit" Content="" HorizontalAlignment="Left" Margin="204,269,0,0" VerticalAlignment="Top"/>
+    </Grid>
+</Window>

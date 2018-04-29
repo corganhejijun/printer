@@ -72,7 +72,6 @@
 #define EXPORT extern "C" __declspec( dllexport )
 #define MAX_SLICE_DATA_LENGTH 256
 
-typedef void(_stdcall *OnGetShape)(void* shape);
 typedef void(_stdcall *OnGetEdge)(void* shape, EdgeType type, double* data, int length);
 typedef void*(_stdcall *GetNextEdge)(EdgeType* type, int index);
 typedef void*(_stdcall *GetFaceHole)(double height, int index);
@@ -237,7 +236,7 @@ EXPORT void* ImportStl(char* theFileName) {
     return sc;
 }
 
-EXPORT bool ImportStep(char* theFileName, OnGetShape getShape)
+EXPORT void* ImportStep(char* theFileName)
 {
     STEPControl_Reader aReader;
     if (aReader.ReadFile(theFileName) != IFSelect_RetDone)
@@ -247,22 +246,22 @@ EXPORT bool ImportStep(char* theFileName, OnGetShape getShape)
     aReader.PrintCheckLoad(isFailsonly, IFSelect_ItemsByEntity);
 
     int aNbRoot = aReader.NbRootsForTransfer();
-    aReader.PrintCheckTransfer(isFailsonly, IFSelect_ItemsByEntity);
-    ofstream file("logReadStep.txt");
-    for (Standard_Integer aRootIter = 1; aRootIter <= aNbRoot; ++aRootIter)
-    {
-        aReader.TransferRoot(aRootIter);
+    ShapeContainer* singleShape = NULL;
+    if (aNbRoot > 0) {
+        aReader.PrintCheckTransfer(isFailsonly, IFSelect_ItemsByEntity);
+        ofstream file("logReadStep.txt");
+        // 可能有多个实体，只读取第一个
+        aReader.TransferRoot(1);
         int aNbShap = aReader.NbShapes();
         if (aNbShap > 0)
         {
             TopoDS_Shape shape = aReader.Shape(aNbShap);
-            ShapeContainer* singleShape = new ShapeContainer(shape);
-            getShape(singleShape);
+            singleShape = new ShapeContainer(shape);
         }
+        file.close();
     }
     aReader.ClearShapes();
-    file.close();
-    return true;
+    return singleShape;
 }
 
 EXPORT bool ImportSlice(char* fileName, OnGetEdge getEdge) {
@@ -397,7 +396,7 @@ EXPORT void* combine(ShapeContainer* shape1, ShapeContainer* shape2) {
     return new ShapeContainer(shape);
 }
 
-EXPORT void getLocatPlane(ShapeContainer* shape, OnGetShape getShape) {
+EXPORT void* getLocatPlane(ShapeContainer* shape) {
     // 获取与XY平面平行的定位面
     TopExp_Explorer explorer;
     double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
@@ -408,9 +407,10 @@ EXPORT void getLocatPlane(ShapeContainer* shape, OnGetShape getShape) {
         BRepBndLib::Add(currentFace, C);
         C.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
         if (Zmax - Zmin < 0.0001) {
-            getShape(new ShapeContainer(currentFace));
+            return new ShapeContainer(currentFace);
         }
     }
+    return NULL;
 }
 
 EXPORT bool exportStep(char* fileName, ShapeContainer** shapeList, int length) {

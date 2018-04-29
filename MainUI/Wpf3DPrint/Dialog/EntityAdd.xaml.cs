@@ -91,23 +91,6 @@ namespace Wpf3DPrint.Dialog
             }
         }
 
-        private void checkBoxManual_Checked(object sender, RoutedEventArgs e)
-        {
-            checkBoxAuto.IsChecked = !checkBoxManual.IsChecked;
-        }
-
-        private void checkBoxAuto_Checked(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                checkBoxManual.IsChecked = !checkBoxAuto.IsChecked;
-            }
-            catch
-            {
-                return;
-            }
-        }
-
         void setEntityPhase()
         {
             textBoxX.IsEnabled = false;
@@ -117,10 +100,7 @@ namespace Wpf3DPrint.Dialog
             checkBoxCenter.IsEnabled = false;
             CheckBoxCustomPos.IsEnabled = false;
             buttonAdd.IsEnabled = true;
-            checkBoxAuto.IsEnabled = false;
-            checkBoxManual.IsEnabled = false;
             checkBoxCombine.IsEnabled = false;
-            checkBoxUncombine.IsEnabled = false;
             phase = Phase.Entity;
         }
 
@@ -143,10 +123,7 @@ namespace Wpf3DPrint.Dialog
         {
             checkBoxCenter.IsEnabled = false;
             buttonAdd.IsEnabled = false;
-            checkBoxAuto.IsEnabled = true;
-            checkBoxManual.IsEnabled = true;
             checkBoxCombine.IsEnabled = true;
-            checkBoxUncombine.IsEnabled = true;
             phase = Phase.Edit;
         }
 
@@ -196,10 +173,6 @@ namespace Wpf3DPrint.Dialog
                 return;
             string path = dialog.FileName;
             labelAdd.Content = path;
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
         }
 
         private void buttonPrev_Click(object sender, RoutedEventArgs e)

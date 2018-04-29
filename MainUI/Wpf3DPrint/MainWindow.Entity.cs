@@ -192,7 +192,12 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-
+            Dialog.EntityEdit entityEdit = new Dialog.EntityEdit(unit, fileReader.Shape);
+            entityEdit.Owner = this;
+            if (entityEdit.ShowDialog() == false)
+            {
+                return;
+            }
         }
     }
 }

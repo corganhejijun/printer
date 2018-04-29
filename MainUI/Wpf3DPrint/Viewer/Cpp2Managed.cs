@@ -103,7 +103,6 @@ namespace Wpf3DPrint.Viewer
 
         public class Shape3D
         {
-            public delegate void OnGetShape(IntPtr shape);
             public delegate void OnGetEdge(IntPtr shape, EdgeType type, [MarshalAs(UnmanagedType.LPArray, SizeConst = 256)]double[] data, int length);
             public delegate IntPtr GetNextEdge(ref EdgeType type, int index);
             public delegate IntPtr GetFaceHole(double height, int index);
@@ -112,7 +111,7 @@ namespace Wpf3DPrint.Viewer
             public static extern IntPtr ImportStl(IntPtr theFileName);
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern bool ImportStep(IntPtr theFileName, OnGetShape getShape);
+            public static extern IntPtr ImportStep(IntPtr theFileName);
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern bool ImportSlice(IntPtr theFileName, OnGetEdge getEdge);
@@ -142,7 +141,7 @@ namespace Wpf3DPrint.Viewer
             public static extern IntPtr combine(IntPtr shape1, IntPtr shape2);
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void getLocatPlane(IntPtr shape, OnGetShape getShape);
+            public static extern IntPtr getLocatPlane(IntPtr shape);
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern bool exportStep(IntPtr fileName, IntPtr[] shapeList, int length);
