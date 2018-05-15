@@ -20,14 +20,12 @@
                 <MenuItem x:Name="menuSaveAs" Header="实体另存为..." Click="buttonSaveAs_Click"></MenuItem>
                 <MenuItem x:Name="menuOpenSlice" Header="导入切片..." Click="buttonOpenSlice_Click"></MenuItem>
                 <MenuItem x:Name="menuSaveSlice" Header="导出切片..." Click="buttonSaveSlice_Click"></MenuItem>
-                <MenuItem x:Name="menuDxfSlice" Header="导出快速成型文件..." Click="buttonSaveDxf_Click"></MenuItem>
                 <MenuItem x:Name="menuCloseFile" Header="关闭" Click="buttonClose_Click"></MenuItem>
                 <MenuItem x:Name="menuQuit" Header="退出" Click="buttonQuit_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="编辑" Width="48">
+                <MenuItem x:Name="menuUndo" Header="撤销" IsEnabled="False" Click="menuUndo_Click"></MenuItem>
                 <MenuItem x:Name="menuUnselect" Header="取消选择" Click="menuUnselect_Click"></MenuItem>
-                <MenuItem Header="图形最低点z轴置零" x:Name="menuBase0" Click="menuBase0_Click"></MenuItem>
-                <MenuItem Header="图形xy轴几何中心置零" x:Name="menuBase0xy" Click="menuBase0xy_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="图形" Width="48">
                 <MenuItem x:Name="menuEntityProp" Header="实体属性..." Click="menuEntityProp_Click"></MenuItem>
@@ -36,6 +34,8 @@
                 <MenuItem x:Name="menuEntityAdd" Header="添加实体..." Click="menuEntityAdd_Click"></MenuItem>
                 <MenuItem x:Name="menuEntityEdit" Header="图形编辑..." Click="menuEntityEdit_Click"></MenuItem>
                 <MenuItem x:Name="menuEntityMerge" Header="图形合并" Click="menuEntityMerge_Click"></MenuItem>
+                <MenuItem Header="图形最低点z轴置零" x:Name="menuBase0" Click="menuBase0_Click"></MenuItem>
+                <MenuItem Header="图形xy轴几何中心置零" x:Name="menuBase0xy" Click="menuBase0xy_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="分层" Width="48">
                 <MenuItem x:Name="menuSlice" Header="实体分层..." Click="buttonSlice_Click"></MenuItem>
@@ -70,12 +70,6 @@
                         <StackPanel Orientation="Horizontal">
                             <Image Source="images/Slice.ico" Width="16"></Image>
                             <TextBlock Margin="5,0,0,0">切片</TextBlock>
-                        </StackPanel>
-                    </Button>
-                    <Button ToolTip="导出快速成型文件" x:Name="exportRp" Click="buttonSaveDxf_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="images/RP.png" Width="16"></Image>
-                            <TextBlock Margin="5,0,0,0">导出快速成型文件</TextBlock>
                         </StackPanel>
                     </Button>
                     <Button ToolTip="旋转" x:Name="ButtonRotate" Click="menuRotate_Click">
@@ -155,7 +149,9 @@
                 </Grid>
                 <GridSplitter x:Name="treeViewSplitter" Width="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
                 <Border BorderBrush="Black" BorderThickness="1" Grid.Column="3">
-                    <Grid x:Name="GridScene" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel" MouseUp="GridScene_MouseUp" Cursor="Arrow"></Grid>
+                    <Grid x:Name="GridScene" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel" MouseUp="GridScene_MouseUp" Cursor="Arrow">
+                        <Button Content="x" VerticalAlignment="Top" Background="#FFFF8C8C" HorizontalAlignment="Right" Width="18"/>
+                    </Grid>
                 </Border>
                 <GridSplitter x:Name="sliceSplitter" Width="0" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
                 <Border Grid.Column="5" BorderBrush="Black" BorderThickness="1">
@@ -168,8 +164,11 @@
                             <WindowsFormsHost Margin="0,0,0,0" Panel.ZIndex="-1">
                                 <WinForms:Panel x:Name="PanelSlice" BackColor="White" Resize="PanelSlice_Resize" Margin="50,50,50,50" Paint="PanelSlice_Paint"></WinForms:Panel>
                             </WindowsFormsHost>
+                            <Button Content="x" VerticalAlignment="Top" Background="#FFFF8C8C" HorizontalAlignment="Right" Width="18"/>
                         </Grid>
-                        <Grid x:Name="GridSlice3D" Grid.Column="1" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel"></Grid>
+                        <Grid x:Name="GridSlice3D" Grid.Column="1" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel">
+                            <Button Content="x" VerticalAlignment="Top" Background="#FFFF8C8C" HorizontalAlignment="Right" Width="18"/>
+                        </Grid>
                     </Grid>
                 </Border>
             </Grid>

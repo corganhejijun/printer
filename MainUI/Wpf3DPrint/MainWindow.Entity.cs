@@ -29,13 +29,13 @@ namespace Wpf3DPrint
             if (rotate.ShowDialog() == false)
                 fileReader.Shape.releaseTransform();
             else
+            {
                 fileReader.Shape.applyTransform();
+                if (MessageBox.Show("是否保存当前实体？", "提醒", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                    saveAsStep();
+            }
             scene.displayAfterTransform(fileReader.Shape.getShape());
             scene.displayShape(fileReader.Shape.getMoreShape());
-            if (MessageBox.Show("是否保存当前实体？", "提醒", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-            {
-                saveAsStep();
-            }
         }
 
         void rotatePreview(double xAngle, double yAngle, double zAngle)
@@ -169,13 +169,13 @@ namespace Wpf3DPrint
             if (pan.ShowDialog() == false)
                 fileReader.Shape.releaseTransform();
             else
+            {
                 fileReader.Shape.applyTransform();
+                if (MessageBox.Show("是否保存当前实体？", "提醒", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                    saveAsStep();
+            }
             scene.displayAfterTransform(fileReader.Shape.getShape());
             scene.displayShape(fileReader.Shape.getMoreShape());
-            if (MessageBox.Show("是否保存当前实体？", "提醒", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-            {
-                saveAsStep();
-            }
         }
 
         void movePreview(double x, double y, double z)
@@ -198,6 +198,11 @@ namespace Wpf3DPrint
             {
                 return;
             }
+        }
+
+        private void menuUndo_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -116,7 +116,7 @@ public:
         gp_Ax3 ax3(axPt, axDir);
         myViewer()->SetPrivilegedPlane(ax3);
         myViewer()->SetRectangularGridValues(0, 0, 3, 3, 0);
-        myViewer()->SetRectangularGridGraphicValues(50, 50, 0);
+        myViewer()->SetRectangularGridGraphicValues(3, 3, 0);
         myViewer()->ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines);
         myView()->Zoom(0, 0, 800, 0);
         return true;

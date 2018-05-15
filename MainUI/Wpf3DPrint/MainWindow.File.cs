@@ -180,7 +180,8 @@ namespace Wpf3DPrint
         {
             scene.Proxy.cleanScene();
             slicingScene.Proxy.cleanScene();
-            sliceScene.clearWindow();
+            scene.Proxy.AxoView();
+            slicingScene.Proxy.AxoView();
             TreeViewSlice.Items.Clear();
             fileReader.Shape.release();
             set3DView();

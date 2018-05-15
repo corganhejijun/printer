@@ -44,10 +44,6 @@ namespace Wpf3DPrint.Viewer
             return (m_top - y) * m_scale + PAINT_MARGIN;
         }
 
-        public void clearWindow()
-        {
-        }
-
         public void drawSlice(PaintEventArgs e, Slice.OneSlice slice)
         {
             Graphics g = e.Graphics;
