@@ -36,6 +36,16 @@ namespace Wpf3DPrint
             dlgEntityAdd = null;
             Dialog.About about = new Dialog.About();
             this.Title += "  " + about.Version;
+
+            System.Windows.Forms.Button button = new System.Windows.Forms.Button();
+            button.Text = "x";
+            button.Anchor = (System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Top);
+            button.BackColor = System.Drawing.Color.FromArgb(0xFF, 0xFF, 0x8C, 0x8C);
+            button.Width = 18;
+            button.Height = 18;
+            button.Location = new System.Drawing.Point(182, 0);
+            button.Click += buttonCloseSlice2D_Click;
+            PanelSlice.Controls.Add(button);
         }
 
         private void buttonSlice_Click(object sender, RoutedEventArgs e)

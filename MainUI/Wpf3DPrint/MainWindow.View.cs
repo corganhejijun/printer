@@ -255,5 +255,22 @@ namespace Wpf3DPrint
             if (false == dspSetDlg.ShowDialog())
                 return;
         }
+
+        private void buttonCloseSlice3D_Click(object sender, RoutedEventArgs e)
+        {
+            columnSlice3D.Width = new GridLength(0, GridUnitType.Star);
+            column2D.Width = new GridLength(0, GridUnitType.Star);
+        }
+
+        private void buttonCloseSlice2D_Click(object sender, EventArgs e)
+        {
+            columnSlice2D.Width = new GridLength(0, GridUnitType.Star);
+            column2D.Width = new GridLength(0, GridUnitType.Star);
+        }
+
+        private void buttonCloseScene_Click(object sender, RoutedEventArgs e)
+        {
+            column3D.Width = new GridLength(0, GridUnitType.Star);
+        }
     }
 }

@@ -150,7 +150,7 @@
                 <GridSplitter x:Name="treeViewSplitter" Width="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
                 <Border BorderBrush="Black" BorderThickness="1" Grid.Column="3">
                     <Grid x:Name="GridScene" Background="AliceBlue" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel" MouseUp="GridScene_MouseUp" Cursor="Arrow">
-                        <Button Content="x" VerticalAlignment="Top" Background="#FFFF8C8C" HorizontalAlignment="Right" Width="18"/>
+                        <Button x:Name="buttonCloseScene" Content="x" VerticalAlignment="Top" Background="#FFFF8C8C" HorizontalAlignment="Right" Width="18" Click="buttonCloseScene_Click"/>
                     </Grid>
                 </Border>
                 <GridSplitter x:Name="sliceSplitter" Width="0" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True"/>
@@ -164,10 +164,9 @@
                             <WindowsFormsHost Margin="0,0,0,0" Panel.ZIndex="-1">
                                 <WinForms:Panel x:Name="PanelSlice" BackColor="White" Resize="PanelSlice_Resize" Margin="50,50,50,50" Paint="PanelSlice_Paint"></WinForms:Panel>
                             </WindowsFormsHost>
-                            <Button Content="x" VerticalAlignment="Top" Background="#FFFF8C8C" HorizontalAlignment="Right" Width="18"/>
                         </Grid>
                         <Grid x:Name="GridSlice3D" Grid.Column="1" SizeChanged="GridScene_SizeChanged" MouseLeftButtonDown="GridScene_MouseLeftButtonDown" MouseLeftButtonUp="GridScene_MouseLeftButtonUp" MouseMove="GridScene_MouseMove" MouseLeave="GridScene_MouseLeave" MouseWheel="GridScene_MouseWheel">
-                            <Button Content="x" VerticalAlignment="Top" Background="#FFFF8C8C" HorizontalAlignment="Right" Width="18"/>
+                            <Button x:Name="buttonCloseSlice3D" Content="x" VerticalAlignment="Top" Background="#FFFF8C8C" HorizontalAlignment="Right" Width="18" Click="buttonCloseSlice3D_Click"/>
                         </Grid>
                     </Grid>
                 </Border>
