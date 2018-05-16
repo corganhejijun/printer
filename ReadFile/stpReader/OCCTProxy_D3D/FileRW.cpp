@@ -426,7 +426,10 @@ EXPORT bool exportStep(char* fileName, ShapeContainer** shapeList, int length) {
     return aWriter.Write(fileName) == IFSelect_RetDone;
 }
 
-EXPORT bool exportStl(char* fileName, ShapeContainer** shapeList, int length) {
+EXPORT bool exportStl(char* fileName, ShapeContainer* shapeList) {
+    StlAPI_Writer STLwriter;
+    TopoDS_Shape shape = shapeList->getShape();
+    STLwriter.Write(shape, fileName);
     return true;
 }
 

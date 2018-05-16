@@ -182,7 +182,15 @@ namespace Wpf3DPrint.Viewer
             IntPtr[] shapeList = new IntPtr[1];
             shapeList[0] = shape.getShape();
             Cpp2Managed.Shape3D.exportStep(fileName, shapeList, 1);
+            Marshal.FreeHGlobal(fileName);
             shape.saveAs(path);
+        }
+
+        public void saveStl(string path)
+        {
+            IntPtr fileName = NativeUtf8FromString(path);
+            Cpp2Managed.Shape3D.exportStl(fileName, shape.getShape());
+            Marshal.FreeHGlobal(fileName);
         }
 
         public void sliceShape(Control control, bool locatePlane, bool gradientShape, bool noDelay, SceneThread.afterFunction afterSlice, SceneThread.onFunction onSlice)

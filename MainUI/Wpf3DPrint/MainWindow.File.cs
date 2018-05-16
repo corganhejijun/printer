@@ -149,6 +149,7 @@ namespace Wpf3DPrint
             }
             else if (saveFile.FileName.EndsWith(".stl"))
             {
+                fileReader.saveStl(saveFile.FileName);
             }
         }
 

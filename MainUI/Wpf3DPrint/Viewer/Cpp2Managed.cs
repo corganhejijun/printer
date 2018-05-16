@@ -147,6 +147,9 @@ namespace Wpf3DPrint.Viewer
             public static extern bool exportStep(IntPtr fileName, IntPtr[] shapeList, int length);
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern bool exportStl(IntPtr fileName, IntPtr shape);
+
+            [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr ImportDxf(IntPtr fileName);
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
