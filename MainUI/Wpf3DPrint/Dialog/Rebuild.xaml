@@ -9,9 +9,6 @@
     <Grid>
         <Button x:Name="buttonCancel" Content="取消" HorizontalAlignment="Left" Margin="209,246,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
         <Button x:Name="buttonOK" Content="确定" HorizontalAlignment="Left" Margin="120,246,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="buttonOK_Click"/>
-        <CheckBox x:Name="checkBox_Copy" Content="样条" HorizontalAlignment="Left" Margin="97,16,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="checkBox_Copy1" Content="椭圆" HorizontalAlignment="Left" Margin="154,16,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label" Content="炸开曲线：" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <GroupBox Header="生成多义线" Margin="0,40,0,172">
             <Grid>
                 <Label x:Name="label2" Content="最短直线" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
@@ -22,8 +19,8 @@
         </GroupBox>
         <GroupBox Header="线段检查" Margin="0,143,0,106">
             <Grid>
-                <CheckBox x:Name="checkBox_Copy3" Content="多于两点共有端点" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                <CheckBox x:Name="checkBox_Copy4" Content="原始封闭曲线自相交" HorizontalAlignment="Left" Margin="144,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.374,1.994"/>
+                <CheckBox x:Name="checkBox_Copy3" Content="多于两点共有端点" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True"/>
+                <CheckBox x:Name="checkBox_Copy4" Content="原始封闭曲线自相交" HorizontalAlignment="Left" Margin="144,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.374,1.994" IsChecked="True"/>
             </Grid>
         </GroupBox>
         <CheckBox x:Name="checkBox_Copy5" Content="生成区域(整体)" HorizontalAlignment="Left" Margin="10,221,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.374,1.994"/>
