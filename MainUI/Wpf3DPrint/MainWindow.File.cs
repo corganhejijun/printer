@@ -137,7 +137,19 @@ namespace Wpf3DPrint
                 MessageBox.Show("未打开3D文件");
                 return;
             }
-            saveAsStep();
+            SaveFileDialog saveFile = new SaveFileDialog();
+            saveFile.FileName = "model";
+            saveFile.DefaultExt = "step";
+            saveFile.Filter = "Step file (*.step)|*.step|STL file (*.stl)|*.stl";
+            if (false == saveFile.ShowDialog(this))
+                return;
+            if (saveFile.FileName.EndsWith(".step"))
+            {
+                fileReader.saveStep(saveFile.FileName);
+            }
+            else if (saveFile.FileName.EndsWith(".stl"))
+            {
+            }
         }
 
         public void saveAsStep()

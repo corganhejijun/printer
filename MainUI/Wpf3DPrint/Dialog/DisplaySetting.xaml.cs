@@ -1,6 +1,6 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Forms;
 
 namespace Wpf3DPrint.Dialog
 {
@@ -28,23 +28,67 @@ namespace Wpf3DPrint.Dialog
 
         public Color EntityColor
         {
-            get {
+            get
+            {
                 return entityColor;
+            }
+        }
+
+        public Color LineColor
+        {
+            get
+            {
+                return lineColor;
+            }
+        }
+
+        public Color SelectEntityColor
+        {
+            get
+            {
+                return selectEntityColor;
+            }
+        }
+
+        public Color SelectLineColor
+        {
+            get
+            {
+                return selectLineColor;
             }
         }
 
         private void button_OK_Click(object sender, RoutedEventArgs e)
         {
-
+            this.DialogResult = true;
         }
 
         private void buttonEntityColor_Click(object sender, RoutedEventArgs e)
         {
-            ColorDialog clDlg = new ColorDialog();
+            System.Windows.Forms.ColorDialog clDlg = new System.Windows.Forms.ColorDialog();
             if (clDlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 return;
-            entityColor = Color.FromArgb(255, clDlg.Color.R, clDlg.Color.G, clDlg.Color.B);
-            setTextBoxEntityColor();
+            Button btn = (Button)sender;
+            if (btn.Name.Equals(buttonEntityColor.Name))
+            {
+                entityColor = Color.FromArgb(255, clDlg.Color.R, clDlg.Color.G, clDlg.Color.B);
+                setTextBoxEntityColor();
+            }
+            else if (btn.Name.Equals(buttonLineColor.Name))
+            {
+                lineColor = Color.FromArgb(255, clDlg.Color.R, clDlg.Color.G, clDlg.Color.B);
+                setTextBoxLineColor();
+            }
+            else if (btn.Name.Equals(buttonEntitySelectColor.Name))
+            {
+                selectEntityColor = Color.FromArgb(255, clDlg.Color.R, clDlg.Color.G, clDlg.Color.B);
+                setTextBoxSelectEntityColor();
+            }
+            else if (btn.Name.Equals(buttonLineSelectColor.Name))
+            {
+                selectLineColor = Color.FromArgb(255, clDlg.Color.R, clDlg.Color.G, clDlg.Color.B);
+                setTextBoxSelectLineColor();
+            }
         }
 
         void setTextBoxEntityColor()

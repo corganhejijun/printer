@@ -254,6 +254,10 @@ namespace Wpf3DPrint
             Dialog.DisplaySetting dspSetDlg = new Dialog.DisplaySetting(scene.Setting);
             if (false == dspSetDlg.ShowDialog())
                 return;
+            scene.Setting.entityColor = dspSetDlg.EntityColor;
+            scene.Setting.lineColor = dspSetDlg.LineColor;
+            scene.Setting.selectEntityColor = dspSetDlg.SelectEntityColor;
+            scene.Setting.selectLineColor = dspSetDlg.SelectLineColor;
         }
 
         private void buttonCloseSlice3D_Click(object sender, RoutedEventArgs e)

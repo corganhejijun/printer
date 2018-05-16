@@ -426,6 +426,10 @@ EXPORT bool exportStep(char* fileName, ShapeContainer** shapeList, int length) {
     return aWriter.Write(fileName) == IFSelect_RetDone;
 }
 
+EXPORT bool exportStl(char* fileName, ShapeContainer** shapeList, int length) {
+    return true;
+}
+
 TopoDS_Edge getBspline(void* data, double height) {
     BSpline* bs = (BSpline*)data;
     TColgp_Array1OfPnt array1(1, bs->polesCnt);
@@ -481,8 +485,6 @@ EXPORT void* slice2Wires(double height, GetNextEdge onGetEdge, int edgeCount) {
         default:continue;
         }
     }
-    //Handle(TopTools_HSequenceOfShape) wires = new TopTools_HSequenceOfShape();
-    //ShapeAnalysis_FreeBounds::ConnectEdgesToWires(edges, Precision::Confusion(), Standard_False, wires);
     SequenceContainer* sqContainer = new SequenceContainer(edges);
     return sqContainer;
 }

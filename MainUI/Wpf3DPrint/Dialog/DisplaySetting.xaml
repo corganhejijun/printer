@@ -14,9 +14,9 @@
         <TextBox x:Name="textBoxLineColor" HorizontalAlignment="Left" Height="23" Margin="10,43,0,0" TextWrapping="Wrap" Text="(255, 0, 0)" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
         <Button x:Name="buttonLineColor" Content="线框颜色..." HorizontalAlignment="Left" Margin="135,43,0,0" VerticalAlignment="Top" Width="75" Click="buttonEntityColor_Click"/>
         <TextBox x:Name="textBoxSelectEntityColor" HorizontalAlignment="Left" Height="23" Margin="10,77,0,0" TextWrapping="Wrap" Text="(156, 156, 156)" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
-        <Button x:Name="buttonEntityColor_Copy" Content="3D实体选中颜色..." HorizontalAlignment="Left" Margin="135,77,0,0" VerticalAlignment="Top" Width="121" Click="buttonEntityColor_Click"/>
+        <Button x:Name="buttonEntitySelectColor" Content="3D实体选中颜色..." HorizontalAlignment="Left" Margin="135,77,0,0" VerticalAlignment="Top" Width="121" Click="buttonEntityColor_Click"/>
         <TextBox x:Name="textBoxSelectLineColor" HorizontalAlignment="Left" Height="23" Margin="10,110,0,0" TextWrapping="Wrap" Text="(255, 0, 0)" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
-        <Button x:Name="buttonLineColor_Copy" Content="线框选中颜色..." HorizontalAlignment="Left" Margin="135,110,0,0" VerticalAlignment="Top" Width="121" Click="buttonEntityColor_Click"/>
+        <Button x:Name="buttonLineSelectColor" Content="线框选中颜色..." HorizontalAlignment="Left" Margin="135,110,0,0" VerticalAlignment="Top" Width="121" Click="buttonEntityColor_Click"/>
 
     </Grid>
 </Window>
