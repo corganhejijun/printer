@@ -58,9 +58,10 @@ namespace Wpf3DPrint.Viewer
             IntPtr hWnd;
             IntPtr d3DDevice;
             d3DRender = Direct3DProxy.InitRender(out hWnd, out d3DDevice);
-            if (!occtProxy.InitViewer(hWnd, d3DDevice))
+            int result = occtProxy.InitViewer(hWnd, d3DDevice);
+            if (result < 0)
             {
-                MessageBox.Show("Device init failed!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Device init failed! result code is " + result, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 deviceInitFail = true;
                 if (d3DRender != IntPtr.Zero)
                     Direct3DProxy.ReleaseRender(ref d3DRender);
