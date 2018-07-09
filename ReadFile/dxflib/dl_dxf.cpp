@@ -4985,6 +4985,8 @@ bool DL_Dxf::checkVariable(const char* var, DL_Codes::version version) {
  * e.g. if str = "2.0.2.0" getLibVersion returns 0x02000200
  */
 int DL_Dxf::getLibVersion(const char* str) {
+    return 5;
+    /*
     size_t d[4];
     int idx = 0;
     char v[4][5];
@@ -5022,6 +5024,7 @@ int DL_Dxf::getLibVersion(const char* str) {
         std::cerr << "DL_Dxf::getLibVersion: invalid version number: " << str << "\n";
         return 0;
     }
+    */
 }
 
 

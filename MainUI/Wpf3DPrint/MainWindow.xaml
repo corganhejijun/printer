@@ -19,7 +19,10 @@
                 <MenuItem x:Name="menuOpenFile" Header="打开..." Click="buttonOpen_Click"></MenuItem>
                 <MenuItem x:Name="menuSaveAs" Header="实体另存为..." Click="buttonSaveAs_Click"></MenuItem>
                 <MenuItem x:Name="menuOpenSlice" Header="导入切片..." Click="buttonOpenSlice_Click"></MenuItem>
-                <MenuItem x:Name="menuSaveSlice" Header="导出切片..." Click="buttonSaveSlice_Click"></MenuItem>
+                <MenuItem Header="导出">
+                    <MenuItem x:Name="menuSaveSlice" Header="导出SLC文件..." Click="buttonSaveSlice_Click"></MenuItem>
+                    <MenuItem x:Name="menuSaveDxfSlice" Header="导出DXF文件..." Click="buttonSaveDxf_Click"></MenuItem>
+                </MenuItem>
                 <MenuItem x:Name="menuCloseFile" Header="关闭" Click="buttonClose_Click"></MenuItem>
                 <MenuItem x:Name="menuQuit" Header="退出" Click="buttonQuit_Click"></MenuItem>
             </MenuItem>

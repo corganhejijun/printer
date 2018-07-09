@@ -1,6 +1,7 @@
 #include "BridgeFBO.hxx"
 #include "slice.h"
 #include "DxfReader.h"
+#include "DxfWriter.h"
 
 // include required OCCT headers
 #include <Standard_Version.hxx>
@@ -431,6 +432,32 @@ EXPORT bool exportStl(char* fileName, ShapeContainer* shapeList) {
     TopoDS_Shape shape = shapeList->getShape();
     STLwriter.Write(shape, fileName);
     return true;
+}
+
+EXPORT void* exportDxfBegin(wchar_t* fileName) {
+    DxfWriter* writer = new DxfWriter(fileName);
+    writer->writeHead();
+    return writer;
+}
+
+EXPORT void exportDxfEnd(void* writerPt) {
+    DxfWriter* writer = (DxfWriter*)writerPt;
+    writer->writeEnd();
+}
+
+EXPORT void writeDxfLine(void* writerPt, double beginX, double beginY, double endX, double endY, double z) {
+    DxfWriter* writer = (DxfWriter*)writerPt;
+    writer->writeLine(beginX, beginY, z, endX, endY, z);
+}
+
+EXPORT void writeDxfCircle(void* writerPt, double x, double y, double z, double r, int normal) {
+    DxfWriter* writer = (DxfWriter*)writerPt;
+    writer->writeCircle(x, y, z, r, normal);
+}
+
+EXPORT void writerDxfArc(void* writerPt, double x, double y, double z, double r, double startAngle, double endAngle, int normal) {
+    DxfWriter* writer = (DxfWriter*)writerPt;
+    writer->writeArc(x, y, z, r, startAngle, endAngle, normal);
 }
 
 TopoDS_Edge getBspline(void* data, double height) {

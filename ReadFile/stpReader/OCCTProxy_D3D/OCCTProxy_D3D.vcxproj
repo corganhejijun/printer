@@ -213,12 +213,14 @@
     <ClCompile Include="BridgeFBO.cxx" />
     <ClCompile Include="Direct3DProxy.cpp" />
     <ClCompile Include="DxfReader.cpp" />
+    <ClCompile Include="DxfWriter.cpp" />
     <ClCompile Include="FileRW.cpp" />
     <ClCompile Include="OCCTProxyD3D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BridgeFBO.hxx" />
     <ClInclude Include="DxfReader.h" />
+    <ClInclude Include="DxfWriter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

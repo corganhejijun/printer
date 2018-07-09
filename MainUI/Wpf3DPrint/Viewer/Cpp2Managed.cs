@@ -160,6 +160,21 @@ namespace Wpf3DPrint.Viewer
 
             [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr makeFaceFromWire(IntPtr wire, double height, int childCnt, GetFaceHole getHole);
+
+            [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr exportDxfBegin(IntPtr fileName);
+
+            [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void exportDxfEnd(IntPtr writer);
+
+            [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void writeDxfLine(IntPtr writer, double startX, double startY, double endX, double endY, double z);
+
+            [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void writeDxfCircle(IntPtr writer, double x, double y, double z, double r, int normal);
+
+            [DllImport("OCCTProxy_D3D.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void writerDxfArc(IntPtr writer, double x, double y, double z, double r, double startAngle, double endAngle, int normal);
         }
     }
 }

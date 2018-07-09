@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using Wpf3DPrint.Viewer;
 
@@ -15,11 +16,17 @@ namespace Wpf3DPrint
         FileStream fileStream;
         StreamWriter __file;
         Shape __shape;
+        string __fileName;
         public DxfWriter(string fileName, Shape shape)
         {
-            fileStream = new FileStream(fileName, FileMode.OpenOrCreate);
-            __file = new StreamWriter(fileStream, Encoding.UTF8);
+            __fileName = fileName;
             __shape = shape;
+        }
+
+        public void openFile()
+        {
+            fileStream = new FileStream(__fileName, FileMode.OpenOrCreate);
+            __file = new StreamWriter(fileStream, Encoding.UTF8);
         }
 
         void writeMinMax(double minX, double minY, double minZ, double maxX, double maxY, double maxZ)
@@ -47,6 +54,73 @@ namespace Wpf3DPrint
             __file.WriteLine(Math.Round(maxZ, 4).ToString());
             __file.WriteLine("  0");
             __file.WriteLine("ENDSEC");
+        }
+
+        public void exportDxfSlice()
+        {
+            IntPtr fileNameSpace = FileReader.NativeUnicodeFromString(__fileName);
+            IntPtr writer = Cpp2Managed.Shape3D.exportDxfBegin(fileNameSpace);
+            Marshal.FreeHGlobal(fileNameSpace);
+
+            foreach (Slice.OneSlice slice in __shape.slice.sliceList)
+            {
+                foreach (object data in slice.data)
+                {
+                    if (data is Cpp2Managed.Circle)
+                    {
+                        Cpp2Managed.Circle circle = (Cpp2Managed.Circle)data;
+                        if (IsTwoPi(Math.Abs(circle.endAngle - circle.startAngle)))
+                        {
+                            Cpp2Managed.Shape3D.writeDxfCircle(writer, TrimZero(circle.center.x), TrimZero(circle.center.y), TrimZero(slice.height), TrimZero(circle.radius), 1);
+                        }
+                        else
+                            Cpp2Managed.Shape3D.writerDxfArc(writer, circle.center.x, circle.center.y, slice.height, circle.radius, circle.startAngle, circle.endAngle, 1);
+                    }
+                    else if (data is Cpp2Managed.Line)
+                    {
+                        Cpp2Managed.Line line = (Cpp2Managed.Line)data;
+                        Cpp2Managed.Shape3D.writeDxfLine(writer, line.start.x, line.start.y, line.end.x, line.end.y, slice.height);
+                    }
+                    else if (data is Cpp2Managed.BSpline)
+                    {
+                        Cpp2Managed.BSpline bs = (Cpp2Managed.BSpline)data;
+                        exportDxfBSplice(writer, bs.poles, bs.start.x, bs.start.y, slice.height, bs.end.x, bs.end.y);
+                    }
+                }
+            }
+
+
+            Cpp2Managed.Shape3D.exportDxfEnd(writer);
+        }
+
+
+        void exportDxfBSplice(IntPtr writer, Cpp2Managed.Point[] polesList, double startX, double startY, double z, double endX, double endY)
+        {
+            ArrayList xList = new ArrayList();
+            ArrayList yList = new ArrayList();
+            xList.Add(startX);
+            yList.Add(startY);
+            foreach (Cpp2Managed.Point pole in polesList)
+            {
+                xList.Add(pole.x);
+                yList.Add(pole.y);
+            }
+            xList.Add(endX);
+            yList.Add(endY);
+            for (int i = 1; i < xList.Count - 1; i++)
+            {
+                if (getDistance((double)xList[i - 1], (double)yList[i - 1], (double)xList[i], (double)yList[i], (double)xList[i + 1], (double)yList[i + 1]) < 0.001)
+                {
+                    xList.RemoveAt(i);
+                    yList.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+            }
+            for (int i = 1; i < xList.Count; i++)
+            {
+                Cpp2Managed.Shape3D.writeDxfLine(writer, (double)xList[i - 1], (double)yList[i - 1], (double)xList[i], (double)yList[i], z);
+            }
         }
 
         public void writeSlice()
@@ -215,9 +289,13 @@ namespace Wpf3DPrint
             __file.WriteLine(Math.Round(yEnd, 4).ToString());
         }
 
-        public void Dispose()
+        public void fileClose()
         {
             __file.Close();
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

@@ -1,4 +1,3 @@
-#include "DxfReader.h"
 /*
 *    Copyright (c) 2013 eryar All Rights Reserved.
 *
