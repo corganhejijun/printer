@@ -123,11 +123,11 @@ public:
     }
 
     /// <summary> Initializes OCCT viewer for OpenGL-Direct3D interoperability. </summary>
-    bool InitViewer(System::IntPtr theHWND, System::IntPtr theD3DDevice)
+    int InitViewer(System::IntPtr theHWND, System::IntPtr theD3DDevice)
     {
         if (!InitViewer(theHWND))
         {
-            return false;
+            return -1;
         }
 
         Graphic3d_CView*       aCView = reinterpret_cast<Graphic3d_CView*> (myView()->View()->CView());
@@ -135,7 +135,7 @@ public:
         Handle(OpenGl_Context) aGlContext = aCViewGl->WS->GetGlContext();
         if (aGlContext.IsNull())
         {
-            return false;
+            return -2;
         }
         if (!aGlContext->IsCurrent())
         {
@@ -145,11 +145,11 @@ public:
         myBridgeFBO = new BridgeFBO();
         if (!myBridgeFBO->Init(aGlContext, theD3DDevice.ToPointer()))
         {
-            return false;
+            return -3;
         }
 
         aCView->ptrFBO = myBridgeFBO;
-        return true;
+        return 1;
     }
 
     /// <summary> Resizes custom FBO for Direct3D output. </summary>
