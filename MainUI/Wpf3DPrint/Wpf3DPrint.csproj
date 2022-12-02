@@ -259,12 +259,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ReadFile\stpReader\OCCTProxy_D3D\OCCTProxy_D3D.vcxproj">
-      <Project>{969912d9-78e7-4ab8-b4ff-6b52b4f03991}</Project>
-      <Name>OCCTProxy_D3D</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
